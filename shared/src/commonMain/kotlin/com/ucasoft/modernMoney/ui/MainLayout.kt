@@ -1,0 +1,92 @@
+package com.ucasoft.modernMoney.ui
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.ucasoft.modernMoney.Screen
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainLayout(screens: List<Screen>) {
+
+    val navController = rememberNavController()
+
+    val currentDestination by navController.currentBackStackEntryFlow.collectAsState(null)
+
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            screens.map {
+                item(
+                    icon = {
+                        Icon(
+                            it.icon,
+                            it.title
+                        )
+                    },
+                    label = {
+                        Text(it.title)
+                    },
+                    selected = currentDestination?.destination?.route == it.title,
+                    onClick = { navController.navigate(it.title) }
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    modifier = Modifier.padding(8.dp),
+                    title = {
+                        OutlinedTextField(
+                            onValueChange = {},
+                            value = ""
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                Icons.Rounded.AccountCircle,
+                                "Account"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                Icons.Rounded.Settings,
+                                "Settings"
+                            )
+                        }
+                    }
+                )
+            }
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = "Accounts",
+                modifier = Modifier.padding(top = it.calculateTopPadding())
+            ) {
+                screens.map { screen ->
+                    composable(screen.title) {
+                        screen.content()
+                    }
+                }
+            }
+        }
+    }
+}

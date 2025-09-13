@@ -5,7 +5,6 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(21)
     androidTarget()
     sourceSets {
         val commonMain by getting {
