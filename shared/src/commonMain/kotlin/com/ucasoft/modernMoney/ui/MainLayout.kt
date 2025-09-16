@@ -3,7 +3,9 @@ package com.ucasoft.modernMoney.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.ucasoft.modernMoney.Screen
 
@@ -24,9 +27,9 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
     val currentDestination by navController.currentBackStackEntryFlow.collectAsState(null)
 
     NavigationSuiteScaffold(
-        navigationSuiteItems = {
+        navigationItems = {
             screens.map {
-                item(
+                NavigationSuiteItem(
                     icon = {
                         Icon(
                             it.icon,
@@ -38,6 +41,17 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                     },
                     selected = currentDestination?.destination?.route == it.title,
                     onClick = { navController.navigate(it.title) }
+                )
+            }
+        },
+        primaryActionContent = {
+            FloatingActionButton(
+                modifier = Modifier.padding(start = 20.dp),
+                onClick = {}
+            ) {
+                Icon(
+                    Icons.Rounded.Edit,
+                    ""
                 )
             }
         }

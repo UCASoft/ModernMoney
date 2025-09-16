@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.20"
-compose = "1.8.2"
+compose = "1.9.0-beta03"
 android = "8.11.2"
 adaptive = "1.1.2"
 activity-compose = "1.11.0"
