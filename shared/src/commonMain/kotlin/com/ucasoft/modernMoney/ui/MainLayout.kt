@@ -3,7 +3,6 @@ package com.ucasoft.modernMoney.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -18,7 +17,7 @@ import com.ucasoft.modernMoney.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainLayout(screens: List<Screen>) {
+fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
 
     val navController = rememberNavController()
 
@@ -65,11 +64,13 @@ fun MainLayout(screens: List<Screen>) {
                     },
                     actions = {
                         IconButton(
-                            onClick = {}
+                            onClick = {
+                                navController.navigate(settingsScreen.title)
+                            }
                         ) {
                             Icon(
-                                Icons.Rounded.Settings,
-                                "Settings"
+                                settingsScreen.icon,
+                                settingsScreen.title
                             )
                         }
                     }
@@ -85,6 +86,9 @@ fun MainLayout(screens: List<Screen>) {
                     composable(screen.title) {
                         screen.content()
                     }
+                }
+                dialog(settingsScreen.title) {
+                    settingsScreen.content()
                 }
             }
         }
