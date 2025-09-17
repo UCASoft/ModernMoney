@@ -15,9 +15,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.ucasoft.modernMoney.di.daoModule
+import com.ucasoft.modernMoney.di.platformDbModule
+import com.ucasoft.modernMoney.di.viewModelModule
 import com.ucasoft.modernMoney.ui.MainLayout
 import com.ucasoft.modernMoney.ui.ModernMoneyTheme
 import com.ucasoft.modernMoney.ui.pages.AccountListDetails
+import org.koin.compose.KoinMultiplatformApplication
+import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.dsl.koinConfiguration
 
 sealed class Screen(val title: String, val icon: ImageVector, val content: @Composable () -> Unit) {
     object Accounts : Screen("Accounts", Icons.Rounded.CreditCard, { AccountListDetails() })
@@ -32,10 +38,17 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
     })
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun App() {
-    ModernMoneyTheme {
-        MainLayout(listOf(Screen.Accounts, Screen.Transactions, Screen.Reports), Screen.Settings)
+    KoinMultiplatformApplication(
+        config = koinConfiguration {
+            modules(platformDbModule, daoModule, viewModelModule)
+        }
+    ) {
+        ModernMoneyTheme {
+            MainLayout(listOf(Screen.Accounts, Screen.Transactions, Screen.Reports), Screen.Settings)
+        }
     }
 }
 
