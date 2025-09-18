@@ -15,3 +15,11 @@ data class Currency(
     val name: String,
     val symbol: String
 )
+
+data class Transaction(
+    val dataTime: Int,
+    val incomingAmount: Double?,
+    val incomingAccountCurrency: AccountCurrency?,
+    val expenseAmount: Double?,
+    val expenseAccountCurrency: AccountCurrency?
+)
