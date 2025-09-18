@@ -1,4 +1,4 @@
-package com.ucasoft.modernMoney.ui.pages
+package com.ucasoft.modernMoney.ui.pages.account
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -23,7 +23,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.ucasoft.modernMoney.db.model.Account
-import com.ucasoft.modernMoney.db.model.AccountViewModel
+import com.ucasoft.modernMoney.db.viewModels.AccountViewModel
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel

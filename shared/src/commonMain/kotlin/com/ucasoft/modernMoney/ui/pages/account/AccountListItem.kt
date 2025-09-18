@@ -1,4 +1,4 @@
-package com.ucasoft.modernMoney.ui.pages
+package com.ucasoft.modernMoney.ui.pages.account
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

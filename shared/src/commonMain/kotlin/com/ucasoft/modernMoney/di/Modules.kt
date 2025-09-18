@@ -1,8 +1,8 @@
 package com.ucasoft.modernMoney.di
 
 import com.ucasoft.modernMoney.db.ModernMoneyDatabase
-import com.ucasoft.modernMoney.db.model.AccountDao
-import com.ucasoft.modernMoney.db.model.AccountViewModel
+import com.ucasoft.modernMoney.db.dto.AccountDao
+import com.ucasoft.modernMoney.db.viewModels.AccountViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module

@@ -20,14 +20,15 @@ import com.ucasoft.modernMoney.di.platformDbModule
 import com.ucasoft.modernMoney.di.viewModelModule
 import com.ucasoft.modernMoney.ui.MainLayout
 import com.ucasoft.modernMoney.ui.ModernMoneyTheme
-import com.ucasoft.modernMoney.ui.pages.AccountListDetails
+import com.ucasoft.modernMoney.ui.pages.account.AccountListDetails
+import com.ucasoft.modernMoney.ui.pages.transaction.TransactionListDetails
 import org.koin.compose.KoinMultiplatformApplication
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.koinConfiguration
 
 sealed class Screen(val title: String, val icon: ImageVector, val content: @Composable () -> Unit) {
     object Accounts : Screen("Accounts", Icons.Rounded.CreditCard, { AccountListDetails() })
-    object Transactions : Screen("Transactions", Icons.Rounded.CurrencyExchange, { UnknownScreen() })
+    object Transactions : Screen("Transactions", Icons.Rounded.CurrencyExchange, { TransactionListDetails() })
     object Reports : Screen("Reports", Icons.Rounded.Analytics, { UnknownScreen() })
     object Settings : Screen("Settings", Icons.Rounded.Settings, {
         Card(

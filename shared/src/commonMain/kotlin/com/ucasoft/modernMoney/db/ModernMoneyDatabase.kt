@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.ucasoft.modernMoney.db.model.Account
-import com.ucasoft.modernMoney.db.model.AccountDao
+import com.ucasoft.modernMoney.db.dto.AccountDao
 import kotlinx.coroutines.Dispatchers
 
 @Database(entities = [Account::class], version = 1)
