@@ -1,11 +1,9 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.displayCutoutPadding
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -25,6 +23,7 @@ import androidx.lifecycle.flowWithLifecycle
 import com.ucasoft.modernMoney.db.model.Account
 import com.ucasoft.modernMoney.db.viewModels.AccountViewModel
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
+import com.ucasoft.modernMoney.ui.components.EditableListItem
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -69,9 +68,18 @@ fun AccountListDetails() {
                 } else {
                     LazyColumn {
                         items(accountState.accounts) { account ->
-                            AccountListItem(account) {
-                                scope.launch {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                            EditableListItem(
+                                onDelete = {
+                                    return@EditableListItem false
+                                },
+                                onEdit = {
+                                    return@EditableListItem false
+                                }
+                            ) {
+                                AccountListItem(account) {
+                                    scope.launch {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                                    }
                                 }
                             }
                         }
