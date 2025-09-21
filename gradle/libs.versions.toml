@@ -1,10 +1,11 @@
 [versions]
 kotlin = "2.2.20"
-compose = "1.9.0-beta03"
+compose = "1.9.0"
 android = "8.11.2"
 adaptive = "1.1.2"
+adaptive-navigation-suit = "1.9.0-beta06"
 activity-compose = "1.11.0"
-navigation-compose = "2.9.0-rc02"
+navigation-compose = "2.9.0"
 room = "2.8.0"
 sqlite = "2.6.0"
 ksp = "2.2.20-2.0.3"
@@ -26,7 +27,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive" }
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "adaptive" }
 adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptive" }
-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "compose" }
+adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "adaptive-navigation-suit" }
 compose-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "compose" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
