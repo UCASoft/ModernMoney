@@ -74,6 +74,7 @@ fun AccountListDetails() {
                             EditableListItem(
                                 onDeleting = { true },
                                 onDelete = {
+                                    viewModel.deleteAccount(account)
                                     true
                                 },
                                 onEdit = {

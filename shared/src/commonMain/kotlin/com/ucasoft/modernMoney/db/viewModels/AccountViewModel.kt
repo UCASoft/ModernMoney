@@ -24,6 +24,12 @@ class AccountViewModel(private val accountDao: AccountDao) : ViewModel() {
             accountDao.insert(account)
         }
     }
+
+    fun deleteAccount(account: Account) {
+        viewModelScope.launch {
+            accountDao.delete(account)
+        }
+    }
 }
 
 data class AccountUiState(

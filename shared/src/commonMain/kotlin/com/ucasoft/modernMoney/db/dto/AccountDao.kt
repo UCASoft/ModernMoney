@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.db.dto
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.ucasoft.modernMoney.db.model.Account
@@ -14,4 +15,7 @@ interface AccountDao {
 
     @Insert
     suspend fun insert(account: Account)
+
+    @Delete
+    suspend fun delete(account: Account): Int
 }
