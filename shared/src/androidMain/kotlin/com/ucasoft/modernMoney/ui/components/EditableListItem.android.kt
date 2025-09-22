@@ -8,18 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxState
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -28,31 +18,43 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 actual fun EditableListItem(
+    onDeleting: (() -> Boolean)?,
     onDelete: (() -> Boolean)?,
     onEdit: (() -> Boolean)?,
     content: @Composable (() -> Unit)
 ) {
+
+    var isDeleting by remember { mutableStateOf(false) }
+
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = {
             when (it) {
-                SwipeToDismissBoxValue.EndToStart -> onEdit!!.invoke()
-                SwipeToDismissBoxValue.StartToEnd -> onDelete!!.invoke()
+                SwipeToDismissBoxValue.EndToStart -> { !onEdit!!.invoke() }
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    isDeleting = onDeleting!!.invoke()
+                    false
+                }
                 else -> false
             }
         }
     )
 
-    SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromEndToStart = onEdit != null,
-        enableDismissFromStartToEnd = onDelete != null,
-        backgroundContent = { SwipeBackground(dismissState) }
+    DeletableItem(
+        isDeleting,
+        onDelete
     ) {
-        ListItem(
-            headlineContent = {
-                content()
-            }
-        )
+        SwipeToDismissBox(
+            state = dismissState,
+            enableDismissFromEndToStart = onEdit != null,
+            enableDismissFromStartToEnd = onDeleting != null && onDelete != null,
+            backgroundContent = { SwipeBackground(dismissState) }
+        ) {
+            ListItem(
+                headlineContent = {
+                    content()
+                }
+            )
+        }
     }
 }
 
@@ -68,15 +70,9 @@ fun SwipeBackground(state: SwipeToDismissBoxState) {
         else -> Color.Transparent
     }
 
-    val icon = when {
-        isEdit -> Icons.Default.Edit
-        isDelete -> Icons.Default.Delete
-        else -> null
-    }
-
-    val contentDescription = when {
-        isEdit -> "Edit item"
-        isDelete -> "Delete item"
+    val action = when {
+        isEdit -> EditableAction.Edit
+        isDelete -> EditableAction.Delete
         else -> null
     }
 
@@ -97,11 +93,10 @@ fun SwipeBackground(state: SwipeToDismissBoxState) {
             else -> Alignment.Center
         }
     ) {
-        if (icon != null) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                modifier = Modifier
+        if (action != null) {
+            BuildIcon(
+                action,
+                Modifier
                     .scale(scale)
                     .size(24.dp),
                 tint = MaterialTheme.colorScheme.onPrimary

@@ -67,13 +67,17 @@ fun AccountListDetails() {
                     }
                 } else {
                     LazyColumn {
-                        items(accountState.accounts) { account ->
+                        items(
+                            items = accountState.accounts,
+                            key = { it.id }
+                        ) { account ->
                             EditableListItem(
+                                onDeleting = { true },
                                 onDelete = {
-                                    return@EditableListItem false
+                                    true
                                 },
                                 onEdit = {
-                                    return@EditableListItem false
+                                    true
                                 }
                             ) {
                                 AccountListItem(account) {
