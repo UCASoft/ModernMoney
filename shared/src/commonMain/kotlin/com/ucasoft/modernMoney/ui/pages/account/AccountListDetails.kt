@@ -20,8 +20,9 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
-import com.ucasoft.modernMoney.db.model.Account
-import com.ucasoft.modernMoney.db.viewModels.AccountViewModel
+import com.ucasoft.modernMoney.model.Account
+import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.viewModels.AccountViewModel
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
 import kotlinx.coroutines.launch
@@ -48,7 +49,15 @@ fun AccountListDetails() {
 
     LaunchedEffect(events, lifecycleOwner) {
         events.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
-            viewModel.addAccount(Account(name = "Bank", currency = "USD"))
+            viewModel.addAccount(
+                Account(
+                    name = "Bank", currencies = listOf(
+                        AccountCurrency("Kč"),
+                        AccountCurrency("$"),
+                        AccountCurrency("€")
+                    )
+                )
+            )
         }
     }
 

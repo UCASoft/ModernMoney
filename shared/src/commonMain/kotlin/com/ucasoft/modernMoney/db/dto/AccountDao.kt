@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AccountDao {
 
-    @Query("SELECT * FROM account")
+    @Query("SELECT * FROM accounts")
     fun allAccounts() : Flow<List<Account>>
 
     @Insert
-    suspend fun insert(account: Account)
+    suspend fun insert(account: Account): Long
 
     @Delete
     suspend fun delete(account: Account): Int

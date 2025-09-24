@@ -1,25 +1,36 @@
 package com.ucasoft.modernMoney.model
 
+import com.ucasoft.modernMoney.db.model.Account as DbAccount
+import com.ucasoft.modernMoney.db.model.AccountCurrency as DbAccountCurrency
+
 data class Account(
     val name: String,
-    val currencies: List<AccountCurrency>,
-    val cards: List<String>? = null
-)
+    val currencies: List<AccountCurrency>
+) {
+    var id: Long = 0L
+        internal set
+
+    fun mapToDbAccount() =
+        DbAccount(
+            id,
+            name
+        )
+}
 
 data class AccountCurrency (
-    val currency: Currency,
-    val balance: Double
-)
+    val currencyCode: String
+) {
+    fun mapToDbAccountCurrency(accountId: Long) =
+        DbAccountCurrency(accountId = accountId, currencyCode = currencyCode)
+}
 
-data class Currency(
-    val name: String,
-    val symbol: String
-)
+fun DbAccount.mapToAccount(currencies: List<DbAccountCurrency>) =
+    Account(
+        name,
+        currencies.map { it.mapToCurrency() }
+    ).also { it.id = id }
 
-data class Transaction(
-    val dataTime: Int,
-    val incomingAmount: Double?,
-    val incomingAccountCurrency: AccountCurrency?,
-    val expenseAmount: Double?,
-    val expenseAccountCurrency: AccountCurrency?
-)
+fun DbAccountCurrency.mapToCurrency() =
+    AccountCurrency(
+        currencyCode = currencyCode
+    )
