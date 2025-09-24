@@ -1,0 +1,5 @@
+<resources>
+    <string name="accounts">Accounts</string>
+    <string name="transactions">Transaction</string>
+    <string name="reports">Reports</string>
+</resources>
