@@ -18,6 +18,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
 
+                implementation(compose.components.resources)
                 implementation(compose.materialIconsExtended)
 
                 implementation(libs.adaptive)
