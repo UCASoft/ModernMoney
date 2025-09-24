@@ -15,8 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.ucasoft.modernMoney.Screen
+import com.ucasoft.modern_money.shared.generated.resources.Res
+import com.ucasoft.modern_money.shared.generated.resources.allStringResources
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +43,7 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                         )
                     },
                     label = {
-                        Text(it.title)
+                        Text(stringResource(Res.allStringResources[it.title.lowercase()]!!))
                     },
                     selected = currentDestination?.destination?.route == it.title,
                     onClick = { navController.navigate(it.title) }

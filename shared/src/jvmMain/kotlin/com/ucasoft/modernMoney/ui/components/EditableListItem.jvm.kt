@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.ucasoft.modern_money.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -52,7 +54,7 @@ actual fun EditableListItem(
         ) {
             if (onEdit != null) {
                 DropdownMenuItem(
-                    text = { Text("Edit") },
+                    text = { Text(stringResource(Res.string.edit)) },
                     onClick = {
                         onEdit()
                         showDropdownMenu = false
@@ -65,7 +67,7 @@ actual fun EditableListItem(
 
             if (onDeleting != null && onDelete != null) {
                 DropdownMenuItem(
-                    text = { Text("Delete") },
+                    text = { Text(stringResource(Res.string.delete)) },
                     onClick = {
                         isDeleting = onDeleting()
                         showDropdownMenu = false
