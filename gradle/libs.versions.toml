@@ -6,12 +6,13 @@ adaptive = "1.1.2"
 adaptive-navigation-suit = "1.9.0-beta06"
 activity-compose = "1.11.0"
 navigation-compose = "2.9.0"
-room = "2.8.0"
-sqlite = "2.6.0"
-ksp = "2.2.20-2.0.3"
+room = "2.8.1"
+sqlite = "2.6.1"
+ksp = "2.2.20-2.0.2"
 koin = "4.1.1"
 lifecycle-compose = "2.9.4"
 coroutines = "1.10.2"
+ui-android = "1.9.2"
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
