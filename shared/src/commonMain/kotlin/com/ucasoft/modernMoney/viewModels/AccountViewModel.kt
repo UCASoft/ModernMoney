@@ -15,11 +15,11 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 
     val uiState = accountDao.allAccounts().map {
         AccountUiState(it.map {
-            it.mapToAccount(accountCurrencyDao.accountCurrency(it.id))
+            it.account.mapToAccount(it.currencies)
         })
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = AccountUiState(isLoading = true)
     )
 
