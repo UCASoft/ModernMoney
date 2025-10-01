@@ -60,3 +60,7 @@ dependencies {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+kotlin {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+}

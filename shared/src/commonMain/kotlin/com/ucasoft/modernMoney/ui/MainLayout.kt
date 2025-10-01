@@ -43,7 +43,12 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                         )
                     },
                     label = {
-                        Text(stringResource(Res.allStringResources[it.title.lowercase()]!!))
+                        val resourceTitle = Res.allStringResources[it.title.lowercase()]
+                        if (resourceTitle != null) {
+                            Text(stringResource(resourceTitle))
+                        } else {
+                            Text(it.title)
+                        }
                     },
                     selected = currentDestination?.destination?.route == it.title,
                     onClick = { navController.navigate(it.title) }
@@ -104,7 +109,7 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
             CompositionLocalProvider(LocalPrimaryActionEvents provides primaryActionEvents) {
                 NavHost(
                     navController = navController,
-                    startDestination = "Accounts",
+                    startDestination = screens.first().title,
                     modifier = Modifier.padding(top = it.calculateTopPadding())
                 ) {
                     screens.map { screen ->
