@@ -1,5 +1,6 @@
 package com.ucasoft.modernMoney
 
+import SettingsScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,13 +31,7 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
     object Accounts : Screen("Accounts", Icons.Rounded.CreditCard, { AccountListDetails() })
     object Transactions : Screen("Transactions", Icons.Rounded.CurrencyExchange, { TransactionListDetails() })
     object Reports : Screen("Reports", Icons.Rounded.Analytics, { UnknownScreen() })
-    object Settings : Screen("Settings", Icons.Rounded.Settings, {
-        Card(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight()
-        ) {
-            UnknownScreen("Settings")
-        }
-    })
+    object Settings : Screen("Settings", Icons.Rounded.Settings, { SettingsScreen() } )
 }
 
 @OptIn(KoinExperimentalAPI::class)

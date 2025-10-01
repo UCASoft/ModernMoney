@@ -36,6 +36,9 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel)
 
                 implementation(libs.lifecycle.runtime.compose)
+
+                implementation(libs.preference)
+                api(libs.settings)
             }
         }
 
