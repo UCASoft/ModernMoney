@@ -1,5 +1,6 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,11 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.viewModels.AccountViewModel
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
@@ -32,7 +36,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AccountListDetails() {
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<String>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
@@ -55,7 +59,7 @@ fun AccountListDetails() {
                         AccountCurrency("Kč"),
                         AccountCurrency("$"),
                         AccountCurrency("€")
-                    )
+                    ), bank = Bank("R").also { it.id = 1 }
                 )
             )
         }
@@ -75,7 +79,13 @@ fun AccountListDetails() {
                         CircularProgressIndicator()
                     }
                 } else {
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFFF3F4F6))
+                            .padding(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
                         items(
                             items = accountState.accounts,
                             key = { it.id }
@@ -104,7 +114,7 @@ fun AccountListDetails() {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.contentKey?.let { key ->
-                    AccountDetails(accountState.accounts.first { it.name == key })
+                    AccountDetails(accountState.accounts.first { it.id == key })
                 }
             }
         }

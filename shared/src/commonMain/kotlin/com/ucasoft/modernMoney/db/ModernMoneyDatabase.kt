@@ -8,16 +8,20 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.model.Account
 import com.ucasoft.modernMoney.db.dto.AccountDao
+import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.db.model.AccountCurrency
+import com.ucasoft.modernMoney.db.model.Bank
 import kotlinx.coroutines.Dispatchers
 
-@Database(entities = [Account::class, AccountCurrency::class], version = 1)
+@Database(entities = [Account::class, AccountCurrency::class, Bank::class], version = 1)
 @ConstructedBy(ModernMoneyDatabaseConstructor::class)
 abstract class ModernMoneyDatabase : RoomDatabase() {
 
     abstract val accountDao: AccountDao
 
     abstract val accountCurrencyDao: AccountCurrencyDao
+
+    abstract val bankDao: BankDao
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")

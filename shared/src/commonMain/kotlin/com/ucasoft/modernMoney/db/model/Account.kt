@@ -2,14 +2,26 @@ package com.ucasoft.modernMoney.db.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
-@Entity(tableName = "accounts")
+@Entity(
+    tableName = "accounts",
+    foreignKeys = [
+        ForeignKey(
+            entity = Bank::class,
+            parentColumns = [ "id" ],
+            childColumns = [ "bankId" ],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ]
+)
 data class Account(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val name: String
+    val name: String,
+    val bankId: Long? = null
 )
 
 data class AccountWithCurrencies(
@@ -19,5 +31,10 @@ data class AccountWithCurrencies(
         parentColumn = "id",
         entityColumn = "accountId"
     )
-    val currencies: List<AccountCurrency>
+    val currencies: List<AccountCurrency>,
+    @Relation(
+        parentColumn = "bankId",
+        entityColumn = "id"
+    )
+    val bank: Bank?
 )

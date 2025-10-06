@@ -15,7 +15,7 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 
     val uiState = accountDao.allAccounts().map {
         AccountUiState(it.map {
-            it.account.mapToAccount(it.currencies)
+            it.account.mapToAccount(it.currencies, it.bank)
         })
     }.stateIn(
         scope = viewModelScope,
