@@ -1,11 +1,12 @@
 package com.ucasoft.modernMoney.di
 
+import BanksViewModel
 import com.ucasoft.modernMoney.db.ModernMoneyDatabase
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.viewModels.AccountViewModel
-import com.ucasoft.modernMoney.viewModels.BankViewModel
+import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -20,5 +21,6 @@ val daoModule = module {
 
 val viewModelModule = module {
     viewModelOf(::AccountViewModel)
+    viewModelOf(::BanksViewModel)
     viewModelOf(::BankViewModel)
 }

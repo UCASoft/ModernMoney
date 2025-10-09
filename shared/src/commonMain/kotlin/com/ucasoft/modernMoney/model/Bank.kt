@@ -10,6 +10,7 @@ data class Bank(
 
     fun mapToBank() =
         DbBank(
+            id = id,
             name = name
         )
 }
