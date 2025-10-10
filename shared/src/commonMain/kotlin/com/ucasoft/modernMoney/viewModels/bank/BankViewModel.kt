@@ -6,23 +6,24 @@ import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.mapToBank
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class BankViewModel(private val bankDao: BankDao, id: Long): ViewModel() {
+class BankViewModel(private val bankDao: BankDao, id: Long?): ViewModel() {
 
     private val _state = MutableStateFlow(BankUiState(isLoading = true))
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            bankDao.bankById(id).collect { bank ->
-                _state.update { it.copy(bank = bank.mapToBank(), isLoading = false) }
+        if (id != null) {
+            viewModelScope.launch {
+                bankDao.bankById(id).collect { bank ->
+                    _state.update { it.copy(bank = bank.mapToBank(), isLoading = false) }
+                }
             }
+        } else {
+            _state.update { BankUiState(Bank(""), isModified = true) }
         }
     }
 

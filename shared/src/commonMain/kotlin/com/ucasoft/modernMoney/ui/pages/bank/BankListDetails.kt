@@ -3,11 +3,7 @@ package com.ucasoft.modernMoney.ui.pages.bank
 import BanksViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.displayCutoutPadding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,12 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
-import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
-import com.ucasoft.modernMoney.ui.pages.account.AccountDetails
-import com.ucasoft.modernMoney.ui.pages.account.AccountListItem
-import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,7 +36,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun BankListDetails() {
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<BankNavigatorParams>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<Pair<Long?, BankDetailsMode>>()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
@@ -60,13 +52,11 @@ fun BankListDetails() {
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
-    /*LaunchedEffect(events, lifecycleOwner) {
+    LaunchedEffect(events, lifecycleOwner) {
         events.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
-            viewModel.addBank(Bank(
-                "Raiffeisen"
-            ))
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to BankDetailsMode.ADD)
         }
-    }*/
+    }
 
     ListDetailPaneScaffold(
         modifier = Modifier.displayCutoutPadding(),
@@ -103,10 +93,7 @@ fun BankListDetails() {
                                     scope.launch {
                                         navigator.navigateTo(
                                             ListDetailPaneScaffoldRole.Detail,
-                                            BankNavigatorParams(
-                                                bank.id,
-                                                BankDetailsMode.EDIT
-                                            )
+                                            bank.id to BankDetailsMode.EDIT
                                         )
                                     }
                                     true
@@ -118,7 +105,7 @@ fun BankListDetails() {
                                         scope.launch {
                                             navigator.navigateTo(
                                                 ListDetailPaneScaffoldRole.Detail,
-                                                BankNavigatorParams(bank.id)
+                                                bank.id to BankDetailsMode.VIEW
                                             )
                                         }
                                     })
@@ -132,14 +119,9 @@ fun BankListDetails() {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.contentKey?.let { key ->
-                    BankDetails(key.id, key.mode)
+                    BankDetails(key.first, key.second)
                 }
             }
         }
     )
 }
-
-data class BankNavigatorParams(
-    val id: Long,
-    val mode: BankDetailsMode = BankDetailsMode.VIEW
-)

@@ -22,5 +22,7 @@ val daoModule = module {
 val viewModelModule = module {
     viewModelOf(::AccountViewModel)
     viewModelOf(::BanksViewModel)
-    viewModelOf(::BankViewModel)
+    factory { (id: Long?) ->
+        BankViewModel(get(), id)
+    }
 }
