@@ -9,11 +9,11 @@ import androidx.compose.ui.Modifier
 import com.ucasoft.modernMoney.model.Account
 
 @Composable
-fun AccountDetails(account: Account) {
+fun AccountDetails(id: Long) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(account.name)
+        Text(id.toString())
     }
 }

@@ -5,7 +5,7 @@ import com.ucasoft.modernMoney.db.ModernMoneyDatabase
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.dto.BankDao
-import com.ucasoft.modernMoney.viewModels.AccountViewModel
+import com.ucasoft.modernMoney.viewModels.AccountsViewModel
 import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
@@ -20,7 +20,7 @@ val daoModule = module {
 }
 
 val viewModelModule = module {
-    viewModelOf(::AccountViewModel)
+    viewModelOf(::AccountsViewModel)
     viewModelOf(::BanksViewModel)
     factory { (id: Long?) ->
         BankViewModel(get(), id)

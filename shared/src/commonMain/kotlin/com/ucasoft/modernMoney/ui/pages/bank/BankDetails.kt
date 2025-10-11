@@ -11,12 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun BankDetails(id: Long?, mode: BankDetailsMode = BankDetailsMode.VIEW) {
+fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
 
     var detailsMode by remember { mutableStateOf(mode) }
 
@@ -33,7 +34,7 @@ fun BankDetails(id: Long?, mode: BankDetailsMode = BankDetailsMode.VIEW) {
         }
     } else {
         Column {
-            if (detailsMode == BankDetailsMode.VIEW) {
+            if (detailsMode == DetailsMode.VIEW) {
                 Text(
                     bankState.bank!!.name
                 )
@@ -42,11 +43,11 @@ fun BankDetails(id: Long?, mode: BankDetailsMode = BankDetailsMode.VIEW) {
                     enabled = bankState.isModified,
                     onClick = {
                         when (detailsMode) {
-                            BankDetailsMode.ADD -> viewModel.addBank(bankState.bank!!)
-                            BankDetailsMode.EDIT -> viewModel.updateBank(bankState.bank!!)
+                            DetailsMode.ADD -> viewModel.addBank(bankState.bank!!)
+                            DetailsMode.EDIT -> viewModel.updateBank(bankState.bank!!)
                             else -> {}
                         }
-                        detailsMode = BankDetailsMode.VIEW
+                        detailsMode = DetailsMode.VIEW
                     }
                 ) {
                     Text("Save")
@@ -60,10 +61,4 @@ fun BankDetails(id: Long?, mode: BankDetailsMode = BankDetailsMode.VIEW) {
             }
         }
     }
-}
-
-enum class BankDetailsMode {
-    ADD,
-    EDIT,
-    VIEW
 }

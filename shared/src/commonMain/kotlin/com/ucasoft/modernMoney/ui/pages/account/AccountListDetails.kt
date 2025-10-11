@@ -1,42 +1,41 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.AnimatedPane
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.ucasoft.modernMoney.model.Account
-import com.ucasoft.modernMoney.model.AccountCurrency
-import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.viewModels.AccountViewModel
-import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
-import com.ucasoft.modernMoney.ui.components.EditableListItem
-import kotlinx.coroutines.launch
-import org.koin.compose.viewmodel.koinViewModel
+import com.ucasoft.modernMoney.ui.pages.ListDetails
+import com.ucasoft.modernMoney.viewModels.AccountUiState
+import com.ucasoft.modernMoney.viewModels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AccountListDetails() {
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+    ListDetails<Long, AccountsViewModel, AccountUiState, Account>(
+        onAddClickEvent = {
+
+        },
+        listContent = { account, event ->
+            AccountListItem(account) {
+                event.invoke(account)
+            }
+        },
+        onListItemEvent = { account, navigator ->
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key)
+        },
+        onEditItemEvent = null,
+        onDeleting = { true },
+        onDelete = { account, viewModel ->
+            viewModel.deleteAccount(account)
+            true
+        }
+    ) {
+        AccountDetails(it)
+    }
+
+    /*val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
@@ -117,5 +116,5 @@ fun AccountListDetails() {
                 }
             }
         }
-    )
+    )*/
 }

@@ -3,7 +3,6 @@ package com.ucasoft.modernMoney.ui.pages.bank
 import BanksUiState
 import BanksViewModel
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -11,17 +10,17 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ucasoft.modernMoney.model.Bank
+import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.ui.pages.ListDetails
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun BankListDetails() {
 
-    ListDetails<Pair<Long?, BankDetailsMode>, BanksViewModel, BanksUiState, Bank>(
+    ListDetails<Pair<Long?, DetailsMode>, BanksViewModel, BanksUiState, Bank>(
         onAddClickEvent = { navigator ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to BankDetailsMode.ADD)
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
         listContent = { bank, event ->
             ListItem(
@@ -32,13 +31,13 @@ fun BankListDetails() {
         onListItemEvent = { bank, navigator ->
             navigator.navigateTo(
                 ListDetailPaneScaffoldRole.Detail,
-                bank.id to BankDetailsMode.VIEW
+                bank.id to DetailsMode.VIEW
             )
         },
         onEditItemEvent = { bank, navigator ->
             navigator.navigateTo(
                 ListDetailPaneScaffoldRole.Detail,
-                bank.id to BankDetailsMode.EDIT
+                bank.id to DetailsMode.EDIT
             )
         },
         onDeleting = { true },

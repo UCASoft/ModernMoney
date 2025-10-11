@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao) : ViewModel() {
+class AccountsViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao) : ListViewModel<Account, AccountUiState>() {
 
-    val uiState = accountDao.allAccounts().map {
+    override val listState = accountDao.allAccounts().map {
         AccountUiState(it.map {
             it.account.mapToAccount(it.currencies, it.bank)
         })
@@ -40,6 +40,6 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 }
 
 data class AccountUiState(
-    val accounts: List<Account> = emptyList(),
-    val isLoading: Boolean = false
-)
+    override val items: List<Account> = emptyList(),
+    override val isLoading: Boolean = false
+) : ListState<Account>
