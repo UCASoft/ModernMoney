@@ -1,14 +1,13 @@
-package com.ucasoft.modernMoney.ui.pages.account
+package com.ucasoft.modernMoney.ui.pages
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,25 +17,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
-import com.ucasoft.modernMoney.model.Account
-import com.ucasoft.modernMoney.model.AccountCurrency
-import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.viewModels.AccountViewModel
+import com.ucasoft.modernMoney.model.KeyEntity
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
+import com.ucasoft.modernMoney.viewModels.ListState
+import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun AccountListDetails() {
+inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> ListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+    crossinline listContent: @Composable (T, (T) -> Unit) -> Unit,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+    noinline onDeleting: ((T) -> Boolean)? = null,
+    noinline onDelete: ((T, VM) -> Boolean)? = null,
+    crossinline detailContent: @Composable (NK) -> Unit
+) {
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<NK>()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
@@ -45,25 +50,18 @@ fun AccountListDetails() {
         }
     }
 
-    val viewModel = koinViewModel<AccountViewModel>()
-    val accountState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val events = LocalPrimaryActionEvents.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
+
     LaunchedEffect(events, lifecycleOwner) {
         events.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
-            viewModel.addAccount(
-                Account(
-                    name = "Bank", currencies = listOf(
-                        AccountCurrency("Kč"),
-                        AccountCurrency("$"),
-                        AccountCurrency("€")
-                    ), bank = Bank("R").also { it.id = 1 }
-                )
-            )
+            onAddClickEvent.invoke(navigator)
         }
     }
+
+    val viewModel = koinViewModel<VM>()
+    val state by viewModel.listState.collectAsStateWithLifecycle()
 
     ListDetailPaneScaffold(
         modifier = Modifier.displayCutoutPadding(),
@@ -71,7 +69,7 @@ fun AccountListDetails() {
         directive = navigator.scaffoldDirective,
         listPane = {
             AnimatedPane {
-                if (accountState.isLoading) {
+                if (state.isLoading) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -86,22 +84,17 @@ fun AccountListDetails() {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         items(
-                            items = accountState.accounts,
-                            key = { it.id }
-                        ) { account ->
+                            items = state.items,
+                            key = { it.key!! }
+                        ) {
                             EditableListItem(
-                                onDeleting = { true },
-                                onDelete = {
-                                    viewModel.deleteAccount(account)
-                                    true
-                                },
-                                onEdit = {
-                                    true
-                                }
+                                onDeleting = if (onDeleting != null) { { onDeleting.invoke(it) } } else null,
+                                onDelete = if (onDelete != null) { { onDelete.invoke(it, viewModel) } } else null,
+                                onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(it, navigator) }; true  } } else null
                             ) {
-                                AccountListItem(account) {
+                                listContent(it) { item ->
                                     scope.launch {
-                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                                        onListItemEvent(item, navigator)
                                     }
                                 }
                             }
@@ -112,8 +105,8 @@ fun AccountListDetails() {
         },
         detailPane = {
             AnimatedPane {
-                navigator.currentDestination?.contentKey?.let { key ->
-                    AccountDetails(accountState.accounts.first { it.id == key })
+                navigator.currentDestination?.contentKey?.let {
+                    detailContent(it)
                 }
             }
         }

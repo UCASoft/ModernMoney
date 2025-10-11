@@ -4,9 +4,11 @@ import com.ucasoft.modernMoney.db.model.Bank as DbBank
 
 data class Bank(
     val name: String
-) {
+) : KeyEntity<Long> {
     var id: Long = 0L
         internal set
+
+    override val key = id
 
     fun mapToBank() =
         DbBank(

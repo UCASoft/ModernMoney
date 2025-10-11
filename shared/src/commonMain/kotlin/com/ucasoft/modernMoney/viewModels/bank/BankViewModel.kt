@@ -42,12 +42,6 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): ViewModel() {
         ) }
     }
 
-    fun deleteBank(bank: Bank) {
-        viewModelScope.launch {
-            bankDao.delete(bank.mapToBank())
-        }
-    }
-
     fun updateBankName(name: String) {
         _state.update { it.copy(
             bank = it.bank?.copy(name = name).also { self -> self!!.id = it.bank!!.id },
