@@ -13,6 +13,3 @@ interface ListState<T : KeyEntity<*>> : StateWithLoading {
     val items: List<T>
 }
 
-interface StateWithLoading {
-    val isLoading: Boolean
-}
