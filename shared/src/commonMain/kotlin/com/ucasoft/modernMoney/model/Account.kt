@@ -10,15 +10,16 @@ data class AccountCard(
 )
 
 data class Account(
-    val name: String,
-    val currencies: List<AccountCurrency>,
+    val name: String = "",
+    val currencies: List<AccountCurrency> = emptyList(),
     val bank: Bank? = null,
     val cards: List<AccountCard> = emptyList()
 ) : KeyEntity<Long> {
     var id: Long = 0L
         internal set
 
-    override val key = id
+    override val key: Long
+        get() = id
 
     val isBankAccount: Boolean
         get() = bank != null

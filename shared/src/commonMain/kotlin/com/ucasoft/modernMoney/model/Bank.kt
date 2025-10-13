@@ -8,7 +8,8 @@ data class Bank(
     var id: Long = 0L
         internal set
 
-    override val key = id
+    override val key: Long
+        get() = id
 
     fun mapToBank() =
         DbBank(

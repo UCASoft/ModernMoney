@@ -16,6 +16,10 @@ interface AccountDao {
     @Query("SELECT * FROM accounts")
     fun allAccounts() : Flow<List<AccountWithCurrencies>>
 
+    @Transaction
+    @Query("SELECT * FROM accounts WHERE id = :id")
+    fun accountById(id: Long): Flow<AccountWithCurrencies>
+
     @Insert
     suspend fun insert(account: Account): Long
 

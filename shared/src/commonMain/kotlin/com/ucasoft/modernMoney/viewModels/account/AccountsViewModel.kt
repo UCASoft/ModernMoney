@@ -1,36 +1,27 @@
-package com.ucasoft.modernMoney.viewModels
+package com.ucasoft.modernMoney.viewModels.account
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.mapToAccount
+import com.ucasoft.modernMoney.viewModels.ListState
+import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountsViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao) : ListViewModel<Account, AccountUiState>() {
+class AccountsViewModel(private val accountDao: AccountDao) : ListViewModel<Account, AccountsUiState>() {
 
     override val listState = accountDao.allAccounts().map {
-        AccountUiState(it.map {
+        AccountsUiState(it.map {
             it.account.mapToAccount(it.currencies, it.bank)
         })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = AccountUiState(isLoading = true)
+        initialValue = AccountsUiState(isLoading = true)
     )
-
-    fun addAccount(account: Account) {
-        viewModelScope.launch {
-            val accountId = accountDao.insert(account.mapToDbAccount())
-            account.currencies.forEach {
-                accountCurrencyDao.insert(it.mapToDbAccountCurrency(accountId))
-            }
-        }
-    }
 
     fun deleteAccount(account: Account) {
         viewModelScope.launch {
@@ -39,7 +30,7 @@ class AccountsViewModel(private val accountDao: AccountDao, private val accountC
     }
 }
 
-data class AccountUiState(
+data class AccountsUiState(
     override val items: List<Account> = emptyList(),
     override val isLoading: Boolean = false
 ) : ListState<Account>

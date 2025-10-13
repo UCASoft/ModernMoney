@@ -1,19 +1,30 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import com.ucasoft.modernMoney.model.Account
+import com.ucasoft.modernMoney.ui.pages.DetailsMode
+import com.ucasoft.modernMoney.ui.pages.EntityDetails
+import com.ucasoft.modernMoney.viewModels.account.AccountUiState
+import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 
 @Composable
-fun AccountDetails(id: Long) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(id.toString())
-    }
+fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
+
+    EntityDetails<Long, Account, AccountUiState, AccountViewModel>(
+        id,
+        {
+            Text(it.name)
+        },
+        { account, viewModel, _ ->
+            EditAccount(account, viewModel)
+        },
+        { account, viewModel ->
+            when (mode) {
+                DetailsMode.ADD -> viewModel.addAccount(account)
+                else -> {}
+            }
+        },
+        mode = mode
+    )
 }

@@ -19,9 +19,9 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 it.name
             )
         },
-        { state, viewModel, _ ->
+        { bank, viewModel, _ ->
             OutlinedTextField(
-                value = state.entity?.name ?: "",
+                value = bank?.name ?: "",
                 onValueChange = {
                     viewModel.updateBankName(it)
                 }

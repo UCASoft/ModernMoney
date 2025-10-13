@@ -23,11 +23,6 @@ import com.ucasoft.modernMoney.model.Bank
 
 @Composable
 fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
-    ClaudAccountItem(account, onClick)
-}
-
-@Composable
-fun ClaudAccountItem(account: Account, onClick: (Long) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -45,7 +40,6 @@ fun ClaudAccountItem(account: Account, onClick: (Long) -> Unit) {
                 onExpandClick = { expanded = !expanded }
             )
 
-            // Expandable Cards Section
             if (expanded && account.isBankAccount && account.cards.isNotEmpty()) {
                 CardsList(cards = account.cards)
             }
@@ -69,10 +63,8 @@ private fun AccountHeader(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Account Icon
             AccountIcon(account = account)
 
-            // Account Info
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -88,17 +80,14 @@ private fun AccountHeader(
                     )
                 }
 
-                // Bank Info
                 if (account.isBankAccount) {
                     BankInfoRow(bankInfo = account.bank!!)
                 }
 
-                // Currencies
                 CurrenciesRow(currencies = account.currencies)
             }
         }
 
-        // Expand Button
         if (account.isBankAccount && account.cards.isNotEmpty()) {
             IconButton(onClick = onExpandClick) {
                 Icon(
@@ -148,7 +137,6 @@ private fun BankInfoRow(bankInfo: Bank) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Bank Logo
         Surface(
             modifier = Modifier.size(24.dp),
             color = Color(0xFFF3F4F6),
@@ -251,7 +239,6 @@ private fun CardItem(card: AccountCard) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Card Icon
                 Box(
                     modifier = Modifier
                         .width(40.dp)

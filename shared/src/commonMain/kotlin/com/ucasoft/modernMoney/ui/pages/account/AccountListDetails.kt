@@ -5,17 +5,18 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.ucasoft.modernMoney.model.Account
+import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.ui.pages.ListDetails
-import com.ucasoft.modernMoney.viewModels.AccountUiState
-import com.ucasoft.modernMoney.viewModels.AccountsViewModel
+import com.ucasoft.modernMoney.viewModels.account.AccountsUiState
+import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AccountListDetails() {
 
-    ListDetails<Long, AccountsViewModel, AccountUiState, Account>(
+    ListDetails<Pair<Long?, DetailsMode>, AccountsViewModel, AccountsUiState, Account>(
         onAddClickEvent = {
-
+            it.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
         listContent = { account, event ->
             AccountListItem(account) {
@@ -23,98 +24,17 @@ fun AccountListDetails() {
             }
         },
         onListItemEvent = { account, navigator ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key)
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key to DetailsMode.VIEW)
         },
-        onEditItemEvent = null,
+        onEditItemEvent = { account, navigator ->
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key to DetailsMode.EDIT)
+        },
         onDeleting = { true },
         onDelete = { account, viewModel ->
             viewModel.deleteAccount(account)
             true
         }
     ) {
-        AccountDetails(it)
+        AccountDetails(it.first, it.second)
     }
-
-    /*val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
-    val scope = rememberCoroutineScope()
-
-    BackHandler(navigator.canNavigateBack()) {
-        scope.launch {
-            navigator.navigateBack()
-        }
-    }
-
-    val viewModel = koinViewModel<AccountViewModel>()
-    val accountState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val events = LocalPrimaryActionEvents.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(events, lifecycleOwner) {
-        events.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
-            viewModel.addAccount(
-                Account(
-                    name = "Bank", currencies = listOf(
-                        AccountCurrency("Kč"),
-                        AccountCurrency("$"),
-                        AccountCurrency("€")
-                    ), bank = Bank("R").also { it.id = 1 }
-                )
-            )
-        }
-    }
-
-    ListDetailPaneScaffold(
-        modifier = Modifier.displayCutoutPadding(),
-        scaffoldState = navigator.scaffoldState,
-        directive = navigator.scaffoldDirective,
-        listPane = {
-            AnimatedPane {
-                if (accountState.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(
-                            items = accountState.accounts,
-                            key = { it.id }
-                        ) { account ->
-                            EditableListItem(
-                                onDeleting = { true },
-                                onDelete = {
-                                    viewModel.deleteAccount(account)
-                                    true
-                                },
-                                onEdit = {
-                                    true
-                                }
-                            ) {
-                                AccountListItem(account) {
-                                    scope.launch {
-                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        detailPane = {
-            AnimatedPane {
-                navigator.currentDestination?.contentKey?.let { key ->
-                    AccountDetails(accountState.accounts.first { it.id == key })
-                }
-            }
-        }
-    )*/
 }
