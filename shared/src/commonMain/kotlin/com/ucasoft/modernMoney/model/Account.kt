@@ -32,22 +32,10 @@ data class Account(
         )
 }
 
-data class AccountCurrency (
-    val currencyCode: String
-) {
-    fun mapToDbAccountCurrency(accountId: Long) =
-        DbAccountCurrency(accountId = accountId, currencyCode = currencyCode)
-}
-
 fun DbAccount.mapToAccount(currencies: List<DbAccountCurrency>, bank: DbBank?) =
     Account(
         name,
         currencies.map { it.mapToCurrency() },
         bank?.mapToBank()
     ).also { it.id = id }
-
-fun DbAccountCurrency.mapToCurrency() =
-    AccountCurrency(
-        currencyCode = currencyCode
-    )
 

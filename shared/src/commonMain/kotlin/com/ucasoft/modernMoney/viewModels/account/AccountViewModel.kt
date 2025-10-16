@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.model.Account
+import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.mapToAccount
 import com.ucasoft.modernMoney.model.mapToBank
@@ -46,6 +47,15 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         }
     }
 
+    fun updateAccount(account: Account) {
+        viewModelScope.launch {
+            accountDao.update(account.mapToDbAccount())
+            account.currencies.filter { it.id == 0L }.forEach {
+                accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
+            }
+        }
+    }
+
     fun updateAccountName(name: String) {
         _state.update { it.copy(
             entity = it.entity?.copy(name = name).also { self -> self!!.id = it.entity!!.id },
@@ -53,9 +63,23 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         ) }
     }
 
-    fun updateAccountBank(bank: Bank) {
+    fun updateAccountBank(bank: Bank?) {
         _state.update { it.copy(
             entity = it.entity?.copy(bank = bank).also { self -> self!!.id = it.entity!!.id },
+            isModified = true
+        ) }
+    }
+
+    fun addAccountCurrency(currency: AccountCurrency) {
+        _state.update { it.copy(
+            entity = it.entity?.copy(currencies = it.entity.currencies + currency).also { self -> self!!.id = it.entity!!.id },
+            isModified = true
+        ) }
+    }
+
+    fun deleteAccountCurrency(currency: AccountCurrency) {
+        _state.update { it.copy(
+            entity = it.entity?.copy(currencies = it.entity.currencies.filter { it != currency }).also { self -> self!!.id = it.entity!!.id },
             isModified = true
         ) }
     }

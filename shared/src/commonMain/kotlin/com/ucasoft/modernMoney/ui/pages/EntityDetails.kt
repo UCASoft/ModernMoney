@@ -27,7 +27,7 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
 
     var detailsMode by remember { mutableStateOf(mode) }
 
-    val viewModel = koinViewModel<VM> { parametersOf(id) }
+    val viewModel = koinViewModel<VM>(key = id?.toString() ?: "") { parametersOf(id) }
     val detailState by viewModel.state.collectAsStateWithLifecycle()
 
     if (detailState.isLoading) {

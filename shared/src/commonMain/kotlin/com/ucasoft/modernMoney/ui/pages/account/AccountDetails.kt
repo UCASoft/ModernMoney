@@ -22,6 +22,7 @@ fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
         { account, viewModel ->
             when (mode) {
                 DetailsMode.ADD -> viewModel.addAccount(account)
+                DetailsMode.EDIT -> viewModel.updateAccount(account)
                 else -> {}
             }
         },

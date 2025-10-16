@@ -5,9 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ucasoft.modernMoney.db.model.Account
 import com.ucasoft.modernMoney.db.model.AccountWithCurrencies
-import com.ucasoft.modernMoney.model.AccountCurrency
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,6 +22,9 @@ interface AccountDao {
 
     @Insert
     suspend fun insert(account: Account): Long
+
+    @Update
+    suspend fun update(account: Account)
 
     @Delete
     suspend fun delete(account: Account): Int
