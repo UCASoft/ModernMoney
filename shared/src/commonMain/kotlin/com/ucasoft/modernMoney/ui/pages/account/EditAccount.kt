@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.HdrPlus
 import androidx.compose.material.icons.rounded.PlusOne
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.ucasoft.modernMoney.db.model.Currency
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.ui.pages.bank.BankDropDown
@@ -71,7 +74,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                 }
             ) {
                 Icon(
-                    Icons.Rounded.PlusOne,
+                    Icons.Rounded.Add,
                     "Add Currency"
                 )
             }
@@ -85,7 +88,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                 value = currencyCode,
                 onValueChange = {
                     currencyCode = it
-                    isValid.value = it.length == 3 && currencies.find { c -> c.currencyCode == it.uppercase() } == null
+                    //isValid.value = it.length == 3 && currencies.find { c -> c.currencyCode == it.uppercase() } == null
                 },
                 label = { Text("Currency Code") },
                 modifier = Modifier.fillMaxWidth()
@@ -96,13 +99,13 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
             ) {
                 IconButton(
                     onClick = {
-                        onCurrencyAdded(AccountCurrency(currencyCode))
+                        onCurrencyAdded(AccountCurrency(currency = Currency(name = "Czech koruna", code = "CZK", symbol = "Kč", isVisible = true)))
                         isEditVisible = false
                     },
                     enabled = isValid.value
                 ) {
                     Icon(
-                        Icons.Rounded.PlusOne,
+                        Icons.Rounded.Add,
                         "Add Currency"
                     )
                 }
@@ -111,7 +114,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
         LazyColumn{
             items(currencies) {
                 ListItem(
-                    headlineContent = { Text(it.currencyCode) },
+                    headlineContent = { Text(it.currency.code) },
                     trailingContent = {
                         if (it.id == 0L) {
                             IconButton(

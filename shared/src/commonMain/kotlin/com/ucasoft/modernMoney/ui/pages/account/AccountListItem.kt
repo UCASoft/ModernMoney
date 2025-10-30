@@ -177,7 +177,7 @@ private fun CurrenciesRow(currencies: List<AccountCurrency>) {
                     color = Color(0xFF111827)
                 )*/
                 Text(
-                    text = currency.currencyCode,
+                    text = currency.currency.code,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF6B7280)
                 )
