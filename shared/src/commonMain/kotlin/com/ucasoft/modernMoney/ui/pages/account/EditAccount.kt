@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.ui.pages.account
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,30 +57,12 @@ fun EditAccount(account: Account?, viewModel: AccountViewModel) {
 @Composable
 fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCurrency) -> Unit = {}, onCurrencyDeleted: (AccountCurrency) -> Unit = {}) {
 
-    var isEditVisible by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            IconButton(
-                onClick = {
-                    isEditVisible = true
-                }
-            ) {
-                Icon(
-                    Icons.Rounded.Add,
-                    "Add Currency"
-                )
-            }
-        }
-        if (isEditVisible) {
+        var currency by remember { mutableStateOf<Currency?>(null) }
 
-            var currency by remember { mutableStateOf<Currency?>(null) }
-
+        Row {
             CurrencyDropDown(
                 currency,
                 onCurrencySelected = {
@@ -93,7 +76,6 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                 IconButton(
                     onClick = {
                         onCurrencyAdded(AccountCurrency(currency = currency!!))
-                        isEditVisible = false
                     },
                     enabled = currency != null
                 ) {
@@ -104,7 +86,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                 }
             }
         }
-        LazyColumn{
+        LazyColumn {
             items(currencies) {
                 ListItem(
                     headlineContent = { Text(it.currency.name) },
@@ -114,7 +96,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                                 onClick = {
                                     onCurrencyDeleted(it)
                                 }
-                            ){
+                            ) {
                                 Icon(
                                     Icons.Rounded.Delete,
                                     "Delete Currency"
