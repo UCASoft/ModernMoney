@@ -8,22 +8,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.HdrPlus
-import androidx.compose.material.icons.rounded.PlusOne
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ucasoft.modernMoney.db.model.Currency
+import com.ucasoft.modernMoney.model.Currency
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.ui.pages.bank.BankDropDown
@@ -81,17 +78,13 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
         }
         if (isEditVisible) {
 
-            var currencyCode by remember { mutableStateOf("") }
-            val isValid: MutableState<Boolean> = remember { mutableStateOf(false) }
+            var currency by remember { mutableStateOf<Currency?>(null) }
 
-            OutlinedTextField(
-                value = currencyCode,
-                onValueChange = {
-                    currencyCode = it
-                    //isValid.value = it.length == 3 && currencies.find { c -> c.currencyCode == it.uppercase() } == null
-                },
-                label = { Text("Currency Code") },
-                modifier = Modifier.fillMaxWidth()
+            CurrencyDropDown(
+                currency,
+                onCurrencySelected = {
+                    currency = it
+                }
             )
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,10 +92,10 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
             ) {
                 IconButton(
                     onClick = {
-                        onCurrencyAdded(AccountCurrency(currency = Currency(name = "Czech koruna", code = "CZK", symbol = "Kč", isVisible = true)))
+                        onCurrencyAdded(AccountCurrency(currency = currency!!))
                         isEditVisible = false
                     },
-                    enabled = isValid.value
+                    enabled = currency != null
                 ) {
                     Icon(
                         Icons.Rounded.Add,
@@ -114,7 +107,7 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
         LazyColumn{
             items(currencies) {
                 ListItem(
-                    headlineContent = { Text(it.currency.code) },
+                    headlineContent = { Text(it.currency.name) },
                     trailingContent = {
                         if (it.id == 0L) {
                             IconButton(

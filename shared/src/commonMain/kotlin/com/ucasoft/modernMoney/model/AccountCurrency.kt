@@ -1,7 +1,7 @@
 package com.ucasoft.modernMoney.model
 
-import com.ucasoft.modernMoney.db.model.Currency
 import com.ucasoft.modernMoney.db.model.AccountCurrency as DbAccountCurrency
+import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
 
 data class AccountCurrency (
     val currency: Currency
@@ -10,10 +10,10 @@ data class AccountCurrency (
         internal set
 
     fun mapToDbAccountCurrency(accountId: Long) =
-        DbAccountCurrency(id, accountId = accountId, currencyId = currency.id)
+        DbAccountCurrency(id, accountId = accountId, currencyCode = currency.code)
 }
 
-fun DbAccountCurrency.mapToCurrency() =
+fun AccountCurrencyWithCurrency.mapToCurrency() =
     AccountCurrency(
-        currency = Currency(name = "Czech koruna", code = "CZK", symbol = "Kč", isVisible = true)
-    ).also { it.id = id }
+        currency = currency.mapToCurrency()
+    ).also { it.id = accountCurrency.id }

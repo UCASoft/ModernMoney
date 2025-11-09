@@ -1,8 +1,10 @@
 package com.ucasoft.modernMoney.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(
     tableName = "account_currencies",
@@ -26,4 +28,15 @@ data class AccountCurrency (
     val id: Long = 0L,
     val accountId: Long,
     val currencyCode: String
+)
+
+
+data class AccountCurrencyWithCurrency(
+    @Embedded
+    val accountCurrency: AccountCurrency,
+    @Relation(
+        parentColumn = "currencyCode",
+        entityColumn = "code"
+    )
+    val currency: Currency
 )

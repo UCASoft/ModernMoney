@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -30,6 +31,7 @@ import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import me.zhanghai.compose.preference.ListPreference
 import me.zhanghai.compose.preference.ListPreferenceType
 import me.zhanghai.compose.preference.MultiSelectListPreference
+import me.zhanghai.compose.preference.Preference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.TextFieldPreference
 import me.zhanghai.compose.preference.TwoTargetSwitchPreference
@@ -83,15 +85,21 @@ fun CurrenciesPreference() {
 
     val currenciesViewModel = koinViewModel<CurrenciesViewModel>()
 
-    val currenciesState by currenciesViewModel.listState.collectAsStateWithLifecycle()
+    val currenciesState by currenciesViewModel.fullState.collectAsStateWithLifecycle()
 
-    if (!currenciesState.isLoading) {
+    if (currenciesState.isLoading) {
+        Preference(
+            title = { Text("Currencies") },
+            enabled = false,
+            widgetContainer = { CircularProgressIndicator() }
+        )
+    } else {
         MultiSelectListPreference(
-            value = currenciesState.items.filter { it.isVisible }.toSet(),
+            value = currenciesState.items.toSet(),
             onValueChange = {
-                println(it)
+                currenciesViewModel.updateCurrencies(it.toList())
             },
-            values = currenciesState.items,
+            values = currenciesState.remote,
             title = { Text("Currencies") },
             item = { v, vs, t ->
                 ListItem(

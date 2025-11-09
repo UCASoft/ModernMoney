@@ -1,7 +1,7 @@
 package com.ucasoft.modernMoney.model
 
+import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
 import com.ucasoft.modernMoney.db.model.Account as DbAccount
-import com.ucasoft.modernMoney.db.model.AccountCurrency as DbAccountCurrency
 import com.ucasoft.modernMoney.db.model.Bank as DbBank
 
 data class AccountCard(
@@ -32,7 +32,7 @@ data class Account(
         )
 }
 
-fun DbAccount.mapToAccount(currencies: List<DbAccountCurrency>, bank: DbBank?) =
+fun DbAccount.mapToAccount(currencies: List<AccountCurrencyWithCurrency>, bank: DbBank?) =
     Account(
         name,
         currencies.map { it.mapToCurrency() },

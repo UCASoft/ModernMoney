@@ -4,22 +4,60 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CurrencyDao
 import com.ucasoft.modernMoney.model.Currency
 import com.ucasoft.modernMoney.model.mapToCurrency
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import com.ucasoft.modernMoney.network.CurrencyClient
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import kotlin.collections.map
 
-class CurrenciesViewModel(private val currencyDao: CurrencyDao): ListViewModel<Currency, CurrenciesUiState>() {
-    
-    override val listState = currencyDao.allCurrencies().map {
-        CurrenciesUiState(it.map { it.mapToCurrency() })
+class CurrenciesViewModel : ListViewModel<Currency, CurrencyUiState>(), KoinComponent {
+
+    private val client by inject<CurrencyClient>()
+
+    private val currenciesDao by inject<CurrencyDao>()
+
+    private val fullCurrencyFlow = combine(
+        currenciesDao.visibleCurrencies().onStart { emit(emptyList()) },
+        flow {
+            val remote = client.fetchCurrencies()
+            emit(remote)
+        }
+    ) { l, r ->
+        CurrencyUiState(l.map { it.mapToCurrency() }, r.map { it.mapToCurrency() })
+    }
+
+    val fullState = fullCurrencyFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = CurrencyUiState(isLoading = true)
+    )
+
+    override val listState = currenciesDao.allCurrencies().map {
+        CurrencyUiState(it.map { it.mapToCurrency() })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = CurrenciesUiState(isLoading = true)
+        initialValue = CurrencyUiState(isLoading = true)
     )
+
+    val visibleState = currenciesDao.visibleCurrencies().map {
+        CurrencyUiState(it.map { it.mapToCurrency() })
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = CurrencyUiState(isLoading = true)
+    )
+
+    fun updateCurrencies(currencies: List<Currency>) {
+        viewModelScope.launch {
+            currenciesDao.refreshCurrencies(currencies.map { it.mapToCurrency() })
+        }
+    }
 }
 
-data class CurrenciesUiState(
+data class CurrencyUiState(
     override val items: List<Currency> = emptyList(),
+    val remote: List<Currency> = emptyList(),
     override val isLoading: Boolean = false
 ) : ListState<Currency>

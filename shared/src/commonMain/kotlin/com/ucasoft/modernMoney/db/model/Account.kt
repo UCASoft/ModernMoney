@@ -29,9 +29,10 @@ data class AccountWithCurrencies(
     val account: Account,
     @Relation(
         parentColumn = "id",
-        entityColumn = "accountId"
+        entityColumn = "accountId",
+        entity = AccountCurrency::class
     )
-    val currencies: List<AccountCurrency>,
+    val currencies: List<AccountCurrencyWithCurrency>,
     @Relation(
         parentColumn = "bankId",
         entityColumn = "id"

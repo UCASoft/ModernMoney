@@ -84,7 +84,7 @@ private fun AccountHeader(
                     BankInfoRow(bankInfo = account.bank!!)
                 }
 
-                CurrenciesRow(currencies = account.currencies)
+                CurrenciesRow(accountCurrencies = account.currencies)
             }
         }
 
@@ -161,12 +161,12 @@ private fun BankInfoRow(bankInfo: Bank) {
 }
 
 @Composable
-private fun CurrenciesRow(currencies: List<AccountCurrency>) {
+private fun CurrenciesRow(accountCurrencies: List<AccountCurrency>) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        currencies.forEach { currency ->
+        accountCurrencies.map { it.currency }.forEach { currency ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -177,7 +177,7 @@ private fun CurrenciesRow(currencies: List<AccountCurrency>) {
                     color = Color(0xFF111827)
                 )*/
                 Text(
-                    text = currency.currency.code,
+                    text = currency.symbol,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF6B7280)
                 )
