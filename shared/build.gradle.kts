@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -39,6 +40,8 @@ kotlin {
 
                 implementation(libs.preference)
                 api(libs.settings)
+
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 
