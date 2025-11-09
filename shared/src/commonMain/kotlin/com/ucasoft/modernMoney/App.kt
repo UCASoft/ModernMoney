@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ucasoft.modernMoney.di.daoModule
+import com.ucasoft.modernMoney.di.networkModule
 import com.ucasoft.modernMoney.di.platformDbModule
 import com.ucasoft.modernMoney.di.viewModelModule
 import com.ucasoft.modernMoney.ui.MainLayout
@@ -39,7 +40,7 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
 fun App() {
     KoinMultiplatformApplication(
         config = koinConfiguration {
-            modules(platformDbModule, daoModule, viewModelModule)
+            modules(platformDbModule, daoModule, viewModelModule, networkModule)
         }
     ) {
         ModernMoneyTheme {
