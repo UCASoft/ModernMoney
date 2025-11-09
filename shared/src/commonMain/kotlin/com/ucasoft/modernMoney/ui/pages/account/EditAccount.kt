@@ -39,7 +39,7 @@ fun EditAccount(account: Account?, viewModel: AccountViewModel) {
         BankDropDown(account?.bank) {
             viewModel.updateAccountBank(it)
         }
-        if (account?.bank != null) {
+        if (account != null) {
             CurrencyPanel(
                 account.currencies,
                 onCurrencyAdded = {
