@@ -7,10 +7,9 @@ import androidx.room.PrimaryKey
     tableName = "currencies"
 )
 data class Currency(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
+    @PrimaryKey
+    val code: String = "",
     val name: String,
-    val code: String,
     val symbol: String,
     val isVisible: Boolean = false
 )

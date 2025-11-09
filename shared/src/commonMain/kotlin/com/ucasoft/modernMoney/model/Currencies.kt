@@ -1,25 +1,22 @@
 package com.ucasoft.modernMoney.model
 
 import com.ucasoft.modernMoney.db.model.Currency as DbCurrency
+import com.ucasoft.modernMoney.network.model.Currency as NetworkCurrency
 
 data class Currency(
     val name: String,
     val code: String,
     val symbol: String,
     val isVisible: Boolean
-) : KeyEntity<Long> {
+) : KeyEntity<String> {
 
-    var id: Long = 0L
-        internal set
-
-    override val key: Long
-        get() = id
+    override val key: String
+        get() = code
 
     fun mapToCurrency() =
         DbCurrency(
-            id,
-            name,
             code,
+            name,
             symbol,
             isVisible
         )
@@ -31,4 +28,12 @@ fun DbCurrency.mapToCurrency() =
         code,
         symbol,
         isVisible
-    ).also { it.id = id }
+    )
+
+fun NetworkCurrency.mapToCurrency() =
+    Currency(
+        name,
+        code,
+        symbol,
+        true
+    )

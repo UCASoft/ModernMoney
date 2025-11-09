@@ -38,17 +38,5 @@ expect object ModernMoneyDatabaseConstructor : RoomDatabaseConstructor<ModernMon
 }
 
 fun getRoomDatabase(builder: RoomDatabase.Builder<ModernMoneyDatabase>) : ModernMoneyDatabase {
-    return builder.addCallback(object : RoomDatabase.Callback() {
-        override fun onCreate(connection: SQLiteConnection) {
-            super.onCreate(connection)
-            CoroutineScope(Dispatchers.IO).launch {
-                val database = builder.build()
-                val dao = database.currencyDao
-                dao.insert(Currency(name = "Czech koruna", code = "CZK", symbol = "Kč", isVisible = true))
-                dao.insert(Currency(name = "Euro", code = "EUR", symbol = "€", isVisible = true))
-                dao.insert(Currency(name = "United States dollar", code = "USD", symbol = "$", isVisible = true))
-            }
-        }
-    }
-    ).setDriver(BundledSQLiteDriver()).setQueryCoroutineContext(Dispatchers.IO).build()
+    return builder.setDriver(BundledSQLiteDriver()).setQueryCoroutineContext(Dispatchers.IO).build()
 }

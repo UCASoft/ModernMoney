@@ -15,8 +15,8 @@ import androidx.room.PrimaryKey
         ),
         ForeignKey(
             entity = Currency::class,
-            parentColumns = [ "id" ],
-            childColumns = [ "currencyId" ],
+            parentColumns = [ "code" ],
+            childColumns = [ "currencyCode" ],
             onDelete = ForeignKey.RESTRICT
         )
     ]
@@ -25,5 +25,5 @@ data class AccountCurrency (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val accountId: Long,
-    val currencyId: Long
+    val currencyCode: String
 )
