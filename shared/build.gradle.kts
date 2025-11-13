@@ -1,3 +1,5 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
+
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
@@ -50,9 +52,24 @@ kotlin {
             }
         }
 
+        @OptIn(ExperimentalComposeLibrary::class)
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(compose.uiTest)
+                implementation(libs.mock)
+            }
+        }
+
         val jvmMain by getting {
             dependencies {
                 runtimeOnly(libs.kotlinx.coroutines.swing)
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
             }
         }
     }
