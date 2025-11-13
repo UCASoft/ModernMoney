@@ -21,7 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BankDropDown(current: Bank?, isEmptyAllowed: Boolean = true, onBankSelected: (Bank?) -> Unit) {
+fun BankDropDown(current: Bank?, label: String = "Bank", isEmptyAllowed: Boolean = true, onBankSelected: (Bank?) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
     val viewModel = koinViewModel<BanksViewModel>()
@@ -36,7 +36,8 @@ fun BankDropDown(current: Bank?, isEmptyAllowed: Boolean = true, onBankSelected:
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = { Text(label) }
         )
         ExposedDropdownMenu(
             expanded = expanded,

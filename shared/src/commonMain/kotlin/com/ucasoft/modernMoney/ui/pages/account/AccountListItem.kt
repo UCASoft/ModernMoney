@@ -24,7 +24,25 @@ import com.ucasoft.modernMoney.model.Bank
 @Composable
 fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
 
-    var expanded by remember { mutableStateOf(false) }
+    ListItem(
+        leadingContent = { AccountIcon(account) },
+        headlineContent = {
+            Text(
+                text = account.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        supportingContent = { CurrenciesRow(account.currencies) },
+        overlineContent = {
+            if (account.isBankAccount) {
+                BankInfoRow(bankInfo = account.bank!!)
+            }
+        },
+        modifier = Modifier.clickable { onClick(account.id) }
+    )
+
+    /*var expanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -44,7 +62,7 @@ fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
                 CardsList(cards = account.cards)
             }
         }
-    }
+    }*/
 }
 
 @Composable

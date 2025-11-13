@@ -10,7 +10,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyDropDown(current: Currency?, onCurrencySelected: (Currency) -> Unit) {
+fun CurrencyDropDown(current: Currency?, label: String = "Currency", onCurrencySelected: (Currency) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
     val viewModel = koinViewModel<CurrenciesViewModel>()
@@ -25,7 +25,8 @@ fun CurrencyDropDown(current: Currency?, onCurrencySelected: (Currency) -> Unit)
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = { Text(label) }
         )
         ExposedDropdownMenu(
             expanded = expanded,

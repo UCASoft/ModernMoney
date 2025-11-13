@@ -37,9 +37,6 @@ fun EditAccount(account: Account?, viewModel: AccountViewModel) {
             },
             label = { Text("Account Name") }
         )
-        BankDropDown(account?.bank) {
-            viewModel.updateAccountBank(it)
-        }
         if (account != null) {
             CurrencyPanel(
                 account.currencies,
@@ -50,6 +47,9 @@ fun EditAccount(account: Account?, viewModel: AccountViewModel) {
                     viewModel.deleteAccountCurrency(it)
                 }
             )
+        }
+        BankDropDown(account?.bank) {
+            viewModel.updateAccountBank(it)
         }
     }
 }
