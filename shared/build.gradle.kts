@@ -77,7 +77,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                implementation("androidx.compose.ui:ui-test-junit4-android:1.9.4")
+                implementation(libs.androidx.ui.test.android)
             }
         }
     }
