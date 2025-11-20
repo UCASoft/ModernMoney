@@ -24,7 +24,8 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 value = bank?.name ?: "",
                 onValueChange = {
                     viewModel.updateBankName(it)
-                }
+                },
+                label = { Text("Name") }
             )
         },
         { bank, viewModel ->

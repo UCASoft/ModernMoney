@@ -66,7 +66,7 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
             ) {
                 Icon(
                     Icons.Rounded.Edit,
-                    ""
+                    "Edit"
                 )
             }
         }

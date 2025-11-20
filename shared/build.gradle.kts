@@ -15,6 +15,7 @@ kotlin {
     jvm()
     androidTarget()
     sourceSets {
+        @OptIn(ExperimentalComposeLibrary::class)
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
@@ -49,6 +50,8 @@ kotlin {
                 implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.json)
+
+                api(compose.uiTest)
             }
         }
 
@@ -56,7 +59,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation(compose.uiTest)
                 implementation(libs.mock)
             }
         }
@@ -70,6 +72,12 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+            }
+        }
+
+        val androidMain by getting {
+            dependencies {
+                implementation("androidx.compose.ui:ui-test-junit4-android:1.9.4")
             }
         }
     }

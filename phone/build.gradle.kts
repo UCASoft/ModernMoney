@@ -17,6 +17,14 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
             }
         }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation("androidx.compose.ui:ui-test-junit4-android:1.9.4")
+                implementation("androidx.compose.ui:ui-test-manifest:1.9.4")
+                implementation("androidx.test:runner:1.5.0")
+                implementation("androidx.test:rules:1.5.0")
+            }
+        }
     }
 }
 
@@ -29,6 +37,7 @@ android {
         minSdk = 29
         version = 1
         versionName = "0.0.1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
