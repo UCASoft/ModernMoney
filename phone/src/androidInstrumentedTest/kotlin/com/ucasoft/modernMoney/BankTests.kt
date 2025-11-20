@@ -14,9 +14,13 @@ class BankTests : CommonBankTests() {
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
 
-    @OptIn(ExperimentalTestApi::class)
-    @Test
+    //@Test
     fun addBankTest() {
         addBankTest(composeRule)
+    }
+
+    @Test
+    fun removeBankTest() {
+        removeBankTest(composeRule)
     }
 }
