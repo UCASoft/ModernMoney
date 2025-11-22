@@ -5,17 +5,14 @@ import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModelOf(::AccountsViewModel)
-    factory { (id: Long?) ->
-        AccountViewModel(get(), get(), id)
-    }
+    viewModel { AccountViewModel(get(), get(), it.getOrNull()) }
     viewModelOf(::BanksViewModel)
-    factory { (id: Long?) ->
-        BankViewModel(get(), id)
-    }
+    viewModel { BankViewModel(get(), it.getOrNull()) }
     viewModelOf(::CurrenciesViewModel)
 }

@@ -20,7 +20,7 @@ import org.koin.core.parameter.parametersOf
 inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityDetails(
     id: K?,
     viewContent: @Composable (T) -> Unit,
-    editContent: @Composable (T?, VM, DetailsMode) -> Unit,
+    editContent: @Composable (T?, Map<String, String>, VM, DetailsMode) -> Unit,
     crossinline onSaveButtonClick: (T, VM) -> Unit = { _, _ -> },
     noinline saveButtonEnable: ((S) -> Boolean)? = null,
     mode: DetailsMode = DetailsMode.VIEW) {
@@ -63,7 +63,7 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
                         )
                     }
                 }
-                editContent(detailState.entity, viewModel, detailsMode)
+                editContent(detailState.entity, detailState.errors, viewModel, detailsMode)
             }
         }
     }

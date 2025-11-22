@@ -12,4 +12,5 @@ abstract class DetailViewModel<T: KeyEntity<*>, S: DetailsState<T>>: ViewModel()
 interface DetailsState<T: KeyEntity<*>>: StateWithLoading {
     val entity: T?
     val isModified: Boolean
+    val errors: Map<String, String>
 }

@@ -88,5 +88,6 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 data class AccountUiState(
     override val entity: Account? = null,
     override val isModified: Boolean = false,
-    override val isLoading: Boolean = false
+    override val isLoading: Boolean = false,
+    override val errors: Map<String, String> = emptyMap()
 ) : DetailsState<Account>

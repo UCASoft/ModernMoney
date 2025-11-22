@@ -19,13 +19,15 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 it.name
             )
         },
-        { bank, viewModel, _ ->
+        { bank, errors, viewModel, _ ->
             OutlinedTextField(
                 value = bank?.name ?: "",
                 onValueChange = {
                     viewModel.updateBankName(it)
                 },
-                label = { Text("Name") }
+                label = { Text("Name") },
+                isError = errors.containsKey("name"),
+                supportingText = { Text(errors["name"] ?: "") }
             )
         },
         { bank, viewModel ->
@@ -34,6 +36,9 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 DetailsMode.EDIT -> viewModel.updateBank(bank)
                 else -> {}
             }
+        },
+        {
+            it.errors.isEmpty()
         },
         mode = mode
     )

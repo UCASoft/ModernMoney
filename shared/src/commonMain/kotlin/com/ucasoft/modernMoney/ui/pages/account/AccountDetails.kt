@@ -16,7 +16,7 @@ fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
         {
             Text(it.name)
         },
-        { account, viewModel, _ ->
+        { account, _, viewModel, _ ->
             EditAccount(account, viewModel)
         },
         { account, viewModel ->
