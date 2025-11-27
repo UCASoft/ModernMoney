@@ -30,7 +30,7 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Ba
             }
         } else {
             val newBank = Bank("")
-            _state.update { BankUiState(newBank, isModified = true, errors = validate(newBank, emptyList())) }
+            _state.update { BankUiState(newBank, isModified = true, errors = validate(newBank, allBanks)) }
         }
     }
 

@@ -9,37 +9,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ucasoft.modernMoney.model.Currency
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.model.Currency
 import com.ucasoft.modernMoney.ui.pages.bank.BankDropDown
 import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 
 @Composable
-fun EditAccount(account: Account?, viewModel: AccountViewModel) {
+fun EditAccount(account: Account?, errors: Map<String, String>, viewModel: AccountViewModel) {
     Column {
         OutlinedTextField(
             value = account?.name ?: "",
             onValueChange = {
                 viewModel.updateAccountName(it)
             },
-            label = { Text("Account Name") }
+            label = { Text("Account Name") },
+            isError = errors.containsKey("name"),
+            supportingText = { Text(errors["name"] ?: "") }
         )
         if (account != null) {
             CurrencyPanel(
                 account.currencies,
+                errors["currencies"],
                 onCurrencyAdded = {
                     viewModel.addAccountCurrency(it)
                 },
@@ -55,7 +50,12 @@ fun EditAccount(account: Account?, viewModel: AccountViewModel) {
 }
 
 @Composable
-fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCurrency) -> Unit = {}, onCurrencyDeleted: (AccountCurrency) -> Unit = {}) {
+fun CurrencyPanel(
+    currencies: List<AccountCurrency>,
+    error: String?,
+    onCurrencyAdded: (AccountCurrency) -> Unit = {},
+    onCurrencyDeleted: (AccountCurrency) -> Unit = {}
+) {
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -85,6 +85,12 @@ fun CurrencyPanel(currencies: List<AccountCurrency>, onCurrencyAdded: (AccountCu
                     )
                 }
             }
+        }
+        if (error != null) {
+            Text(
+                error,
+                color = MaterialTheme.colorScheme.error
+            )
         }
         LazyColumn {
             items(currencies) {

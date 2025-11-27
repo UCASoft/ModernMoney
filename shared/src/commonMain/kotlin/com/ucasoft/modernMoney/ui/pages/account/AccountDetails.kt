@@ -16,8 +16,8 @@ fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
         {
             Text(it.name)
         },
-        { account, _, viewModel, _ ->
-            EditAccount(account, viewModel)
+        { account, errors, viewModel, _ ->
+            EditAccount(account, errors, viewModel)
         },
         { account, viewModel ->
             when (mode) {
@@ -25,6 +25,9 @@ fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 DetailsMode.EDIT -> viewModel.updateAccount(account)
                 else -> {}
             }
+        },
+        {
+          it.errors.isEmpty()
         },
         mode = mode
     )
