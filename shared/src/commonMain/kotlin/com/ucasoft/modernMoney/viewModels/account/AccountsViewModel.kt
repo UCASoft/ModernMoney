@@ -15,7 +15,7 @@ class AccountsViewModel(private val accountDao: AccountDao) : ListViewModel<Acco
 
     override val listState = accountDao.allAccounts().map {
         AccountsUiState(it.map {
-            it.account.mapToAccount(it.currencies, it.bank)
+            it.account.mapToAccount(it.currencies, it.bank, it.cards)
         })
     }.stateIn(
         scope = viewModelScope,

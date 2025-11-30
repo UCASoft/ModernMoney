@@ -21,8 +21,11 @@ import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Bank
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
+
+    var expanded by remember { mutableStateOf(false) }
 
     ListItem(
         leadingContent = { AccountIcon(account) },
@@ -33,10 +36,26 @@ fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
                 fontWeight = FontWeight.SemiBold
             )
         },
-        supportingContent = { CurrenciesRow(account.currencies) },
+        supportingContent = {
+            Column {
+                CurrenciesRow(account.currencies)
+                if (expanded) {
+                    CardsList(account.cards)
+                }
+            }
+        },
         overlineContent = {
             if (account.isBankAccount) {
                 BankInfoRow(bankInfo = account.bank!!)
+            }
+        },
+        trailingContent = {
+            if (account.cards.isNotEmpty()) {
+                IconButton({
+                    expanded = !expanded
+                }) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(false)
+                }
             }
         },
         modifier = Modifier.clickable { onClick(account.id) }
@@ -285,7 +304,7 @@ private fun CardItem(card: AccountCard) {
                         color = Color(0xFF111827)
                     )
                     Text(
-                        text = "•••• ${card.lastFour}",
+                        text = "•••• ${card.number}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF6B7280)
                     )

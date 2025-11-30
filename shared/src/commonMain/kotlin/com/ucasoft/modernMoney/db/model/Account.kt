@@ -37,5 +37,10 @@ data class AccountWithCurrencies(
         parentColumn = "bankId",
         entityColumn = "id"
     )
-    val bank: Bank?
+    val bank: Bank?,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "accountId"
+    )
+    val cards: List<AccountCard>
 )

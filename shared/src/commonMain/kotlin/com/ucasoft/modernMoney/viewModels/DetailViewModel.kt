@@ -9,8 +9,7 @@ abstract class DetailViewModel<T: KeyEntity<*>, S: DetailsState<T>>: ViewModel()
     abstract val state: StateFlow<S>
 }
 
-interface DetailsState<T: KeyEntity<*>>: StateWithLoading {
+interface DetailsState<T: KeyEntity<*>>: StateWithLoading, StateWithErrors {
     val entity: T?
     val isModified: Boolean
-    val errors: Map<String, String>
 }

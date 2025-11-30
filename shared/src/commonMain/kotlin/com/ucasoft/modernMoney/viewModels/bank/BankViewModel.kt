@@ -61,7 +61,7 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Ba
         }
     }
 
-    fun validate(bank: Bank, others: List<Bank>) = when {
+    private fun validate(bank: Bank, others: List<Bank>) = when {
             bank.name.isBlank() -> mapOf("name" to "Name cannot be empty or blank!")
             others.any { it.name == bank.name } -> mapOf("name" to "Bank with name ${bank.name} already exists!")
             else -> emptyMap()

@@ -1,9 +1,11 @@
 package com.ucasoft.modernMoney.viewModels.account
 
 import androidx.lifecycle.viewModelScope
+import com.ucasoft.modernMoney.db.dto.AccountCardDao
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.model.Account
+import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.mapToAccount
@@ -14,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AccountViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao, id: Long?) : DetailViewModel<Account, AccountUiState>() {
+class AccountViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao, private val accountCardDao: AccountCardDao, id: Long?) : DetailViewModel<Account, AccountUiState>() {
 
     private val _state = MutableStateFlow(AccountUiState(isLoading = true))
     override val state = _state.asStateFlow()
@@ -23,12 +25,12 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 
     init {
         viewModelScope.launch {
-            accountDao.allAccounts().collect { allAccounts.addAll(it.map { it.account.mapToAccount(it.currencies, it.bank) }) }
+            accountDao.allAccounts().collect { allAccounts.addAll(it.map { it.account.mapToAccount(it.currencies, it.bank, it.cards) }) }
         }
         if (id != null) {
             viewModelScope.launch {
                 accountDao.accountById(id).collect { account ->
-                    _state.update { it.copy(entity = account.account.mapToAccount(account.currencies, account.bank), isLoading = false) }
+                    _state.update { it.copy(entity = account.account.mapToAccount(account.currencies, account.bank, account.cards), isLoading = false) }
                 }
             }
         } else {
@@ -43,6 +45,9 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
             account.currencies.forEach {
                 accountCurrencyDao.insert(it.mapToDbAccountCurrency(accountId))
             }
+            account.cards.forEach {
+                accountCardDao.insert(it.mapToDbAccountCard(accountId))
+            }
         }
     }
 
@@ -52,6 +57,7 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
             account.currencies.filter { it.id == 0L }.forEach {
                 accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
             }
+            accountCardDao.refreshCards(account.id, account.cards.map { it.mapToDbAccountCard(account.id) })
         }
     }
 
@@ -98,7 +104,23 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         }
     }
 
-    fun validate(account: Account): Map<String, String> {
+    fun addCard(card: AccountCard) {
+        _state.update {
+            it.copy(
+                entity = it.entity!!.copy(cards = it.entity.cards + card).also { self -> self.id = it.entity.id }
+            )
+        }
+    }
+
+    fun deleteCard(card: AccountCard) {
+        _state.update {
+            it.copy(
+                entity = it.entity!!.copy(cards = it.entity.cards.filter { it != card }).also { self -> self.id = it.entity.id }
+            )
+        }
+    }
+
+    private fun validate(account: Account): Map<String, String> {
         val errors = mutableMapOf<String, String>()
         when {
             account.name.isBlank() -> errors["name"] = "Name cannot be empty or blank!"
