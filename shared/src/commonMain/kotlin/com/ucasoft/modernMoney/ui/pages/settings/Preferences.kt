@@ -25,9 +25,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
+import com.russhwolf.settings.observable.makeObservable
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
+import com.ucasoft.modernMoney.viewModels.SettingsViewModel
 import me.zhanghai.compose.preference.ListPreference
 import me.zhanghai.compose.preference.ListPreferenceType
 import me.zhanghai.compose.preference.MultiSelectListPreference
@@ -40,23 +43,22 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun Preferences() {
 
-    val settings = Settings()
+    val viewModel = koinViewModel<SettingsViewModel>()
 
-    var language by remember { mutableStateOf(settings["language", "EN"]) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     var protected by remember { mutableStateOf(false) }
 
     ProvidePreferenceLocals {
         Column {
             ListPreference(
-                value = language,
+                value = state.language,
                 onValueChange = {
-                    settings.putString("language", it)
-                    language = it
+                    viewModel.setLanguage(it)
                 },
                 values = listOf("EN", "FR"),
                 title = { Text("Language") },
-                summary = { Text(language) },
+                summary = { Text(state.language) },
                 type = ListPreferenceType.DROPDOWN_MENU
             )
             TwoTargetSwitchPreference(

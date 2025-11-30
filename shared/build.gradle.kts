@@ -43,6 +43,8 @@ kotlin {
 
                 implementation(libs.preference)
                 api(libs.settings)
+                api(libs.settings.coroutines)
+                api(libs.settings.observable)
 
                 implementation(libs.kotlinx.serialization.json)
 
