@@ -29,6 +29,7 @@ import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 import com.ucasoft.modern_money.shared.generated.resources.Res
 import com.ucasoft.modern_money.shared.generated.resources.allDrawableResources
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -194,7 +195,9 @@ fun AddCardPanel(onCardAdded: (AccountCard) -> Unit) {
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
-                )
+                ),
+                isError = state.value.errors.containsKey("number"),
+                supportingText = { Text(state.value.errors["number"] ?: "") }
             )
         }
         Box(

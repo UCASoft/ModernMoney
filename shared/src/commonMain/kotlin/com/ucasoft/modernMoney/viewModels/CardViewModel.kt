@@ -38,10 +38,17 @@ class CardViewModel : ViewModel() {
         }
     }
 
-    private fun validate(card: AccountCard) = when {
-        card.type.isBlank() -> mapOf("type" to "Choose type of card!")
-        card.number.length != 4 || card.number.any { !it.isDigit() } -> mapOf("number" to "Card number must contain exact 4 digits!")
-        else -> emptyMap()
+    private fun validate(card: AccountCard): Map<String, String> {
+        val errors = mutableMapOf<String, String>()
+        if (card.type.isBlank()) {
+            errors["type"] = "Choose type of card!"
+        }
+
+        if (card.number.length != 4 || card.number.any { !it.isDigit() }) {
+            errors["number"] = "Card number must contain exact 4 digits!"
+        }
+
+        return errors
     }
 }
 
