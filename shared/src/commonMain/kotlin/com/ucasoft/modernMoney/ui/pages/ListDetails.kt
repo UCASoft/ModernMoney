@@ -21,15 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
+import com.ucasoft.components.treeview.TreeView
+import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.modernMoney.model.KeyEntity
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> ListDetails(
     crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
@@ -38,6 +41,78 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
     noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
     noinline onDeleting: ((T) -> Boolean)? = null,
     noinline onDelete: ((T, VM) -> Boolean)? = null,
+    crossinline detailContent: @Composable (NK) -> Unit
+) {
+    BaseListDetails<NK, VM, S, T>(
+        onAddClickEvent,
+        listContent = { items, viewModel, navigator, scope ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(
+                    items = items,
+                    key = { it.key!! }
+                ) {
+                    EditableListItem(
+                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(it) } } else null,
+                        onDelete = if (onDelete != null) { { onDelete.invoke(it, viewModel) } } else null,
+                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(it, navigator) }; true  } } else null
+                    ) {
+                        listContent(it) { item ->
+                            scope.launch {
+                                onListItemEvent(item, navigator)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        detailContent
+    )
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T> TreeViewDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+    noinline onDeleting: ((T) -> Boolean)? = null,
+    noinline onDelete: ((T, VM) -> Boolean)? = null,
+    crossinline detailContent: @Composable (NK) -> Unit
+) where T: KeyEntity<*>, T: TreeViewNode<*> {
+    BaseListDetails<NK, VM, S, T>(
+        onAddClickEvent,
+        listContent = { items, viewModel, navigator, scope ->
+            TreeView(
+                items as List<TreeViewNode<T>>,
+                { node, content ->
+                    EditableListItem(
+                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(node as T) } } else null,
+                        onDelete = if (onDelete != null) { { onDelete.invoke(node as T, viewModel) } } else null,
+                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(node as T, navigator) }; true  } } else null
+                    ) {
+                        content()
+                    }
+                }
+                ) {
+                scope.launch {
+                    onListItemEvent(it as T, navigator)
+                }
+            }
+        },
+        detailContent
+    )
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
+@Composable
+inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> BaseListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+    crossinline listContent: @Composable (List<T>, VM, ThreePaneScaffoldNavigator<NK>, CoroutineScope) -> Unit,
     crossinline detailContent: @Composable (NK) -> Unit
 ) {
 
@@ -77,29 +152,7 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
                         CircularProgressIndicator()
                     }
                 } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(
-                            items = state.items,
-                            key = { it.key!! }
-                        ) {
-                            EditableListItem(
-                                onDeleting = if (onDeleting != null) { { onDeleting.invoke(it) } } else null,
-                                onDelete = if (onDelete != null) { { onDelete.invoke(it, viewModel) } } else null,
-                                onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(it, navigator) }; true  } } else null
-                            ) {
-                                listContent(it) { item ->
-                                    scope.launch {
-                                        onListItemEvent(item, navigator)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    listContent(state.items, viewModel, navigator, scope)
                 }
             }
         },
