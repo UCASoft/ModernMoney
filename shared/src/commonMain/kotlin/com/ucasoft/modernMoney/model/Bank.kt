@@ -1,9 +1,13 @@
 package com.ucasoft.modernMoney.model
 
+import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.modernMoney.db.model.Bank as DbBank
+import com.ucasoft.modernMoney.ui.toImageBitmap
+import com.ucasoft.modernMoney.ui.toByteArray
 
 data class Bank(
-    val name: String
+    val name: String,
+    val logo: ImageBitmap? = null
 ) : KeyEntity<Long> {
     var id: Long = 0L
         internal set
@@ -14,11 +18,13 @@ data class Bank(
     fun mapToBank() =
         DbBank(
             id = id,
-            name = name
+            name = name,
+            logo = logo?.toByteArray()
         )
 }
 
 fun DbBank.mapToBank() =
     Bank(
-        name
+        name,
+        logo?.toImageBitmap()
     ).also { it.id = id }

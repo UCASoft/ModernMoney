@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -180,12 +181,20 @@ private fun BankInfoRow(bankInfo: Bank) {
             shape = RoundedCornerShape(4.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = bankInfo.name.first().toString(),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF6B7280)
-                )
+                if (bankInfo.logo != null) {
+                    Image(
+                        bitmap = bankInfo.logo,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(
+                        text = bankInfo.name.first().toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF6B7280)
+                    )
+                }
             }
         }
 

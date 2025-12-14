@@ -1,5 +1,8 @@
 package com.ucasoft.modernMoney.viewModels.bank
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CommentBank
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
@@ -57,6 +60,15 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Ba
             )
             firstCopy.copy(
                 errors = validate(firstCopy.entity!!, allBanks)
+            )
+        }
+    }
+
+    fun updateBankLogo(logo: ImageBitmap?) {
+        _state.update {
+            it.copy(
+                entity = it.entity?.copy(logo = logo).also { self -> self!!.id = it.entity!!.id },
+                isModified = true
             )
         }
     }

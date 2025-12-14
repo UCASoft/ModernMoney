@@ -1,6 +1,6 @@
 package com.ucasoft.modernMoney.ui.pages.bank
 
-import BanksViewModel
+import com.ucasoft.modernMoney.viewModels.bank.BanksViewModel
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -51,7 +51,7 @@ fun BankDropDown(current: Bank?, label: String = "Bank", isEmptyAllowed: Boolean
                     }
                 )
             }
-            state.items.map {
+            state.items.forEach {
                 DropdownMenuItem(
                     text = { Text(it.name) },
                     onClick = {

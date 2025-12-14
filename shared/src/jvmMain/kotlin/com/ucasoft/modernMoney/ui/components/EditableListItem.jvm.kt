@@ -6,14 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.ucasoft.modern_money.shared.generated.resources.*
+import com.ucasoft.modern_money.shared.generated.resources.Res
+import com.ucasoft.modern_money.shared.generated.resources.delete
+import com.ucasoft.modern_money.shared.generated.resources.edit
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -38,11 +39,7 @@ actual fun EditableListItem(
             isDeleting,
             onDelete
         ) {
-            ListItem(
-                headlineContent = {
-                    content()
-                }
-            )
+            content()
         }
 
         DropdownMenu(

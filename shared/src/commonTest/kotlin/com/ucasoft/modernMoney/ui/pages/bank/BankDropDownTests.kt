@@ -1,7 +1,7 @@
 package com.ucasoft.modernMoney.ui.pages.bank
 
-import BanksUiState
-import BanksViewModel
+import com.ucasoft.modernMoney.viewModels.bank.BanksUiState
+import com.ucasoft.modernMoney.viewModels.bank.BanksViewModel
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed

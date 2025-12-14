@@ -1,11 +1,11 @@
-import androidx.lifecycle.ViewModel
+package com.ucasoft.modernMoney.viewModels.bank
+
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.mapToBank
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
-import com.ucasoft.modernMoney.viewModels.bank.BankUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn

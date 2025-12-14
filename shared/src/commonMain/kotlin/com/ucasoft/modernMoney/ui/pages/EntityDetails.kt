@@ -3,9 +3,11 @@ package com.ucasoft.modernMoney.ui.pages
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Save
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,24 +48,29 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
                 modifier = Modifier.fillMaxSize()
                     .padding(8.dp, 2.dp)
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd
+                editContent(detailState.entity, detailState.errors, viewModel, detailsMode)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                 ) {
-                    IconButton(
-                        {
+                    Button(
+                        onClick = {
+                            detailsMode = DetailsMode.VIEW
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
                             onSaveButtonClick(detailState.entity!!, viewModel)
                             detailsMode = DetailsMode.VIEW
                         },
                         enabled = if (saveButtonEnable != null) saveButtonEnable(detailState) else detailState.isModified
+
                     ) {
-                        Icon(
-                            Icons.Rounded.Save,
-                            "Save"
-                        )
+                        Text("Save")
                     }
                 }
-                editContent(detailState.entity, detailState.errors, viewModel, detailsMode)
             }
         }
     }

@@ -193,6 +193,7 @@ fun AddCardPanel(onCardAdded: (AccountCard) -> Unit) {
                 {
                     viewModel.updateCardNumber(it)
                 },
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),

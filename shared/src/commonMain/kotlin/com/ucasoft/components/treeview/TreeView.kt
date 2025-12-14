@@ -1,9 +1,7 @@
 package com.ucasoft.components.treeview
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,40 +9,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
-private data class DisplayNode<T>(val node: TreeViewNode<T>, val level: Int)
+import com.ucasoft.components.scrollable.ScrollableLazyColumn
 
 @Composable
-fun <T> TreeView(nodes: List<TreeViewNode<T>>, onSelectedNode: (TreeViewNode<T>) -> Unit) {
+fun <T> TreeView(
+    nodes: List<TreeViewNode<T>>,
+    itemWrapper: @Composable (node: TreeViewNode<T>, wrapper: @Composable () -> Unit) -> Unit = {_, content -> content()},
+    onSelectedNode: (TreeViewNode<T>) -> Unit
+) {
 
     var selectedItem by remember { mutableStateOf<TreeViewNode<T>?>(null) }
-    var expandedNodes by remember { mutableStateOf(setOf<TreeViewNode<T>>()) }
+    var expandedNodeKeys by remember { mutableStateOf(setOf<T>()) }
 
-    val displayNodes = remember(nodes, expandedNodes) {
-        buildDisplayNodes(nodes, expandedNodes)
+    val displayNodes = remember(nodes, expandedNodeKeys) {
+        buildDisplayNodes(nodes, expandedNodeKeys)
     }
 
     LaunchedEffect(selectedItem) {
         selectedItem?.let { onSelectedNode(it) }
     }
 
-    LazyColumn {
-        items(displayNodes) { displayNode ->
+    ScrollableLazyColumn(Modifier) {
+        items(displayNodes) {
             TreeViewItem(
-                node = displayNode.node,
-                isSelected = displayNode.node == selectedItem,
-                isExpanded = displayNode.node in expandedNodes,
-                leftPadding = (displayNode.level * 20).dp,
+                node = it.first,
+                isSelected = it.first == selectedItem,
+                isExpanded = it.first.key in expandedNodeKeys,
+                leftPadding = (it.second * 20).dp,
                 onNodeClick = {
                     selectedItem = it
                 },
                 onToggleExpand = {
-                    expandedNodes = if (it in expandedNodes) {
-                        expandedNodes - it
+                    expandedNodeKeys = if (it.key in expandedNodeKeys) {
+                        expandedNodeKeys - it.key
                     } else {
-                        expandedNodes + it
+                        expandedNodeKeys + it.key
                     }
-                }
+                },
+                itemWrapper
             )
         }
     }
@@ -52,12 +54,12 @@ fun <T> TreeView(nodes: List<TreeViewNode<T>>, onSelectedNode: (TreeViewNode<T>)
 
 private fun <T> buildDisplayNodes(
     nodes: List<TreeViewNode<T>>,
-    expandedNodes: Set<TreeViewNode<T>>,
+    expandedNodeKeys: Set<T>,
     level: Int = 0
-): List<DisplayNode<T>> {
+): List<Pair<TreeViewNode<T>, Int>> {
     return nodes.flatMap { node ->
-        listOf(DisplayNode(node, level)) + if (node in expandedNodes) {
-            buildDisplayNodes(node.children, expandedNodes, level + 1)
+        listOf(node to level) + if (node.key in expandedNodeKeys) {
+            buildDisplayNodes(node.children, expandedNodeKeys, level + 1)
         } else {
             emptyList()
         }
@@ -66,19 +68,36 @@ private fun <T> buildDisplayNodes(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T> TreeViewItem(node: TreeViewNode<T>, isSelected: Boolean, isExpanded: Boolean, leftPadding: Dp, onNodeClick: (TreeViewNode<T>) -> Unit, onToggleExpand: (TreeViewNode<T>) -> Unit) {
-    ListItem(
-        leadingContent = {
-            Icon(node.icon, node.title, Modifier.padding(start = leftPadding))
-        },
-        headlineContent = { Text(node.title) },
-        trailingContent = {
-            if (node.children.isNotEmpty()) {
-                IconButton({ onToggleExpand(node) }) {
-                    ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
+private fun <T> TreeViewItem(
+    node: TreeViewNode<T>,
+    isSelected: Boolean,
+    isExpanded: Boolean,
+    leftPadding: Dp,
+    onNodeClick: (TreeViewNode<T>) -> Unit,
+    onToggleExpand: (TreeViewNode<T>) -> Unit,
+    itemWrapper: @Composable (node: TreeViewNode<T>, wrapper: @Composable () -> Unit) -> Unit
+) {
+    itemWrapper (node) {
+        ListItem(
+            leadingContent = {
+                Icon(node.icon, node.title, Modifier.padding(start = leftPadding))
+            },
+            headlineContent = { Text(node.title) },
+            trailingContent = {
+                if (node.children.isNotEmpty()) {
+                    IconButton({ onToggleExpand(node) }) {
+                        ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
+                    }
                 }
-            }
-        },
-        modifier = Modifier.clickable { onNodeClick(node) }.background(if (isSelected) Color.Red else Color.White)
-    )
+            },
+            colors = ListItemDefaults.colors(
+                containerColor = if (isSelected) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    Color.Unspecified
+                }
+            ),
+            modifier = Modifier.clickable { onNodeClick(node) }
+        )
+    }
 }
