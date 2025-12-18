@@ -5,12 +5,14 @@ import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.model.mapToCategory
 import com.ucasoft.modernMoney.viewModels.ListViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
-class CategoriesViewModel(categoryDao: CategoryDao) : ListViewModel<Category, CategoriesUiState>() {
+class CategoriesViewModel(private val categoryDao: CategoryDao) : ListViewModel<Category, CategoriesUiState>() {
 
     override val listState = categoryDao.allCategories().map {
         CategoriesUiState(buildCategoryHierarchy(it))
@@ -19,6 +21,12 @@ class CategoriesViewModel(categoryDao: CategoryDao) : ListViewModel<Category, Ca
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = CategoriesUiState(isLoading = true)
     )
+
+    fun deleteCategory(category: Category, parentId: Long? = null) {
+        viewModelScope.launch {
+            categoryDao.delete(category.mapToDbCategory(parentId))
+        }
+    }
 
     private fun buildCategoryHierarchy(categories: List<DbCategory>): List<Category> {
         val result = mutableListOf<Category>()

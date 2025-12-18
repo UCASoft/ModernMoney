@@ -4,24 +4,10 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
-import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import androidx.sqlite.execSQL
-import com.ucasoft.modernMoney.db.dto.AccountCardDao
-import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
-import com.ucasoft.modernMoney.db.model.Account
-import com.ucasoft.modernMoney.db.dto.AccountDao
-import com.ucasoft.modernMoney.db.dto.BankDao
-import com.ucasoft.modernMoney.db.dto.CategoryDao
-import com.ucasoft.modernMoney.db.dto.CurrencyDao
-import com.ucasoft.modernMoney.db.model.AccountCard
-import com.ucasoft.modernMoney.db.model.AccountCurrency
-import com.ucasoft.modernMoney.db.model.Bank
-import com.ucasoft.modernMoney.db.model.Category
-import com.ucasoft.modernMoney.db.model.Currency
-import kotlinx.coroutines.CoroutineScope
+import com.ucasoft.modernMoney.db.dto.*
+import com.ucasoft.modernMoney.db.model.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(entities = [Account::class, AccountCurrency::class, Bank::class, Currency::class, AccountCard::class, Category::class], version = 1)
 @ConstructedBy(ModernMoneyDatabaseConstructor::class)

@@ -23,8 +23,9 @@ fun CategoryListDetails() {
 
         },
         onDeleting = { true },
-        onDelete = { _, _ ->
-            false
+        onDelete = { category, viewModel ->
+            viewModel.deleteCategory(category, null)
+            true
         }
     ) {
         CategoryDetails(it.first, it.second)

@@ -26,6 +26,7 @@ expect fun EditableListItem(
 
 @Composable
 internal fun DeletableItem(isDeleting: Boolean = false, onDelete: (() -> Boolean)? = null, content: @Composable () -> Unit) {
+
     LaunchedEffect(isDeleting) {
         if (isDeleting) {
             delay(500)

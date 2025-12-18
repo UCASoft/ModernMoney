@@ -27,9 +27,9 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : Detai
         }
     }
 
-    fun addCategory(category: Category) {
+    fun addCategory(category: Category, parentId: Long? = null) {
         viewModelScope.launch {
-            categoryDao.insert(category.mapToDbCategory(4L))
+            categoryDao.insert(category.mapToDbCategory(parentId))
         }
     }
 }

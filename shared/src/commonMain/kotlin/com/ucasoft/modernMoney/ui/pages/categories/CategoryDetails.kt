@@ -23,7 +23,7 @@ fun CategoryDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
         { category, errors, viewModel, _ ->
         },
         { category, viewModel ->
-            viewModel.addCategory(category)
+            viewModel.addCategory(category, 4L)
         },
         { true },
         mode

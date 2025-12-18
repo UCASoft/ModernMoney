@@ -11,7 +11,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryDao {
 
-    @Query(" SELECT * FROM categories")
+    @Query("""
+        WITH RECURSIVE category(id, name, logo, parentId) as (
+            SELECT id, name, logo, parentId FROM categories WHERE parentId IS NULL
+            UNION ALL
+            SELECT c.id, c.name, c.logo, c.parentId FROM categories c
+            JOIN category ON category.id = c.parentId
+        )
+        SELECT * FROM category
+    """)
     fun allCategories() : Flow<List<Category>>
 
     @Insert

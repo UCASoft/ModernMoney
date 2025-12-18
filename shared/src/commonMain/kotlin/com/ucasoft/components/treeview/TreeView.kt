@@ -14,7 +14,7 @@ import com.ucasoft.components.scrollable.ScrollableLazyColumn
 @Composable
 fun <K, N: TreeViewNode<K>> TreeView(
     nodes: List<N>,
-    itemWrapper: @Composable (node: N, wrapper: @Composable () -> Unit) -> Unit = { _, content -> content() },
+    itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit = { _, content -> content() },
     onSelectedNode: (N) -> Unit
 ) {
 
@@ -25,12 +25,10 @@ fun <K, N: TreeViewNode<K>> TreeView(
         buildDisplayNodes(nodes, expandedNodeKeys)
     }
 
-    LaunchedEffect(selectedItem) {
-        selectedItem?.let { onSelectedNode(it) }
-    }
-
     ScrollableLazyColumn(Modifier) {
-        items(displayNodes) {
+        items(displayNodes, key = {
+            it.first.key!!
+        }) {
             TreeViewItem(
                 node = it.first,
                 isSelected = it.first == selectedItem,
@@ -38,6 +36,7 @@ fun <K, N: TreeViewNode<K>> TreeView(
                 leftPadding = (it.second * 20).dp,
                 onNodeClick = {
                     selectedItem = it
+                    onSelectedNode(it)
                 },
                 onToggleExpand = {
                     expandedNodeKeys = if (it.key in expandedNodeKeys) {
@@ -75,7 +74,7 @@ private fun <N: TreeViewNode<*>> TreeViewItem(
     leftPadding: Dp,
     onNodeClick: (N) -> Unit,
     onToggleExpand: (N) -> Unit,
-    itemWrapper: @Composable (node: N, wrapper: @Composable () -> Unit) -> Unit
+    itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit
 ) {
     itemWrapper (node) {
         ListItem(
