@@ -76,31 +76,31 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T> TreeViewDetails(
+inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDetails(
     crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
     crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
     noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
     noinline onDeleting: ((T) -> Boolean)? = null,
     noinline onDelete: ((T, VM) -> Boolean)? = null,
     crossinline detailContent: @Composable (NK) -> Unit
-) where T: KeyEntity<*>, T: TreeViewNode<*> {
+) where T: KeyEntity<K>, T: TreeViewNode<K> {
     BaseListDetails<NK, VM, S, T>(
         onAddClickEvent,
         listContent = { items, viewModel, navigator, scope ->
             TreeView(
-                items as List<TreeViewNode<T>>,
+                items,
                 { node, content ->
                     EditableListItem(
-                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(node as T) } } else null,
-                        onDelete = if (onDelete != null) { { onDelete.invoke(node as T, viewModel) } } else null,
-                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(node as T, navigator) }; true  } } else null
+                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(node) } } else null,
+                        onDelete = if (onDelete != null) { { onDelete.invoke(node, viewModel) } } else null,
+                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(node, navigator) }; true  } } else null
                     ) {
                         content()
                     }
                 }
                 ) {
                 scope.launch {
-                    onListItemEvent(it as T, navigator)
+                    onListItemEvent(it, navigator)
                 }
             }
         },

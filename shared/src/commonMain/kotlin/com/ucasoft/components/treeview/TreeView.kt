@@ -12,14 +12,14 @@ import androidx.compose.ui.unit.dp
 import com.ucasoft.components.scrollable.ScrollableLazyColumn
 
 @Composable
-fun <T> TreeView(
-    nodes: List<TreeViewNode<T>>,
-    itemWrapper: @Composable (node: TreeViewNode<T>, wrapper: @Composable () -> Unit) -> Unit = {_, content -> content()},
-    onSelectedNode: (TreeViewNode<T>) -> Unit
+fun <K, N: TreeViewNode<K>> TreeView(
+    nodes: List<N>,
+    itemWrapper: @Composable (node: N, wrapper: @Composable () -> Unit) -> Unit = { _, content -> content() },
+    onSelectedNode: (N) -> Unit
 ) {
 
-    var selectedItem by remember { mutableStateOf<TreeViewNode<T>?>(null) }
-    var expandedNodeKeys by remember { mutableStateOf(setOf<T>()) }
+    var selectedItem by remember { mutableStateOf<N?>(null) }
+    var expandedNodeKeys by remember { mutableStateOf(setOf<K>()) }
 
     val displayNodes = remember(nodes, expandedNodeKeys) {
         buildDisplayNodes(nodes, expandedNodeKeys)
@@ -52,14 +52,14 @@ fun <T> TreeView(
     }
 }
 
-private fun <T> buildDisplayNodes(
-    nodes: List<TreeViewNode<T>>,
-    expandedNodeKeys: Set<T>,
+private fun <K, N: TreeViewNode<K>> buildDisplayNodes(
+    nodes: List<N>,
+    expandedNodeKeys: Set<K>,
     level: Int = 0
-): List<Pair<TreeViewNode<T>, Int>> {
+): List<Pair<N, Int>> {
     return nodes.flatMap { node ->
         listOf(node to level) + if (node.key in expandedNodeKeys) {
-            buildDisplayNodes(node.children, expandedNodeKeys, level + 1)
+            buildDisplayNodes(node.children as List<N>, expandedNodeKeys, level + 1)
         } else {
             emptyList()
         }
@@ -68,14 +68,14 @@ private fun <T> buildDisplayNodes(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T> TreeViewItem(
-    node: TreeViewNode<T>,
+private fun <N: TreeViewNode<*>> TreeViewItem(
+    node: N,
     isSelected: Boolean,
     isExpanded: Boolean,
     leftPadding: Dp,
-    onNodeClick: (TreeViewNode<T>) -> Unit,
-    onToggleExpand: (TreeViewNode<T>) -> Unit,
-    itemWrapper: @Composable (node: TreeViewNode<T>, wrapper: @Composable () -> Unit) -> Unit
+    onNodeClick: (N) -> Unit,
+    onToggleExpand: (N) -> Unit,
+    itemWrapper: @Composable (node: N, wrapper: @Composable () -> Unit) -> Unit
 ) {
     itemWrapper (node) {
         ListItem(

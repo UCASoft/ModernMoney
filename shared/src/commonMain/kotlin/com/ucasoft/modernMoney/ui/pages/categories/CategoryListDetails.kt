@@ -12,7 +12,7 @@ import com.ucasoft.modernMoney.viewModels.category.CategoriesViewModel
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun CategoryListDetails() {
-    TreeViewDetails<Pair<Long?, DetailsMode>, CategoriesViewModel, CategoriesUiState, Category> (
+    TreeViewDetails<Pair<Long?, DetailsMode>, CategoriesViewModel, CategoriesUiState, Category, Long> (
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
