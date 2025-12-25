@@ -1,13 +1,7 @@
 package com.ucasoft.modernMoney.ui.pages.account
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -29,7 +23,6 @@ import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 import com.ucasoft.modern_money.shared.generated.resources.Res
 import com.ucasoft.modern_money.shared.generated.resources.allDrawableResources
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -116,8 +109,8 @@ fun CurrencyPanel(
                 color = MaterialTheme.colorScheme.error
             )
         }
-        LazyColumn {
-            items(currencies) {
+        Column {
+            currencies.forEach {
                 ListItem(
                     headlineContent = { Text(it.currency.name) },
                     trailingContent = {
@@ -152,8 +145,8 @@ fun CardPanel(
         AddCardPanel {
             onCardAdded(it)
         }
-        LazyColumn {
-            items(cards) {
+        Column {
+            cards.forEach {
                 ListItem(
                     leadingContent = {
                         CardLogo(it.type)

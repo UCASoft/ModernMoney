@@ -1,6 +1,8 @@
 package com.ucasoft.modernMoney.ui.pages
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -10,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucasoft.components.scrollable.ScrollableColumn
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
 import com.ucasoft.modernMoney.viewModels.DetailsState
 import org.koin.compose.viewmodel.koinViewModel
@@ -19,7 +22,7 @@ import org.koin.core.parameter.parametersOf
 inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityDetails(
     id: K?,
     viewContent: @Composable (T) -> Unit,
-    editContent: @Composable ColumnScope.(S, VM, DetailsMode) -> Unit,
+    crossinline editContent: @Composable ColumnScope.(S, VM, DetailsMode) -> Unit,
     crossinline onSaveButtonClick: (S, VM) -> Unit = { _, _ -> },
     noinline saveButtonEnable: ((S) -> Boolean)? = null,
     mode: DetailsMode = DetailsMode.VIEW) {
@@ -42,7 +45,7 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
         if (detailsMode == DetailsMode.VIEW) {
             viewContent(requireNotNull(detailState.entity) { "EntityDetails: entity is null in VIEW mode" })
         } else {
-            Column(
+            ScrollableColumn(
                 modifier = Modifier.fillMaxSize()
                     .padding(8.dp, 2.dp)
             ) {
