@@ -1,12 +1,15 @@
 package com.ucasoft.components.treeview
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ucasoft.components.scrollable.ScrollableLazyColumn
@@ -14,12 +17,15 @@ import com.ucasoft.components.scrollable.ScrollableLazyColumn
 @Composable
 fun <K, N: TreeViewNode<K>> TreeView(
     nodes: List<N>,
+    current: N?,
     itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit = { _, content -> content() },
     onSelectedNode: (N) -> Unit
 ) {
 
-    var selectedItem by remember { mutableStateOf<N?>(null) }
-    var expandedNodeKeys by remember { mutableStateOf(setOf<K>()) }
+    var selectedItem by remember { mutableStateOf(current) }
+    var expandedNodeKeys by remember {
+        mutableStateOf(current?.let { findParents(nodes, it) } ?: setOf())
+    }
 
     val displayNodes = remember(nodes, expandedNodeKeys) {
         buildDisplayNodes(nodes, expandedNodeKeys)
@@ -31,7 +37,7 @@ fun <K, N: TreeViewNode<K>> TreeView(
         }) {
             TreeViewItem(
                 node = it.first,
-                isSelected = it.first == selectedItem,
+                isSelected = it.first.key == selectedItem?.key,
                 isExpanded = it.first.key in expandedNodeKeys,
                 leftPadding = (it.second * 20).dp,
                 onNodeClick = {
@@ -65,6 +71,20 @@ private fun <K, N: TreeViewNode<K>> buildDisplayNodes(
     }
 }
 
+private fun <K, N : TreeViewNode<K>> findParents(
+    nodes: List<N>,
+    target: N
+): Set<K>? {
+    for (node in nodes) {
+        if (node.key == target.key) return emptySet()
+        if (node.children.isNotEmpty()) {
+            val parents = findParents(node.children as List<N>, target)
+            if (parents != null) return setOf(node.key) + parents
+        }
+    }
+    return null
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun <N: TreeViewNode<*>> TreeViewItem(
@@ -79,7 +99,11 @@ private fun <N: TreeViewNode<*>> TreeViewItem(
     itemWrapper (node) {
         ListItem(
             leadingContent = {
-                Icon(node.icon, node.title, Modifier.padding(start = leftPadding))
+                Image(
+                    node.icon,
+                    node.title,
+                    Modifier.padding(start = leftPadding).size(32.dp),
+                    contentScale = ContentScale.Fit)
             },
             headlineContent = { Text(node.title) },
             trailingContent = {

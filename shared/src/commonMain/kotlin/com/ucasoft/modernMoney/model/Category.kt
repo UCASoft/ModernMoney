@@ -2,17 +2,22 @@ package com.ucasoft.modernMoney.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.components.treeview.TreeViewNode
+import com.ucasoft.modernMoney.ui.toByteArray
+import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
 data class Category(
     val name: String,
-    override val icon: ImageVector
-) : TreeViewNode<Long>, KeyEntity<Long> {
+    override val logo: ImageBitmap? = null,
+) : TreeViewNode<Long>, KeyEntity<Long>, LogoEntity {
 
     var id: Long = 0L
         internal set
+
+    override val icon: ImageBitmap
+        get() = logo ?: Icons.Default.Category.toImageBitmap()
 
     override val children = mutableListOf<Category>()
 
@@ -53,14 +58,14 @@ data class Category(
             id,
             name,
             parentId,
-            null
+            logo?.toByteArray()
         )
 }
 
 fun DbCategory.mapToCategory() =
     Category(
         name,
-        Icons.Default.Category
+        logo?.toImageBitmap()
     ).also {
         it.id = id
     }

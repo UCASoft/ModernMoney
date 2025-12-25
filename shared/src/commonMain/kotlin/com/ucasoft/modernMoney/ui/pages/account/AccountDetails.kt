@@ -16,13 +16,13 @@ fun AccountDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
         {
             Text(it.name)
         },
-        { account, errors, viewModel, _ ->
-            EditAccount(account, errors, viewModel)
+        { accountState, viewModel, _ ->
+            EditAccount(accountState.entity, accountState.errors, viewModel)
         },
-        { account, viewModel ->
+        { accountState, viewModel ->
             when (mode) {
-                DetailsMode.ADD -> viewModel.addAccount(account)
-                DetailsMode.EDIT -> viewModel.updateAccount(account)
+                DetailsMode.ADD -> viewModel.addAccount(accountState.entity!!)
+                DetailsMode.EDIT -> viewModel.updateAccount(accountState.entity!!)
                 else -> {}
             }
         },

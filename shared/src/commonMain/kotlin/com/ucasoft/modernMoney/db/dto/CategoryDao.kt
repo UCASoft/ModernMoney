@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.ucasoft.modernMoney.db.model.Category
+import com.ucasoft.modernMoney.db.model.CategoryWithParent
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,6 +22,18 @@ interface CategoryDao {
         SELECT * FROM category
     """)
     fun allCategories() : Flow<List<Category>>
+
+    @Query("SELECT * FROM categories WHERE id = :id")
+    fun categoryById(id: Long) : Flow<CategoryWithParent>
+
+    @Query(
+        """
+            SELECT 1 FROM categories
+            WHERE name = :name AND parentId IS :parentId
+            LIMIT 1
+        """
+    )
+    suspend fun doesExists(name: String, parentId: Long?) : Boolean
 
     @Insert
     suspend fun insert(category: Category)

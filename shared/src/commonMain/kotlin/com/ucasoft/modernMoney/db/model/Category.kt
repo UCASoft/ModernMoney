@@ -1,8 +1,10 @@
 package com.ucasoft.modernMoney.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(tableName = "categories",
     foreignKeys = [
@@ -42,3 +44,13 @@ data class Category(
         return result
     }
 }
+
+data class CategoryWithParent(
+    @Embedded
+    val category: Category,
+    @Relation(
+        parentColumn = "parentId",
+        entityColumn = "id"
+    )
+    val parent: Category?
+)

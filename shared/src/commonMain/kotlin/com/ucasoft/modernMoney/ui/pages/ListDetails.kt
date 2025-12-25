@@ -89,6 +89,7 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeView
         listContent = { items, viewModel, navigator, scope ->
             TreeView(
                 items,
+                null,
                 { node, content ->
                     EditableListItem(
                         onDeleting = if (onDeleting != null) { { onDeleting.invoke(node) } } else null,

@@ -1,14 +1,11 @@
 package com.ucasoft.modernMoney.ui.pages
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,12 +19,13 @@ import org.koin.core.parameter.parametersOf
 inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityDetails(
     id: K?,
     viewContent: @Composable (T) -> Unit,
-    editContent: @Composable (T?, Map<String, String>, VM, DetailsMode) -> Unit,
-    crossinline onSaveButtonClick: (T, VM) -> Unit = { _, _ -> },
+    editContent: @Composable ColumnScope.(S, VM, DetailsMode) -> Unit,
+    crossinline onSaveButtonClick: (S, VM) -> Unit = { _, _ -> },
     noinline saveButtonEnable: ((S) -> Boolean)? = null,
     mode: DetailsMode = DetailsMode.VIEW) {
 
     var detailsMode by remember { mutableStateOf(mode) }
+    val context = remember { mutableStateMapOf<String, Any>() }
 
     val viewModel = koinViewModel<VM>(key = id?.toString() ?: "") { parametersOf(id) }
     val detailState by viewModel.state.collectAsStateWithLifecycle()
@@ -48,7 +46,7 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
                 modifier = Modifier.fillMaxSize()
                     .padding(8.dp, 2.dp)
             ) {
-                editContent(detailState.entity, detailState.errors, viewModel, detailsMode)
+                editContent(detailState, viewModel, detailsMode)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
@@ -62,7 +60,7 @@ inline fun <K, T, S: DetailsState<T>, reified VM: DetailViewModel<T, S>> EntityD
                     }
                     Button(
                         onClick = {
-                            onSaveButtonClick(detailState.entity!!, viewModel)
+                            onSaveButtonClick(detailState, viewModel)
                             detailsMode = DetailsMode.VIEW
                         },
                         enabled = if (saveButtonEnable != null) saveButtonEnable(detailState) else detailState.isModified

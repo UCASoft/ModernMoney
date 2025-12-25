@@ -19,8 +19,8 @@ fun CategoryListDetails() {
         onListItemEvent = { category, navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, category.id to DetailsMode.VIEW)
         },
-        onEditItemEvent = { _, _ ->
-
+        onEditItemEvent = { category, navigator ->
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, category.id to DetailsMode.EDIT)
         },
         onDeleting = { true },
         onDelete = { category, viewModel ->
