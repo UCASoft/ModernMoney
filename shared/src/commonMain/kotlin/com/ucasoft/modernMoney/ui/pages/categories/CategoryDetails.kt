@@ -6,17 +6,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
-import com.ucasoft.modernMoney.ui.pages.EntityDetails
-import com.ucasoft.modernMoney.ui.pages.LogoPreview
-import com.ucasoft.modernMoney.ui.rememberImagePicker
-import com.ucasoft.modernMoney.ui.toImageBitmap
+import com.ucasoft.modernMoney.ui.pages.LogoEntityDetails
 import com.ucasoft.modernMoney.viewModels.category.CategoryUiState
 import com.ucasoft.modernMoney.viewModels.category.CategoryViewModel
 
 @Composable
 fun CategoryDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
 
-    EntityDetails<Long, Category, CategoryUiState, CategoryViewModel>(
+    LogoEntityDetails<Long, Category, CategoryUiState, CategoryViewModel>(
         id,
         {
             Text(
@@ -24,12 +21,6 @@ fun CategoryDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
             )
         },
         { categoryState, viewModel, _ ->
-
-            val imagePicker = rememberImagePicker {
-                if (it != null) {
-                    viewModel.updateCategoryLogo(it.toImageBitmap())
-                }
-            }
 
             CategoryDropDown(categoryState.parentCategory) {
                 viewModel.updateParentCategory(it)
@@ -50,8 +41,6 @@ fun CategoryDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                 isError = categoryState.errors.contains("name"),
                 supportingText = { Text(categoryState.errors["name"] ?: "") }
             )
-
-            LogoPreview(categoryState.entity, imagePicker)
         },
         { categoryState, viewModel ->
             when(mode) {

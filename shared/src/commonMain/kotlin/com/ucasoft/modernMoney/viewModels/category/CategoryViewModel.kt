@@ -5,27 +5,27 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.model.mapToCategory
-import com.ucasoft.modernMoney.viewModels.DetailViewModel
-import com.ucasoft.modernMoney.viewModels.DetailsState
+import com.ucasoft.modernMoney.viewModels.LogoDetailsState
+import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : DetailViewModel<Category, CategoryUiState>() {
+class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : LogoEntityViewModel<Category, CategoryUiState>() {
 
-    private val _state = MutableStateFlow(CategoryUiState(isLoading = true))
-    override val state = _state.asStateFlow()
+    override val stateFlow = MutableStateFlow(CategoryUiState(isLoading = true))
+    override val state = stateFlow.asStateFlow()
 
     init {
         viewModelScope.launch {
             if (id != null) {
                 categoryDao.categoryById(id).collect { category ->
-                    _state.update { it.copy(entity = category.category.mapToCategory(), isLoading = false, parentCategory = category.parent?.mapToCategory()) }
+                    stateFlow.update { it.copy(entity = category.category.mapToCategory(), isLoading = false, parentCategory = category.parent?.mapToCategory()) }
                 }
             } else {
                 val category = Category("")
-                _state.update {
+                stateFlow.update {
                     CategoryUiState(category, isModified = true, errors = validate(category, null))
                 }
             }
@@ -46,7 +46,7 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : Detai
 
     fun updateParentCategory(parentCategory: Category?) {
         viewModelScope.launch {
-            _state.update {
+            stateFlow.update {
                 it.copy(parentCategory = parentCategory, errors = validate(it.entity!!, parentCategory))
             }
         }
@@ -54,7 +54,7 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : Detai
 
     fun updateCategoryName(name: String, parentCategory: Category?) {
         viewModelScope.launch {
-            _state.update {
+            stateFlow.update {
                 val copy = it.copy(
                     entity = it.entity?.copy(name = name).also { self -> self!!.id = it.entity!!.id },
                     isModified = true
@@ -63,15 +63,6 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : Detai
                     errors = validate(copy.entity!!, parentCategory)
                 )
             }
-        }
-    }
-
-    fun updateCategoryLogo(logo: ImageBitmap?) {
-        _state.update {
-            it.copy(
-                entity = it.entity?.copy(logo = logo).also { self -> self!!.id = it.entity!!.id },
-                isModified = true
-            )
         }
     }
 
@@ -98,4 +89,12 @@ data class CategoryUiState(
     override val isLoading: Boolean = false,
     override val errors: Map<String, String> = emptyMap(),
     var parentCategory: Category? = null
-) : DetailsState<Category>
+) : LogoDetailsState<Category> {
+
+    override fun updateLogo(logo: ImageBitmap?): CategoryUiState {
+        return copy(
+            entity = entity?.copy(logo = logo).also { self -> self!!.id = entity!!.id },
+            isModified = true
+        )
+    }
+}

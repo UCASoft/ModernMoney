@@ -1,23 +1,21 @@
 package com.ucasoft.modernMoney.viewModels.bank
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CommentBank
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.mapToBank
-import com.ucasoft.modernMoney.viewModels.DetailViewModel
-import com.ucasoft.modernMoney.viewModels.DetailsState
+import com.ucasoft.modernMoney.viewModels.LogoDetailsState
+import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Bank, BankUiState>() {
+class BankViewModel(private val bankDao: BankDao, id: Long?): LogoEntityViewModel<Bank, BankUiState>() {
 
-    private val _state = MutableStateFlow(BankUiState(isLoading = true))
-    override val state = _state.asStateFlow()
+    override val stateFlow = MutableStateFlow(BankUiState(isLoading = true))
+    override val state = stateFlow.asStateFlow()
 
     private val allBanks = mutableListOf<Bank>()
 
@@ -28,12 +26,12 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Ba
         if (id != null) {
             viewModelScope.launch {
                 bankDao.bankById(id).collect { bank ->
-                    _state.update { it.copy(entity = bank.mapToBank(), isLoading = false) }
+                    stateFlow.update { it.copy(entity = bank.mapToBank(), isLoading = false) }
                 }
             }
         } else {
             val newBank = Bank("")
-            _state.update { BankUiState(newBank, isModified = true, errors = validate(newBank, allBanks)) }
+            stateFlow.update { BankUiState(newBank, isModified = true, errors = validate(newBank, allBanks)) }
         }
     }
 
@@ -47,28 +45,19 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): DetailViewModel<Ba
         viewModelScope.launch {
             bankDao.update(bank.mapToBank())
         }
-        _state.update { it.copy(
+        stateFlow.update { it.copy(
             isModified = false
         ) }
     }
 
     fun updateBankName(name: String) {
-        _state.update {
+        stateFlow.update {
             val firstCopy = it.copy(
                 entity = it.entity?.copy(name = name).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
             firstCopy.copy(
                 errors = validate(firstCopy.entity!!, allBanks)
-            )
-        }
-    }
-
-    fun updateBankLogo(logo: ImageBitmap?) {
-        _state.update {
-            it.copy(
-                entity = it.entity?.copy(logo = logo).also { self -> self!!.id = it.entity!!.id },
-                isModified = true
             )
         }
     }
@@ -85,4 +74,12 @@ data class BankUiState(
     override val isModified: Boolean = false,
     override val isLoading: Boolean = false,
     override val errors: Map<String, String> = emptyMap()
-) : DetailsState<Bank>
+) : LogoDetailsState<Bank> {
+
+    override fun updateLogo(logo: ImageBitmap?): BankUiState {
+        return copy(
+            entity = entity?.copy(logo = logo).also { self -> self!!.id = entity!!.id  },
+            isModified = true
+        )
+    }
+}

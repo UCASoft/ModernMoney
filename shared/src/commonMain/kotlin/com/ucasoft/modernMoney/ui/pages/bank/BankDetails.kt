@@ -10,18 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.ui.rememberImagePicker
-import com.ucasoft.modernMoney.ui.pages.EntityDetails
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
-import com.ucasoft.modernMoney.ui.pages.LogoPreview
+import com.ucasoft.modernMoney.ui.pages.LogoEntityDetails
 import com.ucasoft.modernMoney.viewModels.bank.BankUiState
 import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
-import com.ucasoft.modernMoney.ui.toImageBitmap
 
 @Composable
 fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
 
-    EntityDetails<Long, Bank, BankUiState, BankViewModel>(
+    LogoEntityDetails<Long, Bank, BankUiState, BankViewModel>(
         id,
         {
             Text(
@@ -29,11 +26,6 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
             )
         },
         { bankState, viewModel, _ ->
-            val imagePicker = rememberImagePicker {
-                if (it != null) {
-                    viewModel.updateBankLogo(it.toImageBitmap())
-                }
-            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(8.dp)
@@ -48,7 +40,6 @@ fun BankDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
                     supportingText = { Text(bankState.errors["name"] ?: "") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                LogoPreview(bankState.entity, imagePicker)
             }
         },
         { bankState, viewModel ->
