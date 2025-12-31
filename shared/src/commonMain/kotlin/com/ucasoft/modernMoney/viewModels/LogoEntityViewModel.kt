@@ -10,6 +10,8 @@ abstract class LogoEntityViewModel<T, S> : DetailViewModel<T, S>()
     where T : KeyEntity<*>, T: LogoEntity, S: LogoDetailsState<T>
 {
     protected abstract val stateFlow: MutableStateFlow<S>
+
+    @Suppress("UNCHECKED_CAST")
     fun updateLogo(logo: ImageBitmap?) {
         stateFlow.update {
             it.updateLogo(logo) as S

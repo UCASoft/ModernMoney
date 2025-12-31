@@ -9,21 +9,31 @@ import com.ucasoft.modernMoney.db.dto.*
 import com.ucasoft.modernMoney.db.model.*
 import kotlinx.coroutines.Dispatchers
 
-@Database(entities = [Account::class, AccountCurrency::class, Bank::class, Currency::class, AccountCard::class, Category::class], version = 1)
+@Database(entities = [
+    Account::class,
+    AccountCard::class,
+    AccountCurrency::class,
+    Bank::class,
+    Category::class,
+    Currency::class,
+    Location::class,
+    Payee::class,
+    PayeeLocation::class,
+    Transaction::class], version = 1)
 @ConstructedBy(ModernMoneyDatabaseConstructor::class)
 abstract class ModernMoneyDatabase : RoomDatabase() {
 
     abstract val accountDao: AccountDao
 
+    abstract val accountCardDao: AccountCardDao
+
     abstract val accountCurrencyDao: AccountCurrencyDao
 
     abstract val bankDao: BankDao
 
-    abstract val currencyDao: CurrencyDao
-
-    abstract val accountCardDao: AccountCardDao
-
     abstract val categoryDao: CategoryDao
+
+    abstract val currencyDao: CurrencyDao
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
