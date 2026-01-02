@@ -6,7 +6,7 @@ import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.ui.toByteArray
 
 data class Bank(
-    val name: String,
+    override val name: String,
     override val logo: ImageBitmap? = null
 ) : KeyEntity<Long>, LogoEntity {
     var id: Long = 0L

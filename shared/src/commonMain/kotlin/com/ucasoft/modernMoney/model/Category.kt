@@ -9,7 +9,7 @@ import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
 data class Category(
-    val name: String,
+    override val name: String,
     override val logo: ImageBitmap? = null,
 ) : TreeViewNode<Long>, KeyEntity<Long>, LogoEntity {
 

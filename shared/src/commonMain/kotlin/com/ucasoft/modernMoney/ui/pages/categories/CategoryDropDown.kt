@@ -1,17 +1,23 @@
 package com.ucasoft.modernMoney.ui.pages.categories
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucasoft.components.treeview.TreeView
 import com.ucasoft.modernMoney.model.Category
+import com.ucasoft.modernMoney.ui.components.EntityDropDown
 import com.ucasoft.modernMoney.viewModels.category.CategoriesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -24,25 +30,12 @@ fun CategoryDropDown(
     onCategorySelect: (Category?) -> Unit
 ) {
 
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        OutlinedTextField(
-            value = current?.name ?: "",
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            label = { Text(label) }
-        )
-
+    EntityDropDown(
+        current,
+        label
+    ) { expanded, onDismiss ->
         if (expanded) {
-            CategoryDropDownDialog(current, {
-                expanded = false
-            }, isEmptyAllowed, onCategorySelect)
+            CategoryDropDownDialog(current, onDismiss, isEmptyAllowed, onCategorySelect)
         }
     }
 }
@@ -70,11 +63,16 @@ private fun CategoryDropDownDialog(
     ) {
         Surface {
             Column {
-                TreeView(
-                    nodes = allNodes,
-                    selected
+                Box(
+                    // TODO Fix TreeView height on different platforms
+                    modifier = Modifier.heightIn(max = 400.dp)
                 ) {
-                    selected = it
+                    TreeView(
+                        nodes = allNodes,
+                        selected
+                    ) {
+                        selected = it
+                    }
                 }
                 HorizontalDivider()
                 Row {
