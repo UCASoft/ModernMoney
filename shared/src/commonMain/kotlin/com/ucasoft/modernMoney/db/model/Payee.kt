@@ -20,6 +20,7 @@ data class Payee(
         if (id != other.id) return false
         if (name != other.name) return false
         if (!logo.contentEquals(other.logo)) return false
+        if (aliases != other.aliases) return false
 
         return true
     }
@@ -28,6 +29,7 @@ data class Payee(
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + (logo?.contentHashCode() ?: 0)
+        result = 31 * result + aliases.hashCode()
         return result
     }
 }
