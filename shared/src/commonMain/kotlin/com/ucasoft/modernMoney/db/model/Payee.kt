@@ -9,7 +9,7 @@ data class Payee(
     val id: Long = 0L,
     val name: String,
     val logo: ByteArray? = null,
-    val aliases: Array<String> = emptyArray()
+    val aliases: List<String> = emptyList()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

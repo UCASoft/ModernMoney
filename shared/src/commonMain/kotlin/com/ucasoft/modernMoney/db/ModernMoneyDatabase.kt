@@ -4,7 +4,10 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
+import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.ucasoft.modernMoney.db.converters.InstantConverter
+import com.ucasoft.modernMoney.db.converters.ListStringConverter
 import com.ucasoft.modernMoney.db.dto.*
 import com.ucasoft.modernMoney.db.model.*
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
     Payee::class,
     PayeeLocation::class,
     Transaction::class], version = 1)
+@TypeConverters(InstantConverter::class, ListStringConverter::class)
 @ConstructedBy(ModernMoneyDatabaseConstructor::class)
 abstract class ModernMoneyDatabase : RoomDatabase() {
 

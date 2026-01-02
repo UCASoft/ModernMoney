@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 
 @Entity(
     tableName = "payee_location",
+    primaryKeys = ["payeeId", "locationId"],
     foreignKeys = [
         ForeignKey(
             entity = Payee::class,
