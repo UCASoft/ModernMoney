@@ -4,9 +4,9 @@ import androidx.room.TypeConverter
 
 class ListStringConverter {
     @TypeConverter
-    fun fromListString(value: List<String>?) = value?.joinToString(",")
+    fun fromListString(value: List<String>?) = value?.joinToString("$#$")
 
     @TypeConverter
-    fun toListString(value: String?) = value?.split(",")?.map { it.trim() } ?: emptyList()
+    fun toListString(value: String?) = value?.split("$#$")?.map { it.trim() } ?: emptyList()
 
 }

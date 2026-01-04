@@ -32,7 +32,7 @@ fun CurrencyDropDown(current: Currency?, label: String = "Currency", onCurrencyS
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            state.items.map {
+            state.items.forEach {
                 DropdownMenuItem(
                     text = { Text(it.name) },
                     onClick = {

@@ -13,12 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucasoft.components.multiSelector.MultiSelectorDropDown
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
-import com.ucasoft.modernMoney.model.Currency
 import com.ucasoft.modernMoney.ui.pages.bank.BankDropDown
 import com.ucasoft.modernMoney.viewModels.CardViewModel
+import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 import com.ucasoft.modern_money.shared.generated.resources.Res
 import com.ucasoft.modern_money.shared.generated.resources.allDrawableResources
@@ -74,62 +75,28 @@ fun CurrencyPanel(
     onCurrencyDeleted: (AccountCurrency) -> Unit = {}
 ) {
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        var currency by remember { mutableStateOf<Currency?>(null) }
+    val viewModel = koinInject<CurrenciesViewModel>()
+    val state by viewModel.visibleState.collectAsStateWithLifecycle()
 
-        Row {
-            CurrencyDropDown(
-                currency,
-                onCurrencySelected = {
-                    currency = it
-                }
-            )
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                IconButton(
-                    onClick = {
-                        onCurrencyAdded(AccountCurrency(currency = currency!!))
-                    },
-                    enabled = currency != null
-                ) {
-                    Icon(
-                        Icons.Rounded.Add,
-                        "Add Currency"
-                    )
-                }
-            }
-        }
-        if (error != null) {
-            Text(
-                error,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
-        Column {
-            currencies.forEach {
-                ListItem(
-                    headlineContent = { Text(it.currency.name) },
-                    trailingContent = {
-                        if (it.id == 0L) {
-                            IconButton(
-                                onClick = {
-                                    onCurrencyDeleted(it)
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Rounded.Delete,
-                                    "Delete Currency"
-                                )
-                            }
-                        }
-                    }
-                )
-            }
-        }
+    MultiSelectorDropDown(
+        state.items,
+        currencies.map { it.currency }.toSet(),
+        {
+            onCurrencyAdded(AccountCurrency(it))
+        },
+        {
+            onCurrencyDeleted(AccountCurrency(it))
+        },
+        label = {
+            Text("Currencies")
+        },
+        isDeleteAllowed = { currency ->
+            currencies.first { it.currency.code == currency.code }.id == 0L
+        },
+        supportedText = error?.let {{ Text(it) }},
+        isError = !error.isNullOrBlank()
+    ) {
+        Text(it.name)
     }
 }
 
