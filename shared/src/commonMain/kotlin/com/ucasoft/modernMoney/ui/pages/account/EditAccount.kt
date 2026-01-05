@@ -121,7 +121,8 @@ fun CardPanel(
                 Spacer(Modifier.width(8.dp))
                 Text(it.number)
             }
-        }
+        },
+        dialogTitle = { Text("Add Card") }
     ) {
         AddCardPanel(it)
     }
