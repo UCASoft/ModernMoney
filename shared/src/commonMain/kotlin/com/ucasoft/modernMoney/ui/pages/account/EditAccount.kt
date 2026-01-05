@@ -3,9 +3,6 @@ package com.ucasoft.modernMoney.ui.pages.account
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucasoft.components.multiSelector.MultiSelectorDialog
 import com.ucasoft.components.multiSelector.MultiSelectorDropDown
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
@@ -28,7 +26,9 @@ import org.koin.compose.koinInject
 
 @Composable
 fun EditAccount(account: Account?, errors: Map<String, String>, viewModel: AccountViewModel) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         OutlinedTextField(
             value = account?.name ?: "",
             onValueChange = {
@@ -106,77 +106,55 @@ fun CardPanel(
     onCardAdded: (AccountCard) -> Unit,
     onCardDeleted: (AccountCard) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        AddCardPanel {
-            onCardAdded(it)
-        }
-        Column {
-            cards.forEach {
-                ListItem(
-                    leadingContent = {
-                        CardLogo(it.type)
-                    },
-                    headlineContent = { Text(it.number) },
-                    trailingContent = {
-                        IconButton(
-                            onClick = {
-                                onCardDeleted(it)
-                            }
-                        ) {
-                            Icon(
-                                Icons.Rounded.Delete,
-                                "Delete Card"
-                            )
-                        }
-                    }
-                )
+    MultiSelectorDialog(
+        cards.toSet(),
+        onCardAdded,
+        onCardDeleted,
+        label = {
+            Text("Cards")
+        },
+        buildItem = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CardLogo(it.type)
+                Spacer(Modifier.width(8.dp))
+                Text(it.number)
             }
         }
+    ) {
+        AddCardPanel(it)
     }
 }
 
 @Composable
-fun AddCardPanel(onCardAdded: (AccountCard) -> Unit) {
+fun AddCardPanel(onResult: (Boolean, AccountCard?) -> Unit) {
 
     val viewModel = koinInject<CardViewModel>()
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Row {
-        Column {
-            CardTypeDropDown {
-                viewModel.updateCardType(it)
-            }
-            OutlinedTextField(
-                state.value.card?.number ?: "",
-                {
-                    viewModel.updateCardNumber(it)
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                isError = state.value.errors.containsKey("number"),
-                supportingText = { Text(state.value.errors["number"] ?: "") }
-            )
+    LaunchedEffect(state) {
+        onResult(state.errors.isEmpty(), state.card)
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        CardTypeDropDown {
+            viewModel.updateCardType(it)
         }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            IconButton(
-                onClick = {
-                    onCardAdded(state.value.card!!)
-                },
-                enabled = state.value.errors.isEmpty()
-            ) {
-                Icon(
-                    Icons.Rounded.Add,
-                    "Add Card"
-                )
-            }
-        }
+        OutlinedTextField(
+            state.card?.number ?: "",
+            {
+                viewModel.updateCardNumber(it)
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            isError = state.errors.containsKey("number"),
+            supportingText = { Text(state.errors["number"] ?: "") }
+        )
     }
 }
 
