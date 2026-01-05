@@ -33,88 +33,94 @@ internal fun <T> MultiSelector(
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
 
-    Column {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
-        ) {
-            BasicTextField(
-                value = "",
-                onValueChange = {},
-                modifier = modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth()
-                    .defaultMinSize(
-                        minWidth = OutlinedTextFieldDefaults.MinWidth,
-                        minHeight = OutlinedTextFieldDefaults.MinHeight
-                    ),
-                readOnly = true,
-                interactionSource = interactionSource,
-                enabled = true,
-                singleLine = false,
-                decorationBox = {
-                    OutlinedTextFieldDefaults.DecorationBox(
-                        value = if (selectedItems.isEmpty()) "" else " ",
-                        innerTextField = {
-                            FlowRow {
-                                selectedItems.forEach {
-                                    AssistChip(
-                                        onClick = {},
-                                        label = {
-                                            buildItem(it)
-                                        },
-                                        trailingIcon = if (isDeleteAllowed(it)) {
-                                            {
-                                                IconButton(
-                                                    modifier = Modifier
-                                                        .size(AssistChipDefaults.IconSize),
-                                                    onClick = {
-                                                        onItemRemoved(it)
-                                                    }
-                                                ) {
-                                                    Icon(
-                                                        Icons.Default.Close,
-                                                        ""
-                                                    )
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        BasicTextField(
+            value = "",
+            onValueChange = {},
+            modifier = modifier
+                .focusRequester(focusRequester)
+                .padding(
+                    bottom = if (supportedText != null) 0.dp else 20.dp
+                )
+                .defaultMinSize(
+                    minWidth = OutlinedTextFieldDefaults.MinWidth,
+                    minHeight = OutlinedTextFieldDefaults.MinHeight
+                ),
+            readOnly = true,
+            interactionSource = interactionSource,
+            enabled = true,
+            singleLine = false,
+            decorationBox = {
+
+                val hasValue = selectedItems.isNotEmpty()
+
+                OutlinedTextFieldDefaults.DecorationBox(
+                    value = if (hasValue) " " else "",
+                    innerTextField = {
+                        FlowRow {
+                            selectedItems.forEach {
+                                AssistChip(
+                                    onClick = {},
+                                    label = {
+                                        buildItem(it)
+                                    },
+                                    trailingIcon = if (isDeleteAllowed(it)) {
+                                        {
+                                            IconButton(
+                                                modifier = Modifier
+                                                    .size(AssistChipDefaults.IconSize),
+                                                onClick = {
+                                                    onItemRemoved(it)
                                                 }
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Close,
+                                                    ""
+                                                )
                                             }
-                                        } else null
-                                    )
-                                }
+                                        }
+                                    } else null
+                                )
                             }
-                        },
-                        enabled = true,
-                        singleLine = false,
-                        visualTransformation = VisualTransformation.None,
-                        interactionSource = interactionSource,
-                        isError = isError,
-                        label = label,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                        },
-                        supportingText = supportedText,
-                        colors = OutlinedTextFieldDefaults.colors(),
-                        contentPadding = PaddingValues(
-                            16.dp, 8.dp, 16.dp, 8.dp
-                        ),
-                        container = {
-                            OutlinedTextFieldDefaults.Container(
-                                enabled = true,
-                                isError = isError,
-                                interactionSource = interactionSource,
-                                colors = OutlinedTextFieldDefaults.colors(),
-                                shape = OutlinedTextFieldDefaults.shape,
-                                modifier = Modifier
-                                    .clickable {
-                                        focusRequester.requestFocus()
-                                        expanded = true
-                                    }
-                            )
                         }
-                    )
-                }
-            )
-            dropDownContent(expanded, items, onItemAdded, { expanded = false })
-        }
+                    },
+                    enabled = true,
+                    singleLine = false,
+                    visualTransformation = VisualTransformation.None,
+                    interactionSource = interactionSource,
+                    isError = isError,
+                    label = label,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                    },
+                    supportingText = supportedText,
+                    colors = OutlinedTextFieldDefaults.colors(),
+                    contentPadding = PaddingValues(
+                        16.dp,
+                        if (hasValue) 0.dp else 16.dp,
+                        16.dp,
+                        if (hasValue) 0.dp else 16.dp
+                    ),
+                    container = {
+                        OutlinedTextFieldDefaults.Container(
+                            enabled = true,
+                            isError = isError,
+                            interactionSource = interactionSource,
+                            colors = OutlinedTextFieldDefaults.colors(),
+                            shape = OutlinedTextFieldDefaults.shape,
+                            modifier = Modifier
+                                .clickable {
+                                    focusRequester.requestFocus()
+                                    expanded = true
+                                }
+                        )
+                    }
+                )
+            }
+        )
+        dropDownContent(expanded, items, onItemAdded, { expanded = false })
     }
 }
