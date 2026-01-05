@@ -1,38 +1,17 @@
 package com.ucasoft.components.multiSelector
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuBoxScope
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,86 +30,91 @@ internal fun <T> MultiSelector(
     dropDownContent: @Composable ExposedDropdownMenuBoxScope.(Boolean, List<T>, (T) -> Unit, () -> Unit) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusRequester = remember { FocusRequester() }
 
     Column {
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded != expanded }
+            onExpandedChange = { expanded = it }
         ) {
-            Row(
+            BasicTextField(
+                value = "",
+                onValueChange = {},
                 modifier = modifier
-                    .border(
-                        1.dp,
-                        if (isError) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.outline
-                        }
-                    )
-                    .clickable {
-                        expanded = true
-                    }
+                    .focusRequester(focusRequester)
+                    .fillMaxWidth()
                     .defaultMinSize(
                         minWidth = OutlinedTextFieldDefaults.MinWidth,
                         minHeight = OutlinedTextFieldDefaults.MinHeight
                     ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FlowRow(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .weight(1f)
-                ) {
-                    selectedItems.ifEmpty { null }?.forEach {
-                        AssistChip(
-                            onClick = {},
-                            label = {
-                                buildItem(it)
-                            },
-                            trailingIcon = if (isDeleteAllowed(it)) {
-                                {
-                                    IconButton(
-                                        modifier = Modifier
-                                            .size(AssistChipDefaults.IconSize),
-                                        onClick = {
-                                            onItemRemoved(it)
-                                        }
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Close,
-                                            ""
-                                        )
-                                    }
+                readOnly = true,
+                interactionSource = interactionSource,
+                enabled = true,
+                singleLine = false,
+                decorationBox = {
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        value = if (selectedItems.isEmpty()) "" else " ",
+                        innerTextField = {
+                            FlowRow {
+                                selectedItems.forEach {
+                                    AssistChip(
+                                        onClick = {},
+                                        label = {
+                                            buildItem(it)
+                                        },
+                                        trailingIcon = if (isDeleteAllowed(it)) {
+                                            {
+                                                IconButton(
+                                                    modifier = Modifier
+                                                        .size(AssistChipDefaults.IconSize),
+                                                    onClick = {
+                                                        onItemRemoved(it)
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Close,
+                                                        ""
+                                                    )
+                                                }
+                                            }
+                                        } else null
+                                    )
                                 }
-                            } else null
-                        )
-                    } ?: label?.let {
-                        CompositionLocalProvider(
-                            LocalContentColor provides if (isError) {
-                                MaterialTheme.colorScheme.error
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
                             }
-                        ) {
-                            it()
+                        },
+                        enabled = true,
+                        singleLine = false,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = interactionSource,
+                        isError = isError,
+                        label = label,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                        },
+                        supportingText = supportedText,
+                        colors = OutlinedTextFieldDefaults.colors(),
+                        contentPadding = PaddingValues(
+                            16.dp, 8.dp, 16.dp, 8.dp
+                        ),
+                        container = {
+                            OutlinedTextFieldDefaults.Container(
+                                enabled = true,
+                                isError = isError,
+                                interactionSource = interactionSource,
+                                colors = OutlinedTextFieldDefaults.colors(),
+                                shape = OutlinedTextFieldDefaults.shape,
+                                modifier = Modifier
+                                    .clickable {
+                                        focusRequester.requestFocus()
+                                        expanded = true
+                                    }
+                            )
                         }
-                    }
+                    )
                 }
-                Spacer(Modifier.width(8.dp))
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            }
+            )
             dropDownContent(expanded, items, onItemAdded, { expanded = false })
-        }
-        supportedText?.let {
-            CompositionLocalProvider(
-                LocalContentColor provides if (isError) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
-            ) {
-                it()
-            }
         }
     }
 }
