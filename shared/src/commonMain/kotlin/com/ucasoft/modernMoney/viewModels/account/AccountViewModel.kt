@@ -124,7 +124,7 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         val errors = mutableMapOf<String, String>()
         when {
             account.name.isBlank() -> errors["name"] = "Name cannot be empty or blank!"
-            allAccounts.any { it.name == account.name } -> errors["name"] = "Account with name ${account.name} already exists!"
+            allAccounts.any { it.name == account.name && it.id != account.id } -> errors["name"] = "Account with name ${account.name} already exists!"
         }
 
         when {

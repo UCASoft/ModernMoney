@@ -64,7 +64,7 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): LogoEntityViewMode
 
     private fun validate(bank: Bank, others: List<Bank>) = when {
             bank.name.isBlank() -> mapOf("name" to "Name cannot be empty or blank!")
-            others.any { it.name == bank.name } -> mapOf("name" to "Bank with name ${bank.name} already exists!")
+            others.any { it.name == bank.name && it.id != bank.id } -> mapOf("name" to "Bank with name ${bank.name} already exists!")
             else -> emptyMap()
         }
 }
