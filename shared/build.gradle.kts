@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.multiplatform.library)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.serialization)
@@ -13,7 +13,13 @@ plugins {
 kotlin {
     jvmToolchain(21)
     jvm()
-    androidTarget()
+    androidLibrary {
+        namespace = "com.ucasoft.modernMoney"
+        compileSdk = 36
+        androidResources {
+            enable = true
+        }
+    }
     sourceSets {
         @OptIn(ExperimentalComposeLibrary::class)
         val commonMain by getting {
@@ -57,7 +63,6 @@ kotlin {
             }
         }
 
-        @OptIn(ExperimentalComposeLibrary::class)
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
@@ -83,11 +88,6 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.ucasoft.modernMoney"
-    compileSdk = 36
 }
 
 dependencies {

@@ -1,6 +1,5 @@
 package com.ucasoft.modernMoney
 
-import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ucasoft.modernMoney.tests.CommonBankTests
@@ -14,7 +13,7 @@ class BankTests : CommonBankTests() {
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
 
-    //@Test
+    @Test
     fun addBankTest() {
         addBankTest(composeRule)
     }

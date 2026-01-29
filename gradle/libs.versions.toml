@@ -1,10 +1,10 @@
 [versions]
 kotlin = "2.3.0"
-compose = "1.9.3"
-android = "8.12.3"
+compose = "1.10.0"
+android = "8.13.2"
 adaptive = "1.2.0"
 adaptive-navigation-suit = "1.9.0"
-activity-compose = "1.12.1"
+activity-compose = "1.12.3"
 navigation-compose = "2.9.1"
 room = "2.8.4"
 sqlite = "2.6.2"
@@ -13,19 +13,20 @@ koin = "4.1.1"
 lifecycle-compose = "2.9.6"
 coroutines = "1.10.2"
 settings = "1.3.0"
-preference = "2.1.0"
-serialization = "1.9.0"
-ktor = "3.3.3"
-mock = "1.14.7"
-ui-test = "1.10.0"
+preference = "2.1.1"
+serialization = "1.10.0"
+ktor = "3.4.0"
+mock = "1.14.9"
+ui-test = "1.10.2"
 test = "1.5.0"
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "android" }
-android-library = { id = "com.android.library", version.ref = "android" }
+android-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}

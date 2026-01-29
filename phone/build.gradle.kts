@@ -1,30 +1,18 @@
 plugins {
-    alias(libs.plugins.multiplatform)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
-    androidTarget()
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":shared"))
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.androidx.activity.compose)
-            }
-        }
-        val androidInstrumentedTest by getting {
-            dependencies {
-                implementation(libs.androidx.ui.test.android)
-                implementation(libs.androidx.ui.test.manifest)
-                implementation(libs.androidx.test.runner)
-                implementation(libs.androidx.test.rules)
-            }
-        }
+    jvmToolchain(21)
+    dependencies {
+        implementation(project(":shared"))
+        implementation(libs.androidx.activity.compose)
+        /*testImplementation(libs.androidx.ui.test.android)
+        testImplementation(libs.androidx.ui.test.manifest)
+        testImplementation(libs.androidx.test.runner)
+        testImplementation(libs.androidx.test.rules)*/
     }
 }
 
@@ -43,4 +31,5 @@ android {
     buildFeatures {
         compose = true
     }
+    buildToolsVersion = "36.1.0"
 }
