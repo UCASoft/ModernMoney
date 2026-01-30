@@ -12,7 +12,7 @@ kotlin {
     jvmToolchain(21)
     jvm()
     androidLibrary {
-        namespace = "com.ucasoft.modernMoney"
+        namespace = "com.ucasoft.modernMoney.shared"
         compileSdk = 36
         androidResources {
             enable = true
