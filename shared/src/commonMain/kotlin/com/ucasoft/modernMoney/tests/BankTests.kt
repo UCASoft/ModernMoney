@@ -7,7 +7,6 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -38,7 +37,7 @@ abstract class CommonBankTests {
         onNodeWithText("Banks").assertIsDisplayed().performClick()
         onAllNodesWithContentDescription("Edit").onFirst().performClick()
         onNodeWithText("Name").performTextInput(name)
-        onNodeWithContentDescription("Save").performClick()
+        onNodeWithText("Save").performClick()
     }
 }
 
