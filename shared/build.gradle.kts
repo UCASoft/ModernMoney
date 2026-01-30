@@ -1,5 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
@@ -21,15 +19,14 @@ kotlin {
         }
     }
     sourceSets {
-        @OptIn(ExperimentalComposeLibrary::class)
         val commonMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material3)
+                api(libs.compose.runtime)
+                api(libs.compose.foundation)
+                api(libs.compose.material3)
 
-                implementation(compose.components.resources)
-                implementation(compose.materialIconsExtended)
+                implementation(libs.compose.components.resources)
+                implementation(libs.compose.material.icons)
 
                 implementation(libs.adaptive)
                 implementation(libs.adaptive.layout)
@@ -59,7 +56,7 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.json)
 
-                api(compose.uiTest)
+                api(libs.compose.ui.test)
             }
         }
 

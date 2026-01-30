@@ -3,7 +3,8 @@ kotlin = "2.3.0"
 compose = "1.10.0"
 android = "8.13.2"
 adaptive = "1.2.0"
-adaptive-navigation-suit = "1.9.0"
+material3 = "1.9.0"
+material-icons = "1.7.3"
 activity-compose = "1.12.3"
 navigation-compose = "2.9.1"
 room = "2.8.4"
@@ -35,8 +36,14 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive" }
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "adaptive" }
 adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptive" }
-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "adaptive-navigation-suit" }
+adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3" }
+
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
 compose-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-material-icons = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
@@ -65,6 +72,8 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 mock = { module = "io.mockk:mockk", version.ref = "mock"}
+
+compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "compose" }
 
 androidx-ui-test-android = { module = "androidx.compose.ui:ui-test-junit4-android", version.ref = "ui-test" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui-test" }

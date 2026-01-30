@@ -9,10 +9,10 @@ kotlin {
     dependencies {
         implementation(project(":shared"))
         implementation(libs.androidx.activity.compose)
-        /*testImplementation(libs.androidx.ui.test.android)
-        testImplementation(libs.androidx.ui.test.manifest)
-        testImplementation(libs.androidx.test.runner)
-        testImplementation(libs.androidx.test.rules)*/
+        androidTestImplementation(libs.androidx.ui.test.android)
+        androidTestImplementation(libs.androidx.ui.test.manifest)
+        androidTestImplementation(libs.androidx.test.runner)
+        androidTestImplementation(libs.androidx.test.rules)
     }
 }
 
