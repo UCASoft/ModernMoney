@@ -38,6 +38,8 @@ abstract class ModernMoneyDatabase : RoomDatabase() {
     abstract val categoryDao: CategoryDao
 
     abstract val currencyDao: CurrencyDao
+
+    abstract val payeeDao: PayeeDao
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")

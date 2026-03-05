@@ -5,7 +5,6 @@ import com.ucasoft.modernMoney.viewModels.bank.BanksUiState
 import com.ucasoft.modernMoney.viewModels.bank.BanksViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi

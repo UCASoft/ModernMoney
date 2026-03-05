@@ -9,18 +9,23 @@ import com.ucasoft.modernMoney.viewModels.account.AccountViewModel
 import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import com.ucasoft.modernMoney.viewModels.category.CategoryViewModel
+import com.ucasoft.modernMoney.viewModels.payee.PayeeViewModel
+import com.ucasoft.modernMoney.viewModels.payee.PayeesViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModelOf(::SettingsViewModel)
-    viewModelOf(::AccountsViewModel)
     viewModel { AccountViewModel(get(), get(), get(), it.getOrNull()) }
-    viewModelOf(::BanksViewModel)
+    viewModelOf(::AccountsViewModel)
     viewModel { BankViewModel(get(), it.getOrNull()) }
-    viewModelOf(::CurrenciesViewModel)
+    viewModelOf(::BanksViewModel)
     viewModelOf(::CardViewModel)
-    viewModelOf(::CategoriesViewModel)
     viewModel { CategoryViewModel(get(), it.getOrNull()) }
+    viewModelOf(::CategoriesViewModel)
+    viewModelOf(::CurrenciesViewModel)
+    viewModel { PayeeViewModel(get(), it.getOrNull()) }
+    viewModelOf(::PayeesViewModel)
+    viewModelOf(::SettingsViewModel)
 }

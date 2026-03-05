@@ -7,13 +7,15 @@ import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.db.dto.CurrencyDao
+import com.ucasoft.modernMoney.db.dto.PayeeDao
 import org.koin.dsl.module
 
 val daoModule = module {
     single<AccountDao> { get<ModernMoneyDatabase>().accountDao }
+    single<AccountCardDao> { get<ModernMoneyDatabase>().accountCardDao }
     single<AccountCurrencyDao> { get<ModernMoneyDatabase>().accountCurrencyDao }
     single<BankDao> { get<ModernMoneyDatabase>().bankDao }
-    single<CurrencyDao> { get<ModernMoneyDatabase>().currencyDao }
-    single<AccountCardDao> { get<ModernMoneyDatabase>().accountCardDao }
     single<CategoryDao> { get<ModernMoneyDatabase>().categoryDao }
+    single<CurrencyDao> { get<ModernMoneyDatabase>().currencyDao }
+    single<PayeeDao> { get<ModernMoneyDatabase>().payeeDao }
 }
