@@ -16,11 +16,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.ucasoft.components.treeview.TreeView
 import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.modernMoney.model.KeyEntity
@@ -117,14 +119,19 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
     crossinline detailContent: @Composable (NK) -> Unit
 ) {
 
+    val navigatorEventState = rememberNavigationEventState(NavigationEventInfo.None)
     val navigator = rememberListDetailPaneScaffoldNavigator<NK>()
     val scope = rememberCoroutineScope()
 
-    BackHandler(navigator.canNavigateBack()) {
-        scope.launch {
-            navigator.navigateBack()
+    NavigationBackHandler(
+        state = navigatorEventState,
+        isBackEnabled = navigator.canNavigateBack(),
+        onBackCompleted = {
+            scope.launch {
+                navigator.navigateBack()
+            }
         }
-    }
+    )
 
     val events = LocalPrimaryActionEvents.current
     val lifecycleOwner = LocalLifecycleOwner.current
