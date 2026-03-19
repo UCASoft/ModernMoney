@@ -104,7 +104,7 @@ class PayeeViewModel(private val payeeDao: PayeeDao, id: Long?) : LogoEntityView
         payee.name.isBlank() -> mapOf("name" to "Name cannot be empty or blank!")
         allPayeesAliases.values.contains(payee.name) -> mapOf("name" to "Payee with name ${payee.name} already exists!")
         payee.aliases.groupBy { it }.any { it.value.size > 1 } -> mapOf("aliases" to "Aliases must be unique!")
-        payee.aliases.any{ allPayeesAliases.containsKey(it) } -> {
+        payee.aliases.any { allPayeesAliases.containsKey(it) } -> {
             val alias = allPayeesAliases.filter { payee.aliases.contains(it.key) }.toList().first()
             mapOf("aliases" to "Alias ${alias.first} is already exists in ${alias.second}")
             
