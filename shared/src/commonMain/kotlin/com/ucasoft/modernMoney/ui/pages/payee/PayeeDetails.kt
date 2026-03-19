@@ -1,7 +1,6 @@
 package com.ucasoft.modernMoney.ui.pages.payee
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ucasoft.components.multiSelector.MultiSelectorDialog
-import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.Payee
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.ui.pages.LogoEntityDetails

@@ -38,7 +38,7 @@ fun CardTypeDropDown(label: String = "Card Type", onTypeSelected: (String) -> Un
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            types.map {
+            types.forEach {
                 DropdownMenuItem(
                     text = { Text(it) },
                     leadingIcon = {

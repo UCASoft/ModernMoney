@@ -19,24 +19,24 @@ import com.ucasoft.modernMoney.model.LogoEntity
 @Composable
 fun LogoPreview(entity: LogoEntity?, imagePicker: () -> Unit) {
     Row(
-        modifier = Modifier.Companion.fillMaxWidth(),
-        verticalAlignment = Alignment.Companion.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            modifier = Modifier.Companion.weight(1f)
+            modifier = Modifier.weight(1f)
         ) {
             entity?.logo?.let {
                 Image(
                     bitmap = it,
                     contentDescription = "Logo",
-                    modifier = Modifier.Companion.width(64.dp).height(64.dp).padding(start = 8.dp),
-                    contentScale = ContentScale.Companion.Fit,
-                    alignment = Alignment.Companion.CenterStart
+                    modifier = Modifier.width(64.dp).height(64.dp).padding(start = 8.dp),
+                    contentScale = ContentScale.Fit,
+                    alignment = Alignment.CenterStart
                 )
             }
         }
         Button(
-            modifier = Modifier.Companion.weight(1f).padding(end = 8.dp),
+            modifier = Modifier.weight(1f).padding(end = 8.dp),
             onClick = { imagePicker() }
         ) {
             Text("Select Logo")

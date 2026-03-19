@@ -1,6 +1,5 @@
 package com.ucasoft.modernMoney.ui.pages.payee
 
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.runtime.Composable

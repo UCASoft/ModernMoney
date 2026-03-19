@@ -1,6 +1,5 @@
 package com.ucasoft.modernMoney
 
-import SettingsScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -24,8 +23,10 @@ import com.ucasoft.modernMoney.ui.ModernMoneyTheme
 import com.ucasoft.modernMoney.ui.pages.account.AccountListDetails
 import com.ucasoft.modernMoney.ui.pages.bank.BankListDetails
 import com.ucasoft.modernMoney.ui.pages.categories.CategoryListDetails
+import com.ucasoft.modernMoney.ui.pages.payee.PayeeListDetails
+import com.ucasoft.modernMoney.ui.pages.settings.SettingsScreen
 import com.ucasoft.modernMoney.ui.pages.transaction.TransactionListDetails
-import org.koin.compose.KoinMultiplatformApplication
+import org.koin.compose.KoinApplication
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.koinConfiguration
 
@@ -35,19 +36,25 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
     object Banks : Screen("Banks", Icons.Default.AccountBalance, { BankListDetails() })
     object Categories : Screen("Categories", Icons.Default.Category, { CategoryListDetails() })
     object Reports : Screen("Reports", Icons.Rounded.BarChart, { UnknownScreen() })
+    object Payees : Screen("Payees", Icons.Rounded.Payments, { PayeeListDetails() })
     object Settings : Screen("Settings", Icons.Rounded.Settings, { SettingsScreen() } )
 }
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 fun App() {
-    KoinMultiplatformApplication(
-        config = koinConfiguration {
+    KoinApplication(
+        configuration = koinConfiguration {
             modules(platformDbModule, daoModule, viewModelModule, networkModule)
         }
     ) {
         ModernMoneyTheme {
-            MainLayout(listOf(Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports), Screen.Settings)
+                MainLayout(
+                    listOf(
+                        Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
+                        Screen.Payees
+                    ), Screen.Settings
+                )
         }
     }
 }

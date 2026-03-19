@@ -17,6 +17,7 @@ kotlin {
         androidResources {
             enable = true
         }
+        buildToolsVersion = "36.1.0"
     }
     sourceSets {
         val commonMain by getting {
@@ -33,7 +34,7 @@ kotlin {
                 implementation(libs.adaptive.navigation)
                 implementation(libs.adaptive.navigation.suite)
                 implementation(libs.androidx.navigation.compose)
-                implementation(libs.compose.backhandler)
+                implementation(libs.androidx.navigationevent.compose)
 
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
