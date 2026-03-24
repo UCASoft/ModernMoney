@@ -18,7 +18,7 @@ class SettingsViewModel : ViewModel() {
     private val language = settings.getStringFlow(SettingsKey.LANGUAGE, "EN")
 
     val state = combine(
-        language,
+        language
     ){ l ->
         SettingsState(l[0])
     }.stateIn(

@@ -25,7 +25,7 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
 
     init {
         viewModelScope.launch {
-            accountDao.allAccounts().collect { allAccounts.addAll(it.map { it.account.mapToAccount(it.currencies, it.bank, it.cards) }) }
+            accountDao.allAccounts().collect { allAccounts.addAll(it.filterNot { it.account.id == id }.map { it.account.mapToAccount(it.currencies, it.bank, it.cards) }) }
         }
         if (id != null) {
             viewModelScope.launch {
@@ -124,7 +124,7 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         val errors = mutableMapOf<String, String>()
         when {
             account.name.isBlank() -> errors["name"] = "Name cannot be empty or blank!"
-            allAccounts.any { it.name == account.name && it.id != account.id } -> errors["name"] = "Account with name ${account.name} already exists!"
+            allAccounts.any { it.name == account.name } -> errors["name"] = "Account with name ${account.name} already exists!"
         }
 
         when {
