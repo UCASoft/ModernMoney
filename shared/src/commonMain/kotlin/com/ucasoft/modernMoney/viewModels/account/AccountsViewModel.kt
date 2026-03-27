@@ -5,13 +5,13 @@ import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.mapToAccount
 import com.ucasoft.modernMoney.viewModels.ListState
-import com.ucasoft.modernMoney.viewModels.ListViewModel
+import com.ucasoft.modernMoney.viewModels.ReorderingViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountsViewModel(private val accountDao: AccountDao) : ListViewModel<Account, AccountsUiState>() {
+class AccountsViewModel(private val accountDao: AccountDao) : ReorderingViewModel<Account, AccountsUiState>() {
 
     override val listState = accountDao.allAccounts().map {
         AccountsUiState(it.map {
@@ -26,6 +26,12 @@ class AccountsViewModel(private val accountDao: AccountDao) : ListViewModel<Acco
     fun deleteAccount(account: Account) {
         viewModelScope.launch {
             accountDao.delete(account.mapToDbAccount())
+        }
+    }
+
+    override fun reorderItems(from: Int, to: Int) {
+        viewModelScope.launch {
+            accountDao.reorderItems(from, to)
         }
     }
 }

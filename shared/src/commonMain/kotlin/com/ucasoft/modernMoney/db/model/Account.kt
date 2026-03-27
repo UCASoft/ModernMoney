@@ -21,7 +21,8 @@ data class Account(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val name: String,
-    val bankId: Long? = null
+    val bankId: Long? = null,
+    val order: Int = 0
 )
 
 data class AccountWithCurrencies(

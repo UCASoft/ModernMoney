@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
-import com.ucasoft.modernMoney.ui.pages.ListDetails
+import com.ucasoft.modernMoney.ui.pages.ReorderingListDetails
 import com.ucasoft.modernMoney.viewModels.account.AccountsUiState
 import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 
@@ -14,12 +14,12 @@ import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 @Composable
 fun AccountListDetails() {
 
-    ListDetails<Pair<Long?, DetailsMode>, AccountsViewModel, AccountsUiState, Account>(
+    ReorderingListDetails<Pair<Long?, DetailsMode>, AccountsViewModel, AccountsUiState, Account>(
         onAddClickEvent = {
             it.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
-        listContent = { account, event ->
-            AccountListItem(account) {
+        listContent = { account, draggedOffset, event ->
+            AccountListItem(account, draggedOffset) {
                 event.invoke(account)
             }
         },

@@ -1,8 +1,12 @@
 package com.ucasoft.modernMoney.ui.pages
 
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -12,10 +16,14 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,9 +38,97 @@ import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.components.EditableListItem
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
+import com.ucasoft.modernMoney.viewModels.ReorderingViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+inline fun <NK, reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> ReorderingListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+    crossinline listContent: @Composable LazyItemScope.(T, Float?, (T) -> Unit) -> Unit,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+    noinline onDeleting: ((T) -> Boolean)? = null,
+    noinline onDelete: ((T, VM) -> Boolean)? = null,
+    crossinline detailContent: @Composable (NK) -> Unit
+) {
+    BaseListDetails<NK, VM, S, T>(
+        onAddClickEvent,
+        listContent = { items, viewModel, navigator, scope ->
+            val listState = rememberLazyListState()
+            var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
+            var draggedOffset by remember { mutableStateOf(0f) }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
+                    .pointerInput(Unit) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { offset ->
+                                listState.layoutInfo.visibleItemsInfo
+                                    .firstOrNull { item -> offset.y.toInt() in item.offset..(item.offset + item.size) }
+                                    ?.let {
+                                        draggedItemIndex = it.index
+                                    }
+                            },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                draggedOffset += dragAmount.y
+
+                                val currentIndex = draggedItemIndex ?: return@detectDragGesturesAfterLongPress
+
+                                val itemInfo = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == currentIndex } ?: return@detectDragGesturesAfterLongPress
+                                val itemHeight = itemInfo.size.toFloat() + 4.dp.toPx()
+
+                                val targetIndex = when {
+                                    draggedOffset > itemHeight / 2 -> currentIndex + 1
+                                    draggedOffset < -itemHeight / 2 -> currentIndex - 1
+                                    else -> currentIndex
+                                }
+
+                                if (targetIndex != currentIndex && targetIndex in items.indices) {
+                                    viewModel.reorderItems(currentIndex, targetIndex)
+                                    draggedOffset += if (targetIndex > currentIndex) -itemHeight else itemHeight
+                                    draggedItemIndex = targetIndex
+                                }
+                            },
+                            onDragEnd = {
+                                draggedItemIndex = null
+                                draggedOffset = 0f
+                            },
+                            onDragCancel = {
+                                draggedItemIndex = null
+                                draggedOffset = 0f
+                            }
+                        )
+                    },
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                itemsIndexed(
+                    items = items,
+                    key = { _, item -> item.key!! }
+                ) { index, item ->
+                    val isDraggable = index == draggedItemIndex
+                    EditableListItem(
+                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(item) } } else null,
+                        onDelete = if (onDelete != null) { { onDelete.invoke(item, viewModel) } } else null,
+                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(item, navigator) }; true  } } else null
+                    ) {
+                        listContent(item, if (isDraggable) draggedOffset else null) {
+                            scope.launch {
+                                onListItemEvent(it, navigator)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        detailContent
+    )
+}
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -57,15 +153,15 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
                 items(
                     items = items,
                     key = { it.key!! }
-                ) {
+                ) { item ->
                     EditableListItem(
-                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(it) } } else null,
-                        onDelete = if (onDelete != null) { { onDelete.invoke(it, viewModel) } } else null,
-                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(it, navigator) }; true  } } else null
+                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(item) } } else null,
+                        onDelete = if (onDelete != null) { { onDelete.invoke(item, viewModel) } } else null,
+                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(item, navigator) }; true  } } else null
                     ) {
-                        listContent(it) { item ->
+                        listContent(item) {
                             scope.launch {
-                                onListItemEvent(item, navigator)
+                                onListItemEvent(it, navigator)
                             }
                         }
                     }

@@ -19,7 +19,7 @@ preference = "2.2.0"
 serialization = "1.10.0"
 ktor = "3.4.1"
 mock = "1.14.9"
-ui-test = "1.10.5"
+ui-test = "1.10.6"
 test = "1.5.0"
 
 [plugins]

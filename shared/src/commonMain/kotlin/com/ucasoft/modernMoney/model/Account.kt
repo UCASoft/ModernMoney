@@ -9,6 +9,7 @@ data class Account(
     val name: String = "",
     val currencies: List<AccountCurrency> = emptyList(),
     val bank: Bank? = null,
+    val order: Int = 0,
     val cards: List<AccountCard> = emptyList()
 ) : KeyEntity<Long> {
     var id: Long = 0L
@@ -24,7 +25,8 @@ data class Account(
         DbAccount(
             id,
             name,
-            bankId = bank?.id
+            bankId = bank?.id,
+            order
         )
 }
 
@@ -33,6 +35,7 @@ fun DbAccount.mapToAccount(currencies: List<AccountCurrencyWithCurrency>, bank: 
         name,
         currencies.map { it.mapToCurrency() },
         bank?.mapToBank(),
+        order,
         cards.map { it.mapToAccountCard() }
     ).also { it.id = id }
 

@@ -99,4 +99,5 @@ room {
 
 kotlin {
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+    compilerOptions.freeCompilerArgs.add("-Xexplicit-backing-fields")
 }

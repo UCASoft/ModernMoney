@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
@@ -24,9 +27,10 @@ import com.ucasoft.modernMoney.model.Bank
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
+fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onClick: (Long) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
+    val isDragging = draggedOffset != null
 
     ListItem(
         leadingContent = { AccountIcon(account) },
@@ -59,7 +63,13 @@ fun AccountListItem(account: Account, onClick: (Long) -> Unit) {
                 }
             }
         },
-        modifier = Modifier.clickable { onClick(account.id) }
+        modifier = Modifier
+            .clickable { onClick(account.id) }
+            .zIndex(if (isDragging) 1f else 0f)
+            .graphicsLayer {
+                translationY = if (isDragging) draggedOffset else 0f
+                scaleX = if (isDragging) 0.97f else 1f
+            }.animateItem()
     )
 
     /*var expanded by remember { mutableStateOf(false) }

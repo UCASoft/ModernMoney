@@ -13,12 +13,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AccountDao {
     @Transaction
-    @Query("SELECT * FROM accounts")
+    @Query("SELECT * FROM accounts ORDER BY `order`")
     fun allAccounts() : Flow<List<AccountWithCurrencies>>
 
     @Transaction
     @Query("SELECT * FROM accounts WHERE id = :id")
     fun accountById(id: Long): Flow<AccountWithCurrencies>
+
+    @Query("""
+        UPDATE accounts
+        SET `order` = CASE
+            WHEN `order` = :from THEN :to
+            WHEN `order` = :to THEN :from
+            ELSE `order`
+        END
+        WHERE `order` IN (:from, :to)
+    """)
+    suspend fun reorderItems(from: Int, to: Int)
 
     @Insert
     suspend fun insert(account: Account): Long

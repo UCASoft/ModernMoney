@@ -3,21 +3,22 @@ package com.ucasoft.modernMoney.viewModels
 import androidx.lifecycle.ViewModel
 import com.ucasoft.modernMoney.model.AccountCard
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class CardViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow(CardUiState())
-    val state = _state.asStateFlow()
+    val state: StateFlow<CardUiState>
+        field = MutableStateFlow(CardUiState())
 
     init {
         val newCard = AccountCard("", "")
-        _state.update { CardUiState(newCard, validate(newCard)) }
+        state.update { CardUiState(newCard, validate(newCard)) }
     }
 
     fun updateCardType(type: String) {
-        _state.update {
+        state.update {
             val firstCopy = it.copy(
                 card = it.card!!.copy(type = type)
             )
@@ -28,7 +29,7 @@ class CardViewModel : ViewModel() {
     }
 
     fun updateCardNumber(number: String) {
-        _state.update {
+        state.update {
             val firstCopy = it.copy(
                 card = it.card!!.copy(number = number)
             )
