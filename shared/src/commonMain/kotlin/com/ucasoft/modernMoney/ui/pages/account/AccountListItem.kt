@@ -33,7 +33,25 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
     val isDragging = draggedOffset != null
 
     ListItem(
-        leadingContent = { AccountIcon(account) },
+        leadingContent = {
+            Row(modifier = Modifier.fillMaxHeight()) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(40.dp)
+                        .padding(end = 4.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Reorder,
+                        ""
+                    )
+                }
+                Box(modifier = Modifier.padding(top = 8.dp)) {
+                    AccountIcon(account)
+                }
+            }
+        },
         headlineContent = {
             Text(
                 text = account.name,
@@ -59,7 +77,7 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
                 IconButton({
                     expanded = !expanded
                 }) {
-                    ExposedDropdownMenuDefaults.TrailingIcon(false)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
                 }
             }
         },
@@ -69,7 +87,9 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
             .graphicsLayer {
                 translationY = if (isDragging) draggedOffset else 0f
                 scaleX = if (isDragging) 0.97f else 1f
-            }.animateItem()
+            }
+            .animateItem()
+            .height(IntrinsicSize.Min)
     )
 
     /*var expanded by remember { mutableStateOf(false) }
