@@ -12,7 +12,7 @@ import com.ucasoft.modernMoney.viewModels.payee.PayeesViewModel
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun PayeeListDetails() {
-    ListDetails<Pair<Long?, DetailsMode>, PayeesViewModel, PayeesUiState, Payee>(
+    ListDetails<PayeesViewModel, PayeesUiState, Payee, Long>(
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
@@ -20,12 +20,6 @@ fun PayeeListDetails() {
             PayeeListItem(payee) {
                 event.invoke(payee)
             }
-        },
-        onListItemEvent = { payee, navigator ->
-            navigator.navigateTo(
-                ListDetailPaneScaffoldRole.Detail,
-                payee.id to DetailsMode.VIEW
-            )
         },
         onEditItemEvent = { payee, navigator ->
             navigator.navigateTo(
@@ -38,7 +32,7 @@ fun PayeeListDetails() {
             viewModel.deletePayee(payee)
             true
         }
-    ) {
-        PayeeDetails(it.first, it.second)
+    ) { key, mode ->
+        PayeeDetails(key, mode)
     }
 }

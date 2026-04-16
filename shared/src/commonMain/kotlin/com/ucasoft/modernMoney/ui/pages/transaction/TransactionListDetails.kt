@@ -30,7 +30,7 @@ import com.ucasoft.modernMoney.viewModels.transaction.TransactionsViewModel
 @Composable
 fun TransactionListDetails() {
 
-    ListDetails<Pair<Long?, DetailsMode>, TransactionsViewModel, TransactionsUiState, Transaction>(
+    ListDetails<TransactionsViewModel, TransactionsUiState, Transaction, Long>(
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
@@ -41,16 +41,13 @@ fun TransactionListDetails() {
                 supportingContent = { Text(transaction.comment ?: "") }
             )
         },
-        onListItemEvent = { transaction, navigator ->
-        },
         onEditItemEvent = { transaction, navigator ->
         },
         onDeleting = { true },
         onDelete = { transaction, viewModel ->
             true
         }
-    ) {
-
+    ) { _, _ ->
     }
 }
 

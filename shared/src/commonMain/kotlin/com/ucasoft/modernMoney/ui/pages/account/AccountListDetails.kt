@@ -14,7 +14,7 @@ import com.ucasoft.modernMoney.viewModels.account.AccountsViewModel
 @Composable
 fun AccountListDetails() {
 
-    ReorderingListDetails<Pair<Long?, DetailsMode>, AccountsViewModel, AccountsUiState, Account>(
+    ReorderingListDetails<AccountsViewModel, AccountsUiState, Account, Long>(
         onAddClickEvent = {
             it.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
@@ -22,9 +22,6 @@ fun AccountListDetails() {
             AccountListItem(account, draggedOffset) {
                 event.invoke(account)
             }
-        },
-        onListItemEvent = { account, navigator ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key to DetailsMode.VIEW)
         },
         onEditItemEvent = { account, navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, account.key to DetailsMode.EDIT)
@@ -34,7 +31,7 @@ fun AccountListDetails() {
             viewModel.deleteAccount(account)
             true
         }
-    ) {
-        AccountDetails(it.first, it.second)
+    ) { key, mode ->
+        AccountDetails(key, mode)
     }
 }

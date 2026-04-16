@@ -11,9 +11,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +37,7 @@ import com.ucasoft.components.treeview.TreeView
 import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.modernMoney.model.KeyEntity
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
+import com.ucasoft.modernMoney.ui.LocalThreePaneScaffoldNavigator
 import com.ucasoft.modernMoney.ui.components.EditableListItem
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
@@ -45,16 +48,18 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-inline fun <NK, reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> ReorderingListDetails(
-    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+inline fun <reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K> ReorderingListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
     crossinline listContent: @Composable LazyItemScope.(T, Float?, (T) -> Unit) -> Unit,
-    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
-    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit = { entity, navigator ->
+        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, entity.key to DetailsMode.VIEW)
+    },
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit)? = null,
     noinline onDeleting: ((T) -> Boolean)? = null,
     noinline onDelete: ((T, VM) -> Boolean)? = null,
-    crossinline detailContent: @Composable (NK) -> Unit
+    crossinline detailContent: @Composable (K?, DetailsMode) -> Unit
 ) {
-    BaseListDetails<NK, VM, S, T>(
+    BaseListDetails<VM, S, T, K>(
         onAddClickEvent,
         listContent = { items, viewModel, navigator, scope ->
             val listState = rememberLazyListState()
@@ -132,16 +137,18 @@ inline fun <NK, reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEn
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> ListDetails(
-    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
+inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K> ListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
     crossinline listContent: @Composable (T, (T) -> Unit) -> Unit,
-    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
-    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit = { entity, navigator ->
+        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, entity.key to DetailsMode.VIEW)
+    },
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit)? = null,
     noinline onDeleting: ((T) -> Boolean)? = null,
     noinline onDelete: ((T, VM) -> Boolean)? = null,
-    crossinline detailContent: @Composable (NK) -> Unit
+    crossinline detailContent: @Composable (K?, DetailsMode) -> Unit
 ) {
-    BaseListDetails<NK, VM, S, T>(
+    BaseListDetails<VM, S, T, K>(
         onAddClickEvent,
         listContent = { items, viewModel, navigator, scope ->
             LazyColumn(
@@ -174,15 +181,17 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDetails(
-    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
-    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit,
-    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<NK>) -> Unit)? = null,
+inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
+    crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit = { entity, navigator ->
+        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, entity.key to DetailsMode.VIEW)
+    },
+    noinline onEditItemEvent: (suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit)? = null,
     noinline onDeleting: ((T) -> Boolean)? = null,
     noinline onDelete: ((T, VM) -> Boolean)? = null,
-    crossinline detailContent: @Composable (NK) -> Unit
+    crossinline detailContent: @Composable (K?, DetailsMode) -> Unit
 ) where T: KeyEntity<K>, T: TreeViewNode<K> {
-    BaseListDetails<NK, VM, S, T>(
+    BaseListDetails<VM, S, T, K>(
         onAddClickEvent,
         listContent = { items, viewModel, navigator, scope ->
             TreeView(
@@ -209,14 +218,14 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeView
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
-inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*>> BaseListDetails(
-    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<NK>) -> Unit,
-    crossinline listContent: @Composable (List<T>, VM, ThreePaneScaffoldNavigator<NK>, CoroutineScope) -> Unit,
-    crossinline detailContent: @Composable (NK) -> Unit
+inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K> BaseListDetails(
+    crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
+    crossinline listContent: @Composable (List<T>, VM, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>, CoroutineScope) -> Unit,
+    crossinline detailContent: @Composable (K?, DetailsMode) -> Unit
 ) {
 
     val navigatorEventState = rememberNavigationEventState(NavigationEventInfo.None)
-    val navigator = rememberListDetailPaneScaffoldNavigator<NK>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<Pair<K?, DetailsMode>>()
     val scope = rememberCoroutineScope()
 
     NavigationBackHandler(
@@ -263,7 +272,9 @@ inline fun <NK, reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<*
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.contentKey?.let {
-                    detailContent(it)
+                    CompositionLocalProvider(LocalThreePaneScaffoldNavigator provides navigator) {
+                        detailContent(it.first, it.second)
+                    }
                 }
             }
         }

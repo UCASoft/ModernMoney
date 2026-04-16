@@ -22,7 +22,7 @@ import com.ucasoft.modernMoney.ui.pages.ListDetails
 @Composable
 fun BankListDetails() {
 
-    ListDetails<Pair<Long?, DetailsMode>, BanksViewModel, BanksUiState, Bank>(
+    ListDetails<BanksViewModel, BanksUiState, Bank, Long>(
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
@@ -42,12 +42,6 @@ fun BankListDetails() {
                 modifier = Modifier.clickable(true, onClick = { event.invoke(bank) })
             )
         },
-        onListItemEvent = { bank, navigator ->
-            navigator.navigateTo(
-                ListDetailPaneScaffoldRole.Detail,
-                bank.id to DetailsMode.VIEW
-            )
-        },
         onEditItemEvent = { bank, navigator ->
             navigator.navigateTo(
                 ListDetailPaneScaffoldRole.Detail,
@@ -59,7 +53,7 @@ fun BankListDetails() {
             viewModel.deleteBank(bank)
             true
         }
-    ) { key ->
-        BankDetails(key.first, key.second)
+    ) { key, mode ->
+        BankDetails(key, mode)
     }
 }

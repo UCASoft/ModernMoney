@@ -18,7 +18,7 @@ inline fun <K, T, S: LogoDetailsState<T>, reified VM: LogoEntityViewModel<T, S>>
     noinline saveButtonEnable: ((S) -> Boolean)? = null,
     mode: DetailsMode = DetailsMode.VIEW
 )
-    where T: KeyEntity<*>, T: LogoEntity
+    where T: KeyEntity<K>, T: LogoEntity
 {
     EntityDetails(
         id,

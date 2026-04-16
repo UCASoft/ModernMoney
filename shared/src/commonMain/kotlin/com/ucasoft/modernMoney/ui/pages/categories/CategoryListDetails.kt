@@ -12,12 +12,9 @@ import com.ucasoft.modernMoney.viewModels.category.CategoriesViewModel
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun CategoryListDetails() {
-    TreeViewDetails<Pair<Long?, DetailsMode>, CategoriesViewModel, CategoriesUiState, Category, Long> (
+    TreeViewDetails<CategoriesViewModel, CategoriesUiState, Category, Long> (
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
-        },
-        onListItemEvent = { category, navigator ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, category.id to DetailsMode.VIEW)
         },
         onEditItemEvent = { category, navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, category.id to DetailsMode.EDIT)
@@ -27,7 +24,7 @@ fun CategoryListDetails() {
             viewModel.deleteCategory(category, null)
             true
         }
-    ) {
-        CategoryDetails(it.first, it.second)
+    ) { key, mode ->
+        CategoryDetails(key, mode)
     }
 }
