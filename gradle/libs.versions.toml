@@ -18,6 +18,7 @@ settings = "1.3.0"
 preference = "2.2.0"
 serialization = "1.11.0"
 ktor = "3.4.2"
+datetime = "0.7.1"
 mock = "1.14.9"
 ui-test = "1.10.6"
 test = "1.5.0"
@@ -59,13 +60,13 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-compose" }
 
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines"  }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime"  }
 
 preference = { module = "me.zhanghai.compose.preference:preference", version.ref = "preference" }
 settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
 settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
 settings-observable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "settings" }
-
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
