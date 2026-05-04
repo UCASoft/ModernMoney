@@ -4,6 +4,7 @@ import com.ucasoft.modernMoney.db.model.AccountCurrency as DbAccountCurrency
 import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
 
 data class AccountCurrency (
+    val accountId: Long = 0L,
     val currency: Currency
 ) {
     var id: Long = 0L
@@ -15,5 +16,6 @@ data class AccountCurrency (
 
 fun AccountCurrencyWithCurrency.mapToAccountCurrency() =
     AccountCurrency(
+        accountId = accountCurrency.accountId,
         currency = currency.mapToCurrency()
     ).also { it.id = accountCurrency.id }

@@ -82,10 +82,10 @@ fun CurrencyPanel(
         state.items,
         currencies.map { it.currency }.toSet(),
         {
-            onCurrencyAdded(AccountCurrency(it))
+            onCurrencyAdded(AccountCurrency(currency = it))
         },
         {
-            onCurrencyDeleted(AccountCurrency(it))
+            onCurrencyDeleted(AccountCurrency(currency = it))
         },
         label = {
             Text("Currencies")

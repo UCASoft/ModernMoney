@@ -2,47 +2,42 @@ package com.ucasoft.modernMoney.viewModels.transaction
 
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.TransactionDao
+import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
+import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.model.Transaction
+import com.ucasoft.modernMoney.model.mapToTransaction
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlin.time.Clock
 
-class TransactionsViewModel(private val transactionDao: TransactionDao): ListViewModel<Transaction, TransactionsUiState>() {
+class TransactionsViewModel(transactionDao: TransactionDao, accountCurrencyRepository: AccountCurrencyRepository, accountRepository: AccountRepository): ListViewModel<Transaction, TransactionsUiState>() {
 
-    override val listState = transactionDao.allTransaction().map {
-        /*TransactionsUiState(it.map {
-            it.transaction.mapToTransaction(it.category?.mapToCategory())
-        })*/
-        TransactionsUiState(
-            listOf(
-                Transaction(
-                    Clock.System.now(),
-                    2,
-                    250.0,
-                    comment = "Initial transaction"
-                ),
-                Transaction(
-                    Clock.System.now(),
-                    incomeCurrencyId = 2,
-                    incomeAmount = 250.0
-                ).also { it.id = 1 },
-                Transaction(
-                    Clock.System.now(),
-                    2,
-                    250.0,
-                    5,
-                    250.0
-                ).also { it.id = 2 }
+    override val listState = transactionDao.allTransaction()
+        .combine(accountCurrencyRepository.accountCurrencies) { transactions, accountCurrencies ->
+            transactions.map {
+                it to (it.expenseCurrencyId?.let { accountCurrencies[it] } to it.incomeCurrencyId?.let { accountCurrencies[it] })
+            }
+        }
+        .combine(accountRepository.accounts) { transactionsWithCurrencies, accounts ->
+            TransactionsUiState(
+                transactionsWithCurrencies.map { (transaction, currencies) ->
+                    transaction.mapToTransaction(
+                        expenseAccount = currencies.first?.let { accounts[it.accountId] },
+                        expenseAccountCurrency = currencies.first,
+                        incomeAccount = currencies.second?.let { accounts[it.accountId] },
+                        incomeAccountCurrency = currencies.second,
+                        null
+                    )
+                }
             )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = TransactionsUiState(isLoading = true)
         )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = TransactionsUiState(isLoading = true)
-    )
 
 }
 

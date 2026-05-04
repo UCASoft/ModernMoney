@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.ucasoft.modernMoney.db.model.FullTransaction
 import com.ucasoft.modernMoney.db.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionDao {
 
     @Query("SELECT * FROM transactions")
-    fun allTransaction(): Flow<List<FullTransaction>>
+    fun allTransaction(): Flow<List<Transaction>>
 
     @Insert
     suspend fun insert(transaction: Transaction): Long

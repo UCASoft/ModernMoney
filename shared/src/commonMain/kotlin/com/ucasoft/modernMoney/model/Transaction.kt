@@ -5,9 +5,11 @@ import kotlin.time.Instant
 
 data class Transaction(
     val dataTime: Instant,
-    val expenseCurrencyId: Long? = null,
+    val expenseAccount: Account? = null,
+    val expenseAccountCurrency: AccountCurrency? = null,
     val expenseAmount: Double? = null,
-    val incomeCurrencyId: Long? = null,
+    val incomeAccount: Account? = null,
+    val incomeAccountCurrency: AccountCurrency? = null,
     val incomeAmount: Double? = null,
     val payeeId: Long? = null,
     val payeeCurrencyCode: String? = null,
@@ -27,9 +29,9 @@ data class Transaction(
         DbTransaction(
             id,
             dataTime,
-            expenseCurrencyId,
+            expenseAccountCurrency?.id,
             expenseAmount,
-            incomeCurrencyId,
+            incomeAccountCurrency?.id,
             incomeAmount,
             payeeId,
             payeeCurrencyCode,
@@ -40,12 +42,19 @@ data class Transaction(
         )
 }
 
-fun DbTransaction.mapToTransaction(category: Category?) =
-    Transaction(
+fun DbTransaction.mapToTransaction(
+    expenseAccount: Account?,
+    expenseAccountCurrency: AccountCurrency?,
+    incomeAccount: Account?,
+    incomeAccountCurrency: AccountCurrency?,
+    category: Category?
+) = Transaction(
         dataTime,
-        expenseCurrencyId,
+        expenseAccount,
+        expenseAccountCurrency,
         expenseAmount,
-        incomeCurrencyId,
+        incomeAccount,
+        incomeAccountCurrency,
         incomeAmount,
         payeeId,
         payeeCurrencyCode,

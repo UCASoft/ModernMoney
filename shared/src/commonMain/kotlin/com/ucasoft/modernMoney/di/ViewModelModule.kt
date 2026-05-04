@@ -11,6 +11,7 @@ import com.ucasoft.modernMoney.viewModels.bank.BankViewModel
 import com.ucasoft.modernMoney.viewModels.category.CategoryViewModel
 import com.ucasoft.modernMoney.viewModels.payee.PayeeViewModel
 import com.ucasoft.modernMoney.viewModels.payee.PayeesViewModel
+import com.ucasoft.modernMoney.viewModels.transaction.TransactionViewModel
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -29,5 +30,6 @@ val viewModelModule = module {
     viewModel { PayeeViewModel(get(), it.getOrNull()) }
     viewModelOf(::PayeesViewModel)
     viewModelOf(::TransactionsViewModel)
+    viewModel { TransactionViewModel(get(), it.getOrNull()) }
     viewModelOf(::SettingsViewModel)
 }

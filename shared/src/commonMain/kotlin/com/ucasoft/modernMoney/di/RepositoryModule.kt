@@ -1,5 +1,7 @@
 package com.ucasoft.modernMoney.di
 
+import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
+import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.BankRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,5 +14,7 @@ val repositoryModule = module {
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
 
+    singleOf(::AccountRepository)
+    singleOf(::AccountCurrencyRepository)
     singleOf(::BankRepository)
 }

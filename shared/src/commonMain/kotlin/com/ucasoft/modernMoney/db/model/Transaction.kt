@@ -1,10 +1,8 @@
 package com.ucasoft.modernMoney.db.model
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -58,16 +56,6 @@ data class Transaction(
     val categoryId: Long? = null,
     val locationId: Long? = null,
     val comment: String? = null
-)
-
-data class FullTransaction(
-    @Embedded
-    val transaction: Transaction,
-    @Relation(
-        parentColumn = "categoryId",
-        entityColumn = "id"
-    )
-    val category: Category?
 )
 
 /*data class SubTransaction(
