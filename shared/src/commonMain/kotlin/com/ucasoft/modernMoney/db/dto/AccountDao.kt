@@ -7,18 +7,18 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ucasoft.modernMoney.db.model.Account
-import com.ucasoft.modernMoney.db.model.AccountWithCurrencies
+import com.ucasoft.modernMoney.db.model.FullAccount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountDao {
     @Transaction
     @Query("SELECT * FROM accounts ORDER BY `order`")
-    fun allAccounts() : Flow<List<AccountWithCurrencies>>
+    fun allAccounts() : Flow<List<FullAccount>>
 
     @Transaction
     @Query("SELECT * FROM accounts WHERE id = :id")
-    fun accountById(id: Long): Flow<AccountWithCurrencies>
+    fun accountById(id: Long): Flow<FullAccount>
 
     @Query("""
         UPDATE accounts

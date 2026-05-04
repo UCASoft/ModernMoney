@@ -13,7 +13,7 @@ data class AccountCurrency (
         DbAccountCurrency(id, accountId = accountId, currencyCode = currency.code)
 }
 
-fun AccountCurrencyWithCurrency.mapToCurrency() =
+fun AccountCurrencyWithCurrency.mapToAccountCurrency() =
     AccountCurrency(
         currency = currency.mapToCurrency()
     ).also { it.id = accountCurrency.id }

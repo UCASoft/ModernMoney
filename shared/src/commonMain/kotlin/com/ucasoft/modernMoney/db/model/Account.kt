@@ -25,7 +25,7 @@ data class Account(
     val order: Int = 0
 )
 
-data class AccountWithCurrencies(
+data class FullAccount(
     @Embedded
     val account: Account,
     @Relation(
@@ -34,11 +34,6 @@ data class AccountWithCurrencies(
         entity = AccountCurrency::class
     )
     val currencies: List<AccountCurrencyWithCurrency>,
-    @Relation(
-        parentColumn = "bankId",
-        entityColumn = "id"
-    )
-    val bank: Bank?,
     @Relation(
         parentColumn = "id",
         entityColumn = "accountId"

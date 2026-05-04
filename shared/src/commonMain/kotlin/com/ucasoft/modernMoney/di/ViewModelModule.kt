@@ -18,7 +18,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModel { AccountViewModel(get(), get(), get(), it.getOrNull()) }
+    viewModel { AccountViewModel(get(), get(), get(), get(), it.getOrNull()) }
     viewModelOf(::AccountsViewModel)
     viewModel { BankViewModel(get(), it.getOrNull()) }
     viewModelOf(::BanksViewModel)

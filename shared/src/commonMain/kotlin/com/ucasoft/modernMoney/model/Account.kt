@@ -30,11 +30,11 @@ data class Account(
         )
 }
 
-fun DbAccount.mapToAccount(currencies: List<AccountCurrencyWithCurrency>, bank: DbBank?, cards: List<DbAccountCard>) =
+fun DbAccount.mapToAccount(currencies: List<AccountCurrencyWithCurrency>, bank: Bank?, cards: List<DbAccountCard>) =
     Account(
         name,
-        currencies.map { it.mapToCurrency() },
-        bank?.mapToBank(),
+        currencies.map { it.mapToAccountCurrency() },
+        bank,
         order,
         cards.map { it.mapToAccountCard() }
     ).also { it.id = id }

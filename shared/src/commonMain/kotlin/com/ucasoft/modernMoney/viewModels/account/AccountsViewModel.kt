@@ -2,26 +2,28 @@ package com.ucasoft.modernMoney.viewModels.account
 
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.AccountDao
+import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.mapToAccount
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ReorderingViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountsViewModel(private val accountDao: AccountDao) : ReorderingViewModel<Account, AccountsUiState>() {
+class AccountsViewModel(private val accountDao: AccountDao, bankRepository: BankRepository) : ReorderingViewModel<Account, AccountsUiState>() {
 
-    override val listState = accountDao.allAccounts().map {
-        AccountsUiState(it.map {
-            it.account.mapToAccount(it.currencies, it.bank, it.cards)
-        })
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = AccountsUiState(isLoading = true)
-    )
+    override val listState = accountDao.allAccounts()
+        .combine(bankRepository.banks) { accounts, banks ->
+            AccountsUiState(accounts.map {
+                it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards)
+            })
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AccountsUiState(isLoading = true)
+        )
 
     fun deleteAccount(account: Account) {
         viewModelScope.launch {

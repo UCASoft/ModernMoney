@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.AccountCardDao
 import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
+import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
@@ -13,32 +14,55 @@ import com.ucasoft.modernMoney.viewModels.DetailViewModel
 import com.ucasoft.modernMoney.viewModels.DetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AccountViewModel(private val accountDao: AccountDao, private val accountCurrencyDao: AccountCurrencyDao, private val accountCardDao: AccountCardDao, id: Long?) : DetailViewModel<Account, AccountUiState>() {
+class AccountViewModel(
+    private val accountDao: AccountDao,
+    private val bankRepository: BankRepository,
+    private val accountCurrencyDao: AccountCurrencyDao,
+    private val accountCardDao: AccountCardDao, id: Long?
+) : DetailViewModel<Account, AccountUiState>() {
 
-    override val state : StateFlow<AccountUiState>
+    override val state: StateFlow<AccountUiState>
         field = MutableStateFlow(AccountUiState(isLoading = true))
 
     private val allAccounts = mutableListOf<Account>()
 
     init {
         viewModelScope.launch {
-            accountDao.allAccounts().collect {
-                allAccounts.clear()
-                allAccounts.addAll(it.filterNot { it.account.id == id }.map { it.account.mapToAccount(it.currencies, it.bank, it.cards) })
-                if (id == null) {
-                    val newAccount = Account(order = allAccounts.size)
-                    state.update { AccountUiState(newAccount, isModified = true, errors = validate(newAccount)) }
+            accountDao.allAccounts()
+                .combine(bankRepository.banks) { accounts, banks ->
+                    accounts to banks
                 }
-            }
+                .collect { (accounts, banks) ->
+                    allAccounts.clear()
+                    allAccounts.addAll(accounts.filterNot { it.account.id == id }
+                        .map { it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards) })
+                    if (id == null) {
+                        val newAccount = Account(order = allAccounts.size)
+                        state.update { AccountUiState(newAccount, isModified = true, errors = validate(newAccount)) }
+                    }
+                }
         }
         if (id != null) {
             viewModelScope.launch {
-                accountDao.accountById(id).collect { account ->
-                    state.update { it.copy(entity = account.account.mapToAccount(account.currencies, account.bank, account.cards), isLoading = false) }
-                }
+                accountDao.accountById(id)
+                    .combine(bankRepository.banks) { account, banks ->
+                        account to banks
+                    }
+                    .collect { (account, banks) ->
+                        state.update {
+                            it.copy(
+                                entity = account.account.mapToAccount(
+                                    account.currencies,
+                                    banks[account.account.bankId],
+                                    account.cards
+                                ), isLoading = false
+                            )
+                        }
+                    }
             }
         }
     }
@@ -78,16 +102,19 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
     }
 
     fun updateAccountBank(bank: Bank?) {
-        state.update { it.copy(
-            entity = it.entity?.copy(bank = bank).also { self -> self!!.id = it.entity!!.id },
-            isModified = true
-        ) }
+        state.update {
+            it.copy(
+                entity = it.entity?.copy(bank = bank).also { self -> self!!.id = it.entity!!.id },
+                isModified = true
+            )
+        }
     }
 
     fun addAccountCurrency(currency: AccountCurrency) {
         state.update {
             val copy = it.copy(
-                entity = it.entity?.copy(currencies = it.entity.currencies + currency).also { self -> self!!.id = it.entity!!.id },
+                entity = it.entity?.copy(currencies = it.entity.currencies + currency)
+                    .also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
             copy.copy(
@@ -99,7 +126,8 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
     fun deleteAccountCurrency(currency: AccountCurrency) {
         state.update {
             val copy = it.copy(
-                entity = it.entity?.copy(currencies = it.entity.currencies.filter { it != currency }).also { self -> self!!.id = it.entity!!.id },
+                entity = it.entity?.copy(currencies = it.entity.currencies.filter { it != currency })
+                    .also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
             copy.copy(
@@ -119,7 +147,8 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
     fun deleteCard(card: AccountCard) {
         state.update {
             it.copy(
-                entity = it.entity!!.copy(cards = it.entity.cards.filter { it != card }).also { self -> self.id = it.entity.id }
+                entity = it.entity!!.copy(cards = it.entity.cards.filter { it != card })
+                    .also { self -> self.id = it.entity.id }
             )
         }
     }
@@ -128,7 +157,8 @@ class AccountViewModel(private val accountDao: AccountDao, private val accountCu
         val errors = mutableMapOf<String, String>()
         when {
             account.name.isBlank() -> errors["name"] = "Name cannot be empty or blank!"
-            allAccounts.any { it.name == account.name } -> errors["name"] = "Account with name ${account.name} already exists!"
+            allAccounts.any { it.name == account.name } -> errors["name"] =
+                "Account with name ${account.name} already exists!"
         }
 
         when {
