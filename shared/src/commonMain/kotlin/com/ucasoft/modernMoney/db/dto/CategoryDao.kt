@@ -33,7 +33,7 @@ interface CategoryDao {
             LIMIT 1
         """
     )
-    suspend fun doesExists(name: String, parentId: Long?) : Boolean
+    suspend fun doesExist(name: String, parentId: Long?) : Boolean
 
     @Insert
     suspend fun insert(category: Category)

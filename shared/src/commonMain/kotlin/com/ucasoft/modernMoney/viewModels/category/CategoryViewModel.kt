@@ -70,7 +70,7 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : LogoE
         val errors = mutableMapOf<String, String>()
         when {
             category.id == parentCategory?.id -> errors["parentCategory"] = "Category cannot be its own parent!"
-            categoryDao.doesExists(category.name, parentCategory?.id) -> errors["parentCategory"] =
+            categoryDao.doesExist(category.name, parentCategory?.id) -> errors["parentCategory"] =
                 if (parentCategory == null)
                     "Root category ${category.name} already exists!"
                 else
