@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 compose = "1.10.3"
 android = "9.0.0-alpha06"
 adaptive = "1.2.0"
