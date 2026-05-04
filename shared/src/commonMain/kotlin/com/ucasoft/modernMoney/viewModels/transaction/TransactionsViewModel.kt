@@ -11,8 +11,9 @@ import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class TransactionsViewModel(transactionDao: TransactionDao, accountCurrencyRepository: AccountCurrencyRepository, accountRepository: AccountRepository): ListViewModel<Transaction, TransactionsUiState>() {
+class TransactionsViewModel(private val transactionDao: TransactionDao, accountCurrencyRepository: AccountCurrencyRepository, accountRepository: AccountRepository): ListViewModel<Transaction, TransactionsUiState>() {
 
     override val listState = transactionDao.allTransaction()
         .combine(accountCurrencyRepository.accountCurrencies) { transactions, accountCurrencies ->
@@ -39,6 +40,11 @@ class TransactionsViewModel(transactionDao: TransactionDao, accountCurrencyRepos
             initialValue = TransactionsUiState(isLoading = true)
         )
 
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            transactionDao.delete(transaction.mapToTransaction())
+        }
+    }
 }
 
 data class TransactionsUiState(

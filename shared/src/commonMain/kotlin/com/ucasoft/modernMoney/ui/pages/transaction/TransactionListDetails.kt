@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.ui.pages.transaction
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,16 +39,20 @@ fun TransactionListDetails() {
             ListItem(
                 leadingContent = { TransactionLogo(transaction) },
                 headlineContent = { Text("") },
-                supportingContent = { Text(transaction.comment ?: "") }
+                supportingContent = { Text(transaction.comment ?: "") },
+                modifier = Modifier.clickable(true, onClick = { event.invoke(transaction) })
             )
         },
         onEditItemEvent = { transaction, navigator ->
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, transaction.id to DetailsMode.EDIT)
         },
         onDeleting = { true },
         onDelete = { transaction, viewModel ->
+            viewModel.deleteTransaction(transaction)
             true
         }
-    ) { _, _ ->
+    ) { key, mode ->
+        TransactionDetails(key, mode)
     }
 }
 

@@ -14,6 +14,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions")
     fun allTransaction(): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun transactionById(id: Long): Flow<Transaction>
+
     @Insert
     suspend fun insert(transaction: Transaction): Long
 
