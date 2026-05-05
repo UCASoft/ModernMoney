@@ -4,7 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
+import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.mapToTransaction
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
@@ -21,8 +23,10 @@ class TransactionViewModel(
     private val transactionDao: TransactionDao,
     accountCurrencyRepository: AccountCurrencyRepository,
     accountRepository: AccountRepository,
+    categoryRepository: CategoryRepository,
     id: Long?
 ) : DetailViewModel<Transaction, TransactionUiState>() {
+
     override val state: StateFlow<TransactionUiState>
         field = MutableStateFlow(TransactionUiState(isLoading = true))
 
@@ -31,24 +35,31 @@ class TransactionViewModel(
             viewModelScope.launch {
                 transactionDao.transactionById(id)
                     .combine(accountCurrencyRepository.accountCurrencies) { transaction, accountCurrencies ->
-                        transaction to (transaction.expenseCurrencyId?.let { accountCurrencies[it] } to transaction.incomeCurrencyId?.let { accountCurrencies[it] })
-                    }
-                    .combine(accountRepository.accounts) { transactionWithCurrencies, accounts ->
-                        Triple(
-                            transactionWithCurrencies.first,
-                            transactionWithCurrencies.second.first?.let { accounts[it.accountId] } to transactionWithCurrencies.second.first,
-                            transactionWithCurrencies.second.second?.let { accounts[it.accountId] } to transactionWithCurrencies.second.second
+                        transaction to BuildTransaction(
+                            transaction.expenseCurrencyId?.let { accountCurrencies[it] },
+                            transaction.incomeCurrencyId?.let { accountCurrencies[it] }
                         )
                     }
-                    .collect { allFlows ->
+                    .combine(accountRepository.accounts) { transactionWithBuild, accounts ->
+                        transactionWithBuild.first to transactionWithBuild.second.copy(
+                            expenseAccount = transactionWithBuild.second.expenseAccountCurrency?.let { accounts[it.accountId] },
+                            incomeAccount = transactionWithBuild.second.incomeAccountCurrency?.let { accounts[it.accountId] }
+                        )
+                    }
+                    .combine(categoryRepository.categories) { transactionWithBuild, categories ->
+                        transactionWithBuild.first to transactionWithBuild.second.copy(
+                            category = transactionWithBuild.first.categoryId?.let { categories[it] }
+                        )
+                    }
+                    .collect { transactionWithBuild ->
                         state.update {
                             it.copy(
-                                entity = allFlows.first.mapToTransaction(
-                                    expenseAccount = allFlows.second.first,
-                                    expenseAccountCurrency = allFlows.second.second,
-                                    incomeAccount = allFlows.third.first,
-                                    incomeAccountCurrency = allFlows.third.second,
-                                    null
+                                entity = transactionWithBuild.first.mapToTransaction(
+                                    expenseAccount = transactionWithBuild.second.expenseAccount,
+                                    expenseAccountCurrency = transactionWithBuild.second.expenseAccountCurrency,
+                                    incomeAccount = transactionWithBuild.second.incomeAccount,
+                                    incomeAccountCurrency = transactionWithBuild.second.incomeAccountCurrency,
+                                    category = transactionWithBuild.second.category
                                 ),
                                 isLoading = false
                             )
@@ -64,7 +75,7 @@ class TransactionViewModel(
     fun updateTransactionDateTime(dateTime: Instant) {
         state.update {
             it.copy(
-                entity = it.entity?.copy(dataTime = dateTime),
+                entity = it.entity?.copy(dataTime = dateTime).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
         }
@@ -76,7 +87,7 @@ class TransactionViewModel(
                 entity = it.entity?.copy(
                     expenseAccountCurrency = accountCurrency,
                     expenseAmount = amount
-                ),
+                ).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
         }
@@ -88,7 +99,16 @@ class TransactionViewModel(
                 entity = it.entity?.copy(
                     incomeAccountCurrency = accountCurrency,
                     incomeAmount = amount
-                ),
+                ).also { self -> self!!.id = it.entity!!.id },
+                isModified = true
+            )
+        }
+    }
+
+    fun updateTransactionCategory(category: Category?) {
+        state.update {
+            it.copy(
+                entity = it.entity?.copy(category = category).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
         }
@@ -97,6 +117,12 @@ class TransactionViewModel(
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             transactionDao.insert(transaction.mapToTransaction())
+        }
+    }
+
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            transactionDao.update(transaction.mapToTransaction())
         }
     }
 }
@@ -108,3 +134,4 @@ data class TransactionUiState(
     override val errors: Map<String, String> = emptyMap()
 
 ) : DetailsState<Transaction>
+

@@ -3,6 +3,7 @@ package com.ucasoft.modernMoney.di
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.BankRepository
+import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,4 +18,5 @@ val repositoryModule = module {
     singleOf(::AccountRepository)
     singleOf(::AccountCurrencyRepository)
     singleOf(::BankRepository)
+    singleOf(::CategoryRepository)
 }

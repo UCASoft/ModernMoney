@@ -139,7 +139,7 @@ inline fun <reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity
 @Composable
 inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K> ListDetails(
     crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
-    crossinline listContent: @Composable (T, (T) -> Unit) -> Unit,
+    crossinline listContent: @Composable LazyItemScope.(T, (T) -> Unit) -> Unit,
     crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit = { entity, navigator ->
         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, entity.key to DetailsMode.VIEW)
     },

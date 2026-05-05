@@ -24,6 +24,7 @@ import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.ui.pages.EntityDetails
 import com.ucasoft.modernMoney.ui.pages.account.AccountCurrencyDropDown
 import com.ucasoft.modernMoney.ui.pages.account.AccountDropDown
+import com.ucasoft.modernMoney.ui.pages.categories.CategoryDropDown
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionUiState
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionViewModel
 
@@ -55,11 +56,24 @@ fun TransactionDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
             ) { accountCurrency, amount ->
                 viewModel.updateTransactionIncome(accountCurrency, amount)
             }
+            CategoryDropDown(
+                transactionState.entity.category,
+                "Category",
+                isEmptyAllowed = true
+            ) {
+                viewModel.updateTransactionCategory(it)
+            }
+             OutlinedTextField(
+                 value = transactionState.entity.comment ?: "",
+                 onValueChange = { }, //viewModel.updateTransactionComment(it) },
+                 label = { Text("Comment") },
+                 modifier = Modifier.fillMaxWidth()
+             )
         },
         { transactionState, viewModel ->
             when (mode) {
                 DetailsMode.ADD -> viewModel.addTransaction(transactionState.entity!!)
-                //DetailsMode.EDIT -> viewModel.updateTransaction(transactionState.entity!!)
+                DetailsMode.EDIT -> viewModel.updateTransaction(transactionState.entity!!)
                 else -> {}
             }
         },

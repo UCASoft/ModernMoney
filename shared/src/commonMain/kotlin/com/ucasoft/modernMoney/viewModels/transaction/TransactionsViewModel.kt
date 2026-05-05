@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
+import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.mapToTransaction
 import com.ucasoft.modernMoney.viewModels.ListState
@@ -13,23 +14,38 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TransactionsViewModel(private val transactionDao: TransactionDao, accountCurrencyRepository: AccountCurrencyRepository, accountRepository: AccountRepository): ListViewModel<Transaction, TransactionsUiState>() {
+class TransactionsViewModel(
+    private val transactionDao: TransactionDao,
+    accountCurrencyRepository: AccountCurrencyRepository,
+    accountRepository: AccountRepository,
+    categoryRepository: CategoryRepository
+): ListViewModel<Transaction, TransactionsUiState>() {
 
     override val listState = transactionDao.allTransaction()
         .combine(accountCurrencyRepository.accountCurrencies) { transactions, accountCurrencies ->
             transactions.map {
-                it to (it.expenseCurrencyId?.let { accountCurrencies[it] } to it.incomeCurrencyId?.let { accountCurrencies[it] })
+                it to BuildTransaction(
+                    it.expenseCurrencyId?.let { accountCurrencies[it] },
+                    it.incomeCurrencyId?.let { accountCurrencies[it] }
+                )
             }
         }
-        .combine(accountRepository.accounts) { transactionsWithCurrencies, accounts ->
+        .combine(categoryRepository.categories) { transactionsWithBuild, categories ->
+            transactionsWithBuild.map { (transaction, build) ->
+                transaction to build.copy(
+                    category = transaction.categoryId?.let { categories[it] }
+                )
+            }
+        }
+        .combine(accountRepository.accounts) { transactionsWithBuild, accounts ->
             TransactionsUiState(
-                transactionsWithCurrencies.map { (transaction, currencies) ->
+                transactionsWithBuild.map { (transaction, build) ->
                     transaction.mapToTransaction(
-                        expenseAccount = currencies.first?.let { accounts[it.accountId] },
-                        expenseAccountCurrency = currencies.first,
-                        incomeAccount = currencies.second?.let { accounts[it.accountId] },
-                        incomeAccountCurrency = currencies.second,
-                        null
+                        expenseAccount = build.expenseAccountCurrency?.let { accounts[it.accountId] },
+                        expenseAccountCurrency = build.expenseAccountCurrency,
+                        incomeAccount = build.incomeAccountCurrency?.let { accounts[it.accountId] },
+                        incomeAccountCurrency = build.incomeAccountCurrency,
+                        build.category
                     )
                 }
             )
