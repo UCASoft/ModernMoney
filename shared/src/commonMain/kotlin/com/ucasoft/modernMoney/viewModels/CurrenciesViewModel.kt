@@ -7,15 +7,9 @@ import com.ucasoft.modernMoney.model.mapToCurrency
 import com.ucasoft.modernMoney.network.CurrencyClient
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import kotlin.collections.map
 
-class CurrenciesViewModel : ListViewModel<Currency, CurrencyUiState>(), KoinComponent {
-
-    private val client by inject<CurrencyClient>()
-
-    private val currenciesDao by inject<CurrencyDao>()
+class CurrenciesViewModel(private val currenciesDao: CurrencyDao, private val client: CurrencyClient) : ListViewModel<Currency, CurrencyUiState>() {
 
     private val fullCurrencyFlow = combine(
         currenciesDao.visibleCurrencies().onStart { emit(emptyList()) },

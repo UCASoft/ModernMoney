@@ -32,3 +32,23 @@ android {
     }
     buildToolsVersion = "36.1.0"
 }
+
+val syncKmpStrings by tasks.registering(Copy::class) {
+    description = "Copy shared composeResources strings into Android res"
+
+    from(
+        rootProject.file(
+            "shared/src/commonMain/composeResources/values/common.xml"
+        )
+    )
+    into(layout.projectDirectory.dir("src/main/res/values"))
+
+    rename {
+        val name = it.substringBeforeLast(".")
+        "${name}_from_shared.xml"
+    }
+}
+
+afterEvaluate {
+    tasks.findByName("preBuild")?.dependsOn(syncKmpStrings)
+}

@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.di
 
 import com.ucasoft.modernMoney.network.CurrencyClient
+import com.ucasoft.modernMoney.network.CurrencyExchangeClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -20,8 +21,15 @@ val networkModule = module {
                     },
                     contentType = ContentType.Text.Plain
                 )
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                    },
+                    contentType = ContentType.Text.Html
+                )
             }
         }
     }
     singleOf(::CurrencyClient)
+    singleOf(::CurrencyExchangeClient)
 }

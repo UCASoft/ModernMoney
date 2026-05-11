@@ -18,6 +18,7 @@ import com.ucasoft.modernMoney.di.daoModule
 import com.ucasoft.modernMoney.di.networkModule
 import com.ucasoft.modernMoney.di.platformDbModule
 import com.ucasoft.modernMoney.di.repositoryModule
+import com.ucasoft.modernMoney.di.serviceModule
 import com.ucasoft.modernMoney.di.viewModelModule
 import com.ucasoft.modernMoney.ui.MainLayout
 import com.ucasoft.modernMoney.ui.ModernMoneyTheme
@@ -46,16 +47,16 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
 fun App() {
     KoinApplication(
         configuration = koinConfiguration {
-            modules(platformDbModule, daoModule, repositoryModule, viewModelModule, networkModule)
+            modules(platformDbModule, daoModule, repositoryModule, serviceModule, viewModelModule, networkModule)
         }
     ) {
         ModernMoneyTheme {
-                MainLayout(
-                    listOf(
-                        Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
-                        Screen.Payees
-                    ), Screen.Settings
-                )
+            MainLayout(
+                listOf(
+                    Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
+                    Screen.Payees
+                ), Screen.Settings
+            )
         }
     }
 }

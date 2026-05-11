@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.di
 
 import com.ucasoft.modernMoney.viewModels.bank.BanksViewModel
 import com.ucasoft.modernMoney.viewModels.CardViewModel
+import com.ucasoft.modernMoney.viewModels.CurrenciesExchangeViewModel
 import com.ucasoft.modernMoney.viewModels.category.CategoriesViewModel
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
@@ -27,6 +28,7 @@ val viewModelModule = module {
     viewModel { CategoryViewModel(get(), it.getOrNull()) }
     viewModelOf(::CategoriesViewModel)
     viewModelOf(::CurrenciesViewModel)
+    viewModelOf(::CurrenciesExchangeViewModel)
     viewModel { PayeeViewModel(get(), it.getOrNull()) }
     viewModelOf(::PayeesViewModel)
     viewModelOf(::TransactionsViewModel)

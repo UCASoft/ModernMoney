@@ -13,7 +13,7 @@ class AccountCurrencyRepository(accountCurrencyDao: AccountCurrencyDao, scope: C
         .map { it.associate { it.accountCurrency.id to it.mapToAccountCurrency() } }
         .stateIn(
             scope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Lazily,
             initialValue = emptyMap()
         )
 }

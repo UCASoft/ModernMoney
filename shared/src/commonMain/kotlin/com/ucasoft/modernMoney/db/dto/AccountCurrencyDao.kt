@@ -13,7 +13,10 @@ interface AccountCurrencyDao {
     fun accountCurrencies() : Flow<List<AccountCurrencyWithCurrency>>
 
     @Query("SELECT * FROM account_currencies WHERE accountId = :accountId")
-    suspend fun accountCurrencies(accountId: Long) : List<AccountCurrency>
+    fun accountCurrencies(accountId: Long) : Flow<List<AccountCurrency>>
+
+    @Query("SELECT DISTINCT currencyCode FROM account_currencies")
+    fun currencyCodes(): Flow<List<String>>
 
     @Insert
     suspend fun insert(currency: AccountCurrency)

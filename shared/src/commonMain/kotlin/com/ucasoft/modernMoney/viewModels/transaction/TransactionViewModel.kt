@@ -81,7 +81,7 @@ class TransactionViewModel(
         }
     }
 
-    fun updateTransactionExpense(accountCurrency: AccountCurrency, amount: Double?) {
+    fun updateTransactionExpense(accountCurrency: AccountCurrency?, amount: Double?) {
         state.update {
             it.copy(
                 entity = it.entity?.copy(
@@ -93,7 +93,7 @@ class TransactionViewModel(
         }
     }
 
-    fun updateTransactionIncome(accountCurrency: AccountCurrency, amount: Double?) {
+    fun updateTransactionIncome(accountCurrency: AccountCurrency?, amount: Double?) {
         state.update {
             it.copy(
                 entity = it.entity?.copy(

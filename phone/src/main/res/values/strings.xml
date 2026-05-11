@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_type" translatable="false">com.ucasoft.modernMoney.account</string>
+    <string name="currency_rates_provider_authority" translatable="false">com.ucasoft.modernMoney.currencyRates.provider</string>
+    <string name="currency_rates_provider_label">Currency Rates</string>
+</resources>

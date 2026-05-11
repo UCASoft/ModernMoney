@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    @Query("SELECT * FROM transactions")
+    @Query("SELECT * FROM transactions ORDER BY dataTime DESC")
     fun allTransaction(): Flow<List<Transaction>>
 
     @Query("SELECT * FROM transactions WHERE id = :id")

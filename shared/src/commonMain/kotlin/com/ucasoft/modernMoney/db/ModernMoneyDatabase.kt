@@ -11,6 +11,7 @@ import com.ucasoft.modernMoney.db.converters.ListStringConverter
 import com.ucasoft.modernMoney.db.dto.*
 import com.ucasoft.modernMoney.db.model.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 
 @Database(entities = [
     Account::class,
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
     Bank::class,
     Category::class,
     Currency::class,
+    CurrencyExchange::class,
     Location::class,
     Payee::class,
     PayeeLocation::class,
@@ -38,6 +40,8 @@ abstract class ModernMoneyDatabase : RoomDatabase() {
     abstract val categoryDao: CategoryDao
 
     abstract val currencyDao: CurrencyDao
+
+    abstract val currencyExchangeDao: CurrencyExchangeDao
 
     abstract val payeeDao: PayeeDao
 
