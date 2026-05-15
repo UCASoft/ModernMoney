@@ -42,7 +42,6 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
     object Settings : Screen("Settings", Icons.Rounded.Settings, { SettingsScreen() } )
 }
 
-@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun App() {
     KoinApplication(

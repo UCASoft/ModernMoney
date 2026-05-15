@@ -19,7 +19,7 @@
         </service>
         <service android:name=".services.CurrencyRatesSyncService" android:exported="false">
             <intent-filter>
-                    <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
             <meta-data
                 android:name="android.content.SyncAdapter"

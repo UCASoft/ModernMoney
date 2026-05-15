@@ -111,6 +111,7 @@ fun AccountCurrencyAmount(
     var inputAmount by remember(amount) { mutableStateOf(amount?.toString() ?: "") }
 
     val exchangeState by koinViewModel<CurrenciesExchangeViewModel>().state.collectAsStateWithLifecycle()
+    var isFocused by remember { mutableStateOf(false) }
 
     OutlinedCard(
         modifier = Modifier.fillMaxWidth().padding(8.dp, 2.dp)
@@ -136,15 +137,20 @@ fun AccountCurrencyAmount(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
                     .onFocusEvent {
-                        if (it.isFocused && selectedCurrency != null && inputAmount.isEmpty() && otherAccountCurrency != null && otherAmount != null) {
+                        if (!isFocused && it.isFocused && selectedCurrency != null && inputAmount.isEmpty() && otherAccountCurrency != null && otherAmount != null) {
+                            isFocused = true
                             val convertedAmount = convertCurrency(
                                 otherAmount,
                                 otherAccountCurrency.currency,
                                 selectedCurrency!!.currency,
                                 exchangeState
                             )
-                            inputAmount = convertedAmount.toString()
-                            onCurrencyAmountChanged(selectedCurrency!!, convertedAmount)
+                            if (convertedAmount != null) {
+                                inputAmount = convertedAmount.toString()
+                                onCurrencyAmountChanged(selectedCurrency!!, convertedAmount)
+                            }
+                        } else {
+                            isFocused = it.isFocused
                         }
                     }
             )
@@ -157,12 +163,15 @@ private fun convertCurrency(
     fromCurrency: Currency,
     toCurrency: Currency,
     exchanges: List<CurrencyExchange>
-): Double {
+): Double? {
     if (fromCurrency.code == toCurrency.code) {
         return amount
     }
 
-    val rate = exchanges.find { it.from == fromCurrency.code && it.to == toCurrency.code }?.amount!!
+    val rate = exchanges.find { it.from == fromCurrency.code && it.to == toCurrency.code }?.amount
+    if (rate == null) {
+        return null
+    }
 
     return round(amount * rate * 100) / 100.0
 }
