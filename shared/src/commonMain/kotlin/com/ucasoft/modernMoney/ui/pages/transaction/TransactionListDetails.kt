@@ -3,9 +3,13 @@ package com.ucasoft.modernMoney.ui.pages.transaction
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -20,34 +24,73 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionType
+import com.ucasoft.modernMoney.ui.components.EditableListItem
+import com.ucasoft.modernMoney.ui.pages.BaseListDetails
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
-import com.ucasoft.modernMoney.ui.pages.ListDetails
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionsUiState
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionsViewModel
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun TransactionListDetails() {
 
-    ListDetails<TransactionsViewModel, TransactionsUiState, Transaction, Long>(
+    BaseListDetails<TransactionsViewModel, TransactionsUiState, Transaction, Long>(
         onAddClickEvent = { navigator ->
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
-        listContent = { transaction, event ->
-            TransactionListItem(transaction) {
-                event.invoke(transaction)
+        listContent = { items, viewModel, navigator, scope ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items.groupBy { it.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
+                    stickyHeader {
+                        Text(
+                            text = group.key.format(LocalDate.Formats.ISO)
+                        )
+                    }
+                    items(
+                        items = group.value,
+                        key = { it.key }
+                    ) { item ->
+                        EditableListItem(
+                            onDeleting = { true },
+                            onDelete = {
+                                viewModel.deleteTransaction(item)
+                                true
+                            },
+                            onEdit = {
+                                scope.launch {
+                                    navigator.navigateTo(
+                                        ListDetailPaneScaffoldRole.Detail,
+                                        item.key to DetailsMode.EDIT
+                                    )
+                                }
+                                true
+                            }
+                        ) {
+                            TransactionListItem(item) {
+                                scope.launch {
+                                    navigator.navigateTo(
+                                        ListDetailPaneScaffoldRole.Detail,
+                                        item.key to DetailsMode.VIEW
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        },
-        onEditItemEvent = { transaction, navigator ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, transaction.id to DetailsMode.EDIT)
-        },
-        onDeleting = { true },
-        onDelete = { transaction, viewModel ->
-            viewModel.deleteTransaction(transaction)
-            true
         }
     ) { key, mode ->
         TransactionDetails(key, mode)
@@ -55,13 +98,13 @@ fun TransactionListDetails() {
 }
 
 @Composable
-private fun LazyItemScope.TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
+private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
 
     ListItem(
         leadingContent = { TransactionLogo(transaction) },
         overlineContent = {
             Text(
-                transaction.dataTime.format(DateTimeComponents.Formats.RFC_1123),
+                transaction.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Formats.ISO),
                 color = if (transaction.dataTime > Clock.System.now()) Color(0xFFF0A014) else Color.Black,
             )
         },
@@ -98,7 +141,7 @@ private fun TransactionLogo(transaction: Transaction) {
             .background(backgroundColor, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
-        if (transaction.category != null && transaction.category.logo != null) {
+        if (transaction.category?.logo != null) {
             Image(
                 transaction.category.logo,
                 "",
