@@ -1,5 +1,10 @@
 package com.ucasoft.modernMoney.model
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NorthEast
+import androidx.compose.material.icons.filled.OpenInFull
+import androidx.compose.material.icons.filled.SouthWest
+import androidx.compose.ui.graphics.Color
 import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 import kotlin.time.Instant
 
@@ -25,6 +30,14 @@ data class Transaction(
     override val key: Long
         get() = id
 
+    val type: TransactionType?
+        get() = when {
+            expenseAmount != null && incomeAmount != null -> TransactionType.TRANSFER
+            expenseAmount != null -> TransactionType.EXPENSE
+            incomeAmount != null -> TransactionType.INCOME
+            else -> null
+        }
+
     fun mapToTransaction() =
         DbTransaction(
             id,
@@ -40,6 +53,39 @@ data class Transaction(
             locationId,
             comment
         )
+
+    fun default() = default(type)
+
+    companion object {
+
+        fun default(type: TransactionType?)= when(type) {
+            TransactionType.TRANSFER -> Triple(
+                Color(0xFFDCE1FC),
+                Color(0xFF162DA3),
+                Icons.Default.OpenInFull
+            )
+
+            TransactionType.EXPENSE -> Triple(
+                Color(0xFFFEDBDB),
+                Color(0xFFD70C0C),
+                Icons.Default.NorthEast
+            )
+
+            TransactionType.INCOME -> Triple(
+                Color(0xFFDDFEDB),
+                Color(0xFF0CD74C),
+                Icons.Default.SouthWest
+            )
+
+            else -> null
+        }
+    }
+}
+
+enum class TransactionType {
+    EXPENSE,
+    INCOME,
+    TRANSFER
 }
 
 fun DbTransaction.mapToTransaction(

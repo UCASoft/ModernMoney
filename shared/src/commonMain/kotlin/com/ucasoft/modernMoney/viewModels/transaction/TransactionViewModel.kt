@@ -105,6 +105,18 @@ class TransactionViewModel(
         }
     }
 
+    fun updateTransactionPayee(currencyCode: String?, amount: Double?) {
+        state.update {
+            it.copy(
+                entity = it.entity?.copy(
+                    payeeCurrencyCode = currencyCode,
+                    payeeAmount = amount
+                ).also { self -> self!!.id = it.entity!!.id },
+                isModified = true
+            )
+        }
+    }
+
     fun updateTransactionCategory(category: Category?) {
         state.update {
             it.copy(

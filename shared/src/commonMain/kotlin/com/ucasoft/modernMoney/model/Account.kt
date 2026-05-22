@@ -3,7 +3,6 @@ package com.ucasoft.modernMoney.model
 import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
 import com.ucasoft.modernMoney.db.model.Account as DbAccount
 import com.ucasoft.modernMoney.db.model.AccountCard as DbAccountCard
-import com.ucasoft.modernMoney.db.model.Bank as DbBank
 
 data class Account(
     val name: String = "",
