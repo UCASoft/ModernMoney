@@ -1,15 +1,21 @@
 package com.ucasoft.components.treeview
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ucasoft.components.scrollable.ScrollableLazyColumn
@@ -18,6 +24,7 @@ import com.ucasoft.components.scrollable.ScrollableLazyColumn
 fun <K, N: TreeViewNode<K>> TreeView(
     nodes: List<N>,
     current: N?,
+    itemContent: @Composable LazyItemScope.(node: N, isSelected: Boolean) -> Unit,
     itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit = { _, content -> content() },
     onSelectedNode: (N) -> Unit
 ) {
@@ -35,9 +42,10 @@ fun <K, N: TreeViewNode<K>> TreeView(
         items(displayNodes, key = {
             it.first.key!!
         }) {
+            val isSelected = it.first.key == selectedItem?.key
             TreeViewItem(
                 node = it.first,
-                isSelected = it.first.key == selectedItem?.key,
+                isSelected = isSelected,
                 isExpanded = it.first.key in expandedNodeKeys,
                 leftPadding = (it.second * 20).dp,
                 onNodeClick = {
@@ -52,7 +60,9 @@ fun <K, N: TreeViewNode<K>> TreeView(
                     }
                 },
                 itemWrapper
-            )
+            ) {
+                itemContent(it.first, isSelected)
+            }
         }
     }
 }
@@ -94,33 +104,33 @@ private fun <N: TreeViewNode<*>> TreeViewItem(
     leftPadding: Dp,
     onNodeClick: (N) -> Unit,
     onToggleExpand: (N) -> Unit,
-    itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit
+    itemWrapper: @Composable (node: N, content: @Composable () -> Unit) -> Unit,
+    content: @Composable () -> Unit
 ) {
-    itemWrapper (node) {
-        ListItem(
-            leadingContent = {
-                Image(
-                    node.icon,
-                    node.title,
-                    Modifier.padding(start = leftPadding).size(32.dp),
-                    contentScale = ContentScale.Fit)
-            },
-            headlineContent = { Text(node.title) },
-            trailingContent = {
-                if (node.children.isNotEmpty()) {
-                    IconButton({ onToggleExpand(node) }) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
-                    }
+    val backgroundColor = if (isSelected) {
+        MaterialTheme.colorScheme.secondaryContainer
+    } else {
+        Color.Unspecified
+    }
+    itemWrapper(node) {
+        Row(
+            modifier = Modifier
+                .background(backgroundColor)
+                .clickable { onNodeClick(node) },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = leftPadding)
+            ) {
+                content()
+            }
+            if (node.children.isNotEmpty()) {
+                IconButton({ onToggleExpand(node) }) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
                 }
-            },
-            colors = ListItemDefaults.colors(
-                containerColor = if (isSelected) {
-                    MaterialTheme.colorScheme.secondaryContainer
-                } else {
-                    Color.Unspecified
-                }
-            ),
-            modifier = Modifier.clickable { onNodeClick(node) }
-        )
+            }
+        }
     }
 }

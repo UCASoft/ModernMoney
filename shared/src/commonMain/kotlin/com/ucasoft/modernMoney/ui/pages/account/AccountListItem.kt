@@ -27,6 +27,7 @@ import androidx.compose.ui.zIndex
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.ui.EntityCard
 import com.ucasoft.modernMoney.ui.toImageBitmap
 
 
@@ -37,7 +38,7 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
     var expanded by remember { mutableStateOf(false) }
     val isDragging = draggedOffset != null
 
-    AccountCard(
+    EntityCard(
         modifier = Modifier
             .clickable { onClick(account.id) }
             .zIndex(if (isDragging) 1f else 0f)
@@ -116,18 +117,6 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun AccountCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFECECEC)),
-        modifier = modifier.fillMaxWidth()
-    ) {
-        content()
     }
 }
 

@@ -14,25 +14,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.ucasoft.modernMoney.model.Payee
+import com.ucasoft.modernMoney.ui.EntityCard
 
 @Composable
 fun PayeeListItem(payee: Payee, onClick: (Long) -> Unit) {
-    ListItem(
-        leadingContent = {
-            payee.logo?.let {
-                Image(
-                    it,
-                    "",
-                    Modifier.size(32.dp),
-                    contentScale = ContentScale.Fit
-                )
+    EntityCard {
+        ListItem(
+            leadingContent = {
+                payee.logo?.let {
+                    Image(
+                        it,
+                        "",
+                        Modifier.size(32.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+            },
+            headlineContent = { Text(payee.name) },
+            supportingContent = {
+                AliasesRow(payee.aliases)
             }
-        },
-        headlineContent = { Text(payee.name) },
-        supportingContent = {
-            AliasesRow(payee.aliases)
-        }
-    )
+        )
+    }
 }
 
 @Composable

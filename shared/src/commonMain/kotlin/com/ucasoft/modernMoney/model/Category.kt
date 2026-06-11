@@ -16,15 +16,13 @@ data class Category(
     var id: Long = 0L
         internal set
 
-    override val icon: ImageBitmap
+    val icon: ImageBitmap
         get() = logo ?: Icons.Default.Category.toImageBitmap()
 
     override val children = mutableListOf<Category>()
 
     override val key : Long
         get() = id
-
-    override val title = name
 
     fun addChild(category: Category) {
         children.add(category)

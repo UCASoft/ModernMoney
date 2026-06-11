@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionType
+import com.ucasoft.modernMoney.ui.EntityCard
 import com.ucasoft.modernMoney.ui.components.EditableListItem
 import com.ucasoft.modernMoney.ui.pages.BaseListDetails
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
@@ -34,7 +35,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
@@ -63,28 +63,30 @@ fun TransactionListDetails() {
                         items = group.value,
                         key = { it.key }
                     ) { item ->
-                        EditableListItem(
-                            onDeleting = { true },
-                            onDelete = {
-                                viewModel.deleteTransaction(item)
-                                true
-                            },
-                            onEdit = {
-                                scope.launch {
-                                    navigator.navigateTo(
-                                        ListDetailPaneScaffoldRole.Detail,
-                                        item.key to DetailsMode.EDIT
-                                    )
+                        EntityCard {
+                            EditableListItem(
+                                onDeleting = { true },
+                                onDelete = {
+                                    viewModel.deleteTransaction(item)
+                                    true
+                                },
+                                onEdit = {
+                                    scope.launch {
+                                        navigator.navigateTo(
+                                            ListDetailPaneScaffoldRole.Detail,
+                                            item.key to DetailsMode.EDIT
+                                        )
+                                    }
+                                    true
                                 }
-                                true
-                            }
-                        ) {
-                            TransactionListItem(item) {
-                                scope.launch {
-                                    navigator.navigateTo(
-                                        ListDetailPaneScaffoldRole.Detail,
-                                        item.key to DetailsMode.VIEW
-                                    )
+                            ) {
+                                TransactionListItem(item) {
+                                    scope.launch {
+                                        navigator.navigateTo(
+                                            ListDetailPaneScaffoldRole.Detail,
+                                            item.key to DetailsMode.VIEW
+                                        )
+                                    }
                                 }
                             }
                         }

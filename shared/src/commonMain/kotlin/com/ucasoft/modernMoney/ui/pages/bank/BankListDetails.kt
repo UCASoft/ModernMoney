@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.ucasoft.modernMoney.model.Bank
+import com.ucasoft.modernMoney.ui.EntityCard
 import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.ui.pages.ListDetails
 
@@ -27,20 +28,22 @@ fun BankListDetails() {
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
         listContent = { bank, event ->
-            ListItem(
-                leadingContent = {
-                    bank.logo?.let {
-                        Image(
-                            it,
-                            "",
-                            Modifier.size(32.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-                },
-                headlineContent = { Text(bank.name) },
-                modifier = Modifier.clickable(true, onClick = { event.invoke(bank) })
-            )
+            EntityCard {
+                ListItem(
+                    leadingContent = {
+                        bank.logo?.let {
+                            Image(
+                                it,
+                                "",
+                                Modifier.size(32.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    },
+                    headlineContent = { Text(bank.name) },
+                    modifier = Modifier.clickable(true, onClick = { event.invoke(bank) })
+                )
+            }
         },
         onEditItemEvent = { bank, navigator ->
             navigator.navigateTo(

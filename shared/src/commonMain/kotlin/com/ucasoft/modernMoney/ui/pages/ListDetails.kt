@@ -1,12 +1,9 @@
 package com.ucasoft.modernMoney.ui.pages
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -14,14 +11,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -36,6 +26,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.ucasoft.components.treeview.TreeView
 import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.modernMoney.model.KeyEntity
+import com.ucasoft.modernMoney.ui.EntityCard
 import com.ucasoft.modernMoney.ui.LocalPrimaryActionEvents
 import com.ucasoft.modernMoney.ui.LocalThreePaneScaffoldNavigator
 import com.ucasoft.modernMoney.ui.components.EditableListItem
@@ -183,6 +174,7 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
 @Composable
 inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDetails(
     crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
+    crossinline listContent: @Composable LazyItemScope.(item: T, isSelected: Boolean) -> Unit,
     crossinline onListItemEvent: suspend (T, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit = { entity, navigator ->
         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, entity.key to DetailsMode.VIEW)
     },
@@ -197,13 +189,24 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDeta
             TreeView(
                 items,
                 null,
+                { node, isSelected ->
+                    listContent(node, isSelected)
+                },
                 { node, content ->
                     EditableListItem(
-                        onDeleting = if (onDeleting != null) { { onDeleting.invoke(node) } } else null,
-                        onDelete = if (onDelete != null) { { onDelete.invoke(node, viewModel) } } else null,
-                        onEdit = if (onEditItemEvent != null) { { scope.launch { onEditItemEvent.invoke(node, navigator) }; true  } } else null
+                        onDeleting = if (onDeleting != null) {
+                            { onDeleting.invoke(node) }
+                        } else null,
+                        onDelete = if (onDelete != null) {
+                            { onDelete.invoke(node, viewModel) }
+                        } else null,
+                        onEdit = if (onEditItemEvent != null) {
+                            { scope.launch { onEditItemEvent.invoke(node, navigator) }; true }
+                        } else null
                     ) {
-                        content()
+                        EntityCard {
+                            content()
+                        }
                     }
                 }
                 ) {
