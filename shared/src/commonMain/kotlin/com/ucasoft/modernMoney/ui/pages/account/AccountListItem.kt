@@ -165,8 +165,7 @@ private fun CurrenciesColumn(accountCurrencies: List<AccountCurrency>) {
             Text(
                 text = "${currency.symbol} 5369.0",
                 fontWeight = if (index == mainCurrencyIndex) FontWeight.Bold else FontWeight.Normal,
-                fontSize = if (index == mainCurrencyIndex) 12.sp else 11.sp,
-                color = Color(0xFF111827)
+                fontSize = if (index == mainCurrencyIndex) 12.sp else 11.sp
             )
         }
     }

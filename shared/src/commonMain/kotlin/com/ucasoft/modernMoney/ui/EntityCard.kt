@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -14,7 +15,7 @@ import androidx.compose.ui.unit.dp
 fun EntityCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = if (isSystemInDarkTheme()) Color.Unspecified else Color.White),
         border = BorderStroke(1.dp, Color(0xFFECECEC)),
         modifier = modifier.fillMaxWidth()
     ) {

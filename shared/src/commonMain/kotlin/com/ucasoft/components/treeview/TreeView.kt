@@ -110,7 +110,7 @@ private fun <N: TreeViewNode<*>> TreeViewItem(
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.secondaryContainer
     } else {
-        Color.Unspecified
+        MaterialTheme.colorScheme.surface
     }
     itemWrapper(node) {
         Row(
