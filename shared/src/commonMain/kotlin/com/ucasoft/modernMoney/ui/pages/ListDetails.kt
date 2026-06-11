@@ -193,18 +193,19 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDeta
                     listContent(node, isSelected)
                 },
                 { node, content ->
-                    EditableListItem(
-                        onDeleting = if (onDeleting != null) {
-                            { onDeleting.invoke(node) }
-                        } else null,
-                        onDelete = if (onDelete != null) {
-                            { onDelete.invoke(node, viewModel) }
-                        } else null,
-                        onEdit = if (onEditItemEvent != null) {
-                            { scope.launch { onEditItemEvent.invoke(node, navigator) }; true }
-                        } else null
-                    ) {
-                        EntityCard {
+                    EntityCard {
+                        EditableListItem(
+                            onDeleting = if (onDeleting != null) {
+                                { onDeleting.invoke(node) }
+                            } else null,
+                            onDelete = if (onDelete != null) {
+                                { onDelete.invoke(node, viewModel) }
+                            } else null,
+                            onEdit = if (onEditItemEvent != null) {
+                                { scope.launch { onEditItemEvent.invoke(node, navigator) }; true }
+                            } else null
+                        ) {
+
                             content()
                         }
                     }

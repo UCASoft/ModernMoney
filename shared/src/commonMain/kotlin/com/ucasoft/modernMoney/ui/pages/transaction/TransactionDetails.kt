@@ -128,7 +128,7 @@ fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel:
     }
     OutlinedTextField(
         value = transactionState.entity.comment ?: "",
-        onValueChange = { }, //viewModel.updateTransactionComment(it) },
+        onValueChange = { viewModel.updateTransactionComment(it) },
         label = { Text("Comment") },
         modifier = Modifier.fillMaxWidth()
     )

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.xml.stream.events.Comment
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -121,6 +122,15 @@ class TransactionViewModel(
         state.update {
             it.copy(
                 entity = it.entity?.copy(category = category).also { self -> self!!.id = it.entity!!.id },
+                isModified = true
+            )
+        }
+    }
+
+    fun updateTransactionComment(comment: String) {
+        state.update {
+            it.copy(
+                entity = it.entity?.copy(comment = comment).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
         }

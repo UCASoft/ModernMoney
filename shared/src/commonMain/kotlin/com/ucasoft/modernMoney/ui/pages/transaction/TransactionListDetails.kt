@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionType
 import com.ucasoft.modernMoney.ui.EntityCard
@@ -56,7 +57,9 @@ fun TransactionListDetails() {
                 items.groupBy { it.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
                     stickyHeader {
                         Text(
-                            text = group.key.format(LocalDate.Formats.ISO)
+                            text = group.key.format(LocalDate.Formats.ISO),
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 4.dp)
                         )
                     }
                     items(
@@ -106,17 +109,24 @@ private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
         leadingContent = { TransactionLogo(transaction) },
         overlineContent = {
             Text(
-                transaction.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Formats.ISO),
+                transaction.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Format {
+                    hour()
+                    chars(":")
+                    minute()
+                    chars(":")
+                    second()
+                }),
                 color = if (transaction.dataTime > Clock.System.now()) Color(0xFFF0A014) else Color.Black,
             )
         },
         headlineContent = {
             Text(
-                when (transaction.type) {
+                text = when (transaction.type) {
                     TransactionType.EXPENSE -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.code}"
                     TransactionType.INCOME -> "+${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.code}"
                     else -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.code} -> +${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.code}"
-                }
+                },
+                fontSize = 12.sp
             )
         },
         trailingContent = {
@@ -128,7 +138,11 @@ private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
                 }
             )
         },
-        supportingContent = { Text(transaction.comment ?: "") },
+        supportingContent = {
+            transaction.comment?.let {
+                Text(it)
+            }
+        },
         modifier = Modifier.clickable(true, onClick = { onClick.invoke() })
     )
 }
