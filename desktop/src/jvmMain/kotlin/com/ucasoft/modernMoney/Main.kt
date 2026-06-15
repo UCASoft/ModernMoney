@@ -11,10 +11,13 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 
 fun main() = runBlocking {
-    startCurrencyExchangeSync()
+    val syncJob = startCurrencyExchangeSync()
     awaitApplication {
         Window(
-            onCloseRequest = ::exitApplication,
+            onCloseRequest = {
+                syncJob.cancel()
+                exitApplication()
+            },
             state = rememberWindowState(width = 1024.dp, height = 768.dp),
             title = "Modern Money",
             icon = painterResource(Res.drawable.icon)
