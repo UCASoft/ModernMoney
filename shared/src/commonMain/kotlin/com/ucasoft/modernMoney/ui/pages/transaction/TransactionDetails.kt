@@ -75,7 +75,7 @@ fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel:
         }
     }
 
-    DateTimeRow(transactionState.entity!!.dataTime) {
+    DateTimeRow(transactionState.entity!!.dateTime) {
         viewModel.updateTransactionDateTime(it)
     }
     if (selectedType == TransactionType.EXPENSE || selectedType == TransactionType.TRANSFER) {

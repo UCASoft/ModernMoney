@@ -9,7 +9,7 @@ import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 import kotlin.time.Instant
 
 data class Transaction(
-    val dataTime: Instant,
+    val dateTime: Instant,
     val expenseAccount: Account? = null,
     val expenseAccountCurrency: AccountCurrency? = null,
     val expenseAmount: Double? = null,
@@ -41,7 +41,7 @@ data class Transaction(
     fun mapToTransaction() =
         DbTransaction(
             id,
-            dataTime,
+            dateTime,
             expenseAccountCurrency?.id,
             expenseAmount,
             incomeAccountCurrency?.id,

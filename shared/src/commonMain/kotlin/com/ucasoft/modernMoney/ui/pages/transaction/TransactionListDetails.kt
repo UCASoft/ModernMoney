@@ -54,7 +54,7 @@ fun TransactionListDetails() {
                     .padding(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items.groupBy { it.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
+                items.groupBy { it.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
                     stickyHeader {
                         Text(
                             text = group.key.format(LocalDate.Formats.ISO),
@@ -109,22 +109,22 @@ private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
         leadingContent = { TransactionLogo(transaction) },
         overlineContent = {
             Text(
-                transaction.dataTime.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Format {
+                transaction.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Format {
                     hour()
                     chars(":")
                     minute()
                     chars(":")
                     second()
                 }),
-                color = if (transaction.dataTime > Clock.System.now()) Color(0xFFF0A014) else Color.Black,
+                color = if (transaction.dateTime > Clock.System.now()) Color(0xFFF0A014) else Color.Black,
             )
         },
         headlineContent = {
             Text(
                 text = when (transaction.type) {
-                    TransactionType.EXPENSE -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.code}"
-                    TransactionType.INCOME -> "+${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.code}"
-                    else -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.code} -> +${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.code}"
+                    TransactionType.EXPENSE -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.symbol}"
+                    TransactionType.INCOME -> "+${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.symbol}"
+                    else -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.symbol} -> +${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.symbol}"
                 },
                 fontSize = 12.sp
             )

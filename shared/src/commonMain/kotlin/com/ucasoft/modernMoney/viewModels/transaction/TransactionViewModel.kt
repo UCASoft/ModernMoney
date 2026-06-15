@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.xml.stream.events.Comment
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -76,7 +75,7 @@ class TransactionViewModel(
     fun updateTransactionDateTime(dateTime: Instant) {
         state.update {
             it.copy(
-                entity = it.entity?.copy(dataTime = dateTime).also { self -> self!!.id = it.entity!!.id },
+                entity = it.entity?.copy(dateTime = dateTime).also { self -> self!!.id = it.entity!!.id },
                 isModified = true
             )
         }
@@ -88,7 +87,7 @@ class TransactionViewModel(
                 entity = it.entity?.copy(
                     expenseAccountCurrency = accountCurrency,
                     expenseAmount = amount
-                ).also { self -> self!!.id = it.entity!!.id },
+                )?.also { self -> self.id = it.entity.id },
                 isModified = true
             )
         }
@@ -100,7 +99,7 @@ class TransactionViewModel(
                 entity = it.entity?.copy(
                     incomeAccountCurrency = accountCurrency,
                     incomeAmount = amount
-                ).also { self -> self!!.id = it.entity!!.id },
+                )?.also { self -> self.id = it.entity.id },
                 isModified = true
             )
         }
@@ -112,7 +111,7 @@ class TransactionViewModel(
                 entity = it.entity?.copy(
                     payeeCurrencyCode = currencyCode,
                     payeeAmount = amount
-                ).also { self -> self!!.id = it.entity!!.id },
+                )?.also { self -> self.id = it.entity.id },
                 isModified = true
             )
         }
