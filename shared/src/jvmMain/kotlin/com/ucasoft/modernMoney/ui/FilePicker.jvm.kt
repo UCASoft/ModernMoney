@@ -7,18 +7,18 @@ import java.awt.Frame
 import java.io.File
 
 @Composable
-actual fun rememberImagePicker(onImageSelected: (ByteArray?) -> Unit): () -> Unit {
+fun rememberFilePicker(title: String, extension: String, onFileSelected: (ByteArray?) -> Unit): () -> Unit {
     return remember {
         {
-            val dialog = FileDialog(null as Frame?, "Select Logo", FileDialog.LOAD)
-            dialog.file = "*.png"
+            val dialog = FileDialog(null as Frame?, title, FileDialog.LOAD)
+            dialog.file = extension
             dialog.isVisible = true
             val file = dialog.file
             val dir = dialog.directory
             if (file != null) {
-                onImageSelected(File(dir, file).readBytes())
+                onFileSelected(File(dir, file).readBytes())
             } else {
-                onImageSelected(null)
+                onFileSelected(null)
             }
         }
     }

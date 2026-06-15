@@ -30,7 +30,9 @@ inline fun <K, T, S: LogoDetailsState<T>, reified VM: LogoEntityViewModel<T, S>>
                 }
             }
             editContent(state, viewModel, mode)
-            LogoPreview(state.entity, imagePicker)
+            LogoPreview(state.entity, imagePicker) {
+                viewModel.updateLogo(null)
+            }
         },
         onSaveButtonClick,
         saveButtonEnable,
