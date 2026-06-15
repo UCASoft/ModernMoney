@@ -25,4 +25,7 @@ interface TransactionDao {
 
     @Delete
     suspend fun delete(transaction: Transaction)
+
+    @Query("DELETE FROM transactions WHERE expenseCurrencyId is NULL and incomeCurrencyId is NULL")
+    suspend fun clearTransaction()
 }

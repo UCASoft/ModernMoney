@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.viewModels.account
 
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.AccountDao
+import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.mapToAccount
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountsViewModel(private val accountDao: AccountDao, bankRepository: BankRepository) : ReorderingViewModel<Account, AccountsUiState>() {
+class AccountsViewModel(private val accountDao: AccountDao, bankRepository: BankRepository, private val transactionDao: TransactionDao) : ReorderingViewModel<Account, AccountsUiState>() {
 
     override val listState = accountDao.allAccounts()
         .combine(bankRepository.banks) { accounts, banks ->
@@ -28,6 +29,7 @@ class AccountsViewModel(private val accountDao: AccountDao, bankRepository: Bank
     fun deleteAccount(account: Account) {
         viewModelScope.launch {
             accountDao.delete(account.mapToDbAccount())
+            transactionDao.clearTransaction()
         }
     }
 
