@@ -4,8 +4,11 @@
 /.idea
 .DS_Store
 **/build
+**/release
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 .kotlin
+
+phone/**/*_from_shared.xml
