@@ -122,9 +122,9 @@ private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
         headlineContent = {
             Text(
                 text = when (transaction.type) {
-                    TransactionType.EXPENSE -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.symbol}"
-                    TransactionType.INCOME -> "+${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.symbol}"
-                    else -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency!!.currency.symbol} -> +${transaction.incomeAmount} ${transaction.incomeAccountCurrency!!.currency.symbol}"
+                    TransactionType.EXPENSE -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency?.currency?.symbol ?: ""}"
+                    TransactionType.INCOME -> "+${transaction.incomeAmount} ${transaction.incomeAccountCurrency?.currency?.symbol ?: ""}"
+                    else -> "-${transaction.expenseAmount} ${transaction.expenseAccountCurrency?.currency?.symbol ?: ""} -> +${transaction.incomeAmount} ${transaction.incomeAccountCurrency?.currency?.symbol ?: ""}"
                 },
                 fontSize = 12.sp
             )
@@ -132,9 +132,9 @@ private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
         trailingContent = {
             Text(
                 when (transaction.type) {
-                    TransactionType.EXPENSE -> transaction.expenseAccount!!.name
-                    TransactionType.INCOME -> transaction.incomeAccount!!.name
-                    else -> transaction.expenseAccount!!.name + " -> " + transaction.incomeAccount!!.name
+                    TransactionType.EXPENSE -> transaction.expenseAccount?.name ?: ""
+                    TransactionType.INCOME -> transaction.incomeAccount?.name ?: ""
+                    else -> (transaction.expenseAccount?.name ?: "") + " -> " + (transaction.incomeAccount?.name ?: "")
                 }
             )
         },
