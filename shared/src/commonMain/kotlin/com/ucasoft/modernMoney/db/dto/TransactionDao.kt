@@ -14,6 +14,17 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY dataTime DESC")
     fun allTransaction(): Flow<List<Transaction>>
 
+    @Query("""
+        WITH user_currencies AS (
+            SELECT id FROM account_currencies WHERE accountId = :accountId
+        )
+        SELECT * FROM transactions 
+        WHERE expenseCurrencyId IN user_currencies
+        OR incomeCurrencyId IN user_currencies
+        ORDER BY dataTime DESC;
+        """)
+    fun transactionsByAccountId(accountId: Long): Flow<List<Transaction>>
+
     @Query("SELECT * FROM transactions WHERE id = :id")
     fun transactionById(id: Long): Flow<Transaction>
 
