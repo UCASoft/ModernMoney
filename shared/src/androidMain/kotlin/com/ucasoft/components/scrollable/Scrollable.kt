@@ -1,5 +1,6 @@
 package com.ucasoft.components.scrollable
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,8 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-internal actual fun ScrollableLazyColumn(modifier: Modifier, content: LazyListScope.() -> Unit) {
-    LazyColumn(modifier = modifier, content = content)
+internal actual fun ScrollableLazyColumn(
+    modifier: Modifier,
+    reverseLayout: Boolean,
+    verticalArrangement: Arrangement.Vertical,
+    content: LazyListScope.() -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+        reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement,
+        content = content)
 }
 
 @Composable
