@@ -3,12 +3,7 @@ package com.ucasoft.modernMoney.ui.pages.transaction
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -23,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ucasoft.components.scrollable.ScrollableLazyColumn
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionType
 import com.ucasoft.modernMoney.ui.EntityCard
@@ -32,11 +28,7 @@ import com.ucasoft.modernMoney.ui.pages.DetailsMode
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionsUiState
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionsViewModel
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -48,57 +40,75 @@ fun TransactionListDetails() {
             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null to DetailsMode.ADD)
         },
         listContent = { items, viewModel, navigator, scope ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items.groupBy { it.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
-                    stickyHeader {
-                        Text(
-                            text = group.key.format(LocalDate.Formats.ISO),
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
-                    items(
-                        items = group.value,
-                        key = { it.key }
-                    ) { item ->
-                        EntityCard {
-                            EditableListItem(
-                                onDeleting = { true },
-                                onDelete = {
-                                    viewModel.deleteTransaction(item)
-                                    true
-                                },
-                                onEdit = {
-                                    scope.launch {
-                                        navigator.navigateTo(
-                                            ListDetailPaneScaffoldRole.Detail,
-                                            item.key to DetailsMode.EDIT
-                                        )
-                                    }
-                                    true
-                                }
-                            ) {
-                                TransactionListItem(item) {
-                                    scope.launch {
-                                        navigator.navigateTo(
-                                            ListDetailPaneScaffoldRole.Detail,
-                                            item.key to DetailsMode.VIEW
-                                        )
-                                    }
-                                }
+            TransactionList(
+                items,
+                { item, content ->
+                    EditableListItem(
+                        onDeleting = { true },
+                        onDelete = {
+                            viewModel.deleteTransaction(item)
+                            true
+                        },
+                        onEdit = {
+                            scope.launch {
+                                navigator.navigateTo(
+                                    ListDetailPaneScaffoldRole.Detail,
+                                    item.key to DetailsMode.EDIT
+                                )
                             }
+                            true
                         }
+                    ) {
+                        content()
                     }
+                }
+            ) { item ->
+                scope.launch {
+                    navigator.navigateTo(
+                        ListDetailPaneScaffoldRole.Detail,
+                        item.key to DetailsMode.VIEW
+                    )
                 }
             }
         }
     ) { key, mode ->
         TransactionDetails(key, mode)
+    }
+}
+
+@Composable
+fun TransactionList(
+    transactions: List<Transaction>,
+    itemWrapper: @Composable (item: Transaction, content: @Composable () -> Unit) -> Unit = { _, content -> content() },
+    onItemClick: (Transaction) -> Unit = {}
+) {
+    ScrollableLazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        transactions.groupBy { it.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
+            stickyHeader {
+                Text(
+                    text = group.key.format(LocalDate.Formats.ISO),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            items(
+                items = group.value,
+                key = { it.key }
+            ) { item ->
+                EntityCard {
+                    itemWrapper(item) {
+                        TransactionListItem(item) {
+                            onItemClick(item)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
