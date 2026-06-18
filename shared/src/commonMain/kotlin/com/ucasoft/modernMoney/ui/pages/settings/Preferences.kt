@@ -15,9 +15,29 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.execSQL
+import androidx.room.immediateTransaction
+import androidx.room.useWriterConnection
+import com.ucasoft.modernMoney.db.ModernMoneyDatabase
+import com.ucasoft.modernMoney.imports.money.model.Account
+import com.ucasoft.modernMoney.imports.money.model.AccountBank
+import com.ucasoft.modernMoney.imports.money.model.Backup
+import com.ucasoft.modernMoney.imports.money.model.Bank
+import com.ucasoft.modernMoney.imports.money.model.Card
+import com.ucasoft.modernMoney.imports.money.model.Category
+import com.ucasoft.modernMoney.model.Category as MMCategory
+import com.ucasoft.modernMoney.imports.money.model.Currency
+import com.ucasoft.modernMoney.imports.money.model.Transaction
+import com.ucasoft.modernMoney.imports.money.model.flatten
+import com.ucasoft.modernMoney.imports.money.model.toModernMoney
+import com.ucasoft.modernMoney.ui.rememberJsonPicker
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import me.zhanghai.compose.preference.*
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -58,6 +78,7 @@ fun Preferences() {
                 textField = PasswordFieldPreferenceDefaults.PasswordField
             )
             CurrenciesPreference()
+            ImportPreference()
         }
     }
 }
@@ -98,6 +119,81 @@ fun CurrenciesPreference() {
                 )
             }
         )
+    }
+}
+
+@Composable
+fun ImportPreference() {
+
+    val currenciesViewModel = koinViewModel<CurrenciesViewModel>()
+    val currenciesState by currenciesViewModel.fullState.collectAsStateWithLifecycle()
+    val database = koinInject<ModernMoneyDatabase>()
+
+    val jsonPicker = rememberJsonPicker {
+        if (it != null) {
+            val json = Json { ignoreUnknownKeys = true }
+            val backup = json.decodeFromString(
+                Backup.serializer(),
+                it.decodeToString()
+            )
+
+            val banks = backup.getTableRecords<Bank>().map { it.toModernMoney() }
+            val currencies = backup.getTableRecords<Currency>().map { it.toModernMoney(currenciesState.remote) }.toSet()
+            val accounts = backup.getTableRecords<Account>().map {
+                it.toModernMoney(backup.getTableRecords<Currency>(), currencies, banks, backup.getTableRecords<AccountBank>(), backup.getTableRecords<Card>())
+            }
+            val categories = backup.getTableRecords<Category>().toModernMoney()
+
+            runBlocking {
+                database.useWriterConnection {
+                    it.immediateTransaction {
+                        execSQL("DELETE FROM accounts")
+                        execSQL("DELETE FROM account_cards")
+                        execSQL("DELETE FROM account_currencies")
+                        execSQL("DELETE FROM banks")
+                        execSQL("DELETE FROM categories")
+                        execSQL("DELETE FROM currencies")
+                        execSQL("DELETE FROM locations")
+                        execSQL("DELETE FROM payees")
+                        execSQL("DELETE FROM payee_location")
+                        execSQL("DELETE FROM transactions")
+                        execSQL("DELETE FROM sqlite_sequence WHERE name in ('accounts', 'account_cards', 'account_currencies', 'banks', 'categories', 'currencies', 'locations', 'payees', 'payee_location', 'transactions')")
+                    }
+                }
+
+                banks.forEach { database.bankDao.insert(it.mapToBank()) }
+                currencies.forEach { database.currencyDao.insert(it.mapToCurrency()) }
+                accounts.forEach { account ->
+                    database.accountDao.insert(account.mapToDbAccount())
+                    account.currencies.forEach {
+                        database.accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
+                    }
+                    account.cards.forEach {
+                        database.accountCardDao.insert(it.mapToDbAccountCard(account.id))
+                    }
+                }
+                val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
+                importCategories(database, categories)
+                val transactions = backup.getTableRecords<Transaction>().map { it.toModernMoney(backup.getTableRecords<Currency>(), accountCurrencies, categories.flatten()) }
+                transactions.forEach {
+                    database.transactionDao.insert(it.mapToTransaction())
+                }
+            }
+        }
+    }
+
+    Preference(
+        title = { Text("Import") },
+        onClick = { jsonPicker() }
+    )
+}
+
+suspend fun importCategories(database: ModernMoneyDatabase, categories: List<MMCategory>, parentId: Long? = null) {
+    categories.forEach {
+        database.categoryDao.insert(it.mapToDbCategory(parentId))
+        if (it.children.isNotEmpty()) {
+            importCategories(database, it.children, it.id)
+        }
     }
 }
 
