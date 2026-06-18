@@ -29,6 +29,9 @@ kotlin {
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.material.icons)
 
+                implementation(libs.haze.blur)
+                implementation(libs.haze.blur.materials)
+
                 implementation(libs.adaptive)
                 implementation(libs.adaptive.layout)
                 implementation(libs.adaptive.navigation)
@@ -100,5 +103,4 @@ room {
 
 kotlin {
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-    compilerOptions.freeCompilerArgs.add("-Xexplicit-backing-fields")
 }

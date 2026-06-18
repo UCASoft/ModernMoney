@@ -19,8 +19,9 @@ preference = "2.2.0"
 serialization = "1.11.0"
 ktor = "3.5.0"
 datetime = "0.8.0"
+haze = "2.0.0-alpha03"
 mock = "1.14.11"
-ui-test = "1.11.2"
+ui-test = "1.11.3"
 test = "1.5.0"
 
 [plugins]
@@ -45,6 +46,9 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 compose-material-icons = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
+
+haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
+haze-blur-materials = { module = "dev.chrisbanes.haze:haze-blur-materials", version.ref = "haze" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
