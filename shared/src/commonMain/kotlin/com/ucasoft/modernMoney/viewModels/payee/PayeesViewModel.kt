@@ -3,7 +3,7 @@ package com.ucasoft.modernMoney.viewModels.payee
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.PayeeDao
 import com.ucasoft.modernMoney.model.Payee
-import com.ucasoft.modernMoney.model.mapToPayee
+import com.ucasoft.modernMoney.model.toPayee
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class PayeesViewModel(private val payeeDao: PayeeDao) : ListViewModel<Payee, PayeesUiState>() {
 
     override val listState = payeeDao.allPayees().map {
-        PayeesUiState(it.map { it.mapToPayee() })
+        PayeesUiState(it.map { it.toPayee() })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -23,7 +23,7 @@ class PayeesViewModel(private val payeeDao: PayeeDao) : ListViewModel<Payee, Pay
 
     fun deletePayee(payee: Payee) {
         viewModelScope.launch {
-            payeeDao.delete(payee.mapToPayee())
+            payeeDao.delete(payee.toPayee())
         }
     }
 }

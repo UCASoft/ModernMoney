@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.model.Category
-import com.ucasoft.modernMoney.model.mapToCategory
+import com.ucasoft.modernMoney.model.toCategory
 import com.ucasoft.modernMoney.viewModels.LogoDetailsState
 import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : LogoE
         viewModelScope.launch {
             if (id != null) {
                 categoryDao.categoryById(id).collect { category ->
-                    stateFlow.update { it.copy(entity = category.category.mapToCategory(), isLoading = false, parentCategory = category.parent?.mapToCategory()) }
+                    stateFlow.update { it.copy(entity = category.category.toCategory(), isLoading = false, parentCategory = category.parent?.toCategory()) }
                 }
             } else {
                 val category = Category("")

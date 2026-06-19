@@ -3,7 +3,7 @@ package com.ucasoft.modernMoney.viewModels
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CurrencyDao
 import com.ucasoft.modernMoney.model.Currency
-import com.ucasoft.modernMoney.model.mapToCurrency
+import com.ucasoft.modernMoney.model.toCurrency
 import com.ucasoft.modernMoney.network.CurrencyClient
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ class CurrenciesViewModel(private val currenciesDao: CurrencyDao, private val cl
             emit(remote)
         }
     ) { l, r ->
-        CurrencyUiState(l.map { it.mapToCurrency() }, r.map { it.mapToCurrency() })
+        CurrencyUiState(l.map { it.toCurrency() }, r.map { it.toCurrency() })
     }
 
     val fullState = fullCurrencyFlow.stateIn(
@@ -28,7 +28,7 @@ class CurrenciesViewModel(private val currenciesDao: CurrencyDao, private val cl
     )
 
     override val listState = currenciesDao.allCurrencies().map {
-        CurrencyUiState(it.map { it.mapToCurrency() })
+        CurrencyUiState(it.map { it.toCurrency() })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -36,7 +36,7 @@ class CurrenciesViewModel(private val currenciesDao: CurrencyDao, private val cl
     )
 
     val visibleState = currenciesDao.visibleCurrencies().map {
-        CurrencyUiState(it.map { it.mapToCurrency() })
+        CurrencyUiState(it.map { it.toCurrency() })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -45,7 +45,7 @@ class CurrenciesViewModel(private val currenciesDao: CurrencyDao, private val cl
 
     fun updateCurrencies(currencies: List<Currency>) {
         viewModelScope.launch {
-            currenciesDao.refreshCurrencies(currencies.map { it.mapToCurrency() })
+            currenciesDao.refreshCurrencies(currencies.map { it.toCurrency() })
         }
     }
 }

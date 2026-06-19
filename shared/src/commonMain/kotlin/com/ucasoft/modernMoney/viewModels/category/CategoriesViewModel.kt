@@ -3,9 +3,8 @@ package com.ucasoft.modernMoney.viewModels.category
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.model.Category
-import com.ucasoft.modernMoney.model.mapToCategory
+import com.ucasoft.modernMoney.model.toCategory
 import com.ucasoft.modernMoney.viewModels.ListViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -32,7 +31,7 @@ class CategoriesViewModel(private val categoryDao: CategoryDao) : ListViewModel<
         val result = mutableListOf<Category>()
         val categorySet = mutableMapOf<Long, Category>()
         categories.forEach {
-            val category = it.mapToCategory()
+            val category = it.toCategory()
             categorySet[it.id] = category
             if (it.parentId == null) {
                 result.add(category)

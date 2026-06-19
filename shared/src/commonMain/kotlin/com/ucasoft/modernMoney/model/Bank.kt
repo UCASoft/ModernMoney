@@ -1,12 +1,21 @@
 package com.ucasoft.modernMoney.model
 
 import androidx.compose.ui.graphics.ImageBitmap
+import com.ucasoft.komm.annotations.KOMMMap
+import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapFunction
 import com.ucasoft.modernMoney.db.model.Bank as DbBank
-import com.ucasoft.modernMoney.ui.toImageBitmap
-import com.ucasoft.modernMoney.ui.toByteArray
 
+@KOMMMap(from = [DbBank::class], to = [DbBank::class], config = MapConfiguration(
+        allowNotNullAssertion = false,
+        tryAutoCast = true,
+        mapDefaultAsFallback = false,
+        convertFunctionName = ""
+    )
+)
 data class Bank(
     override val name: String,
+    @MapFunction("com.ucasoft.modernMoney.ui", "")
     override val logo: ImageBitmap? = null
 ) : KeyEntity<Long>, LogoEntity {
     var id: Long = 0L
@@ -14,17 +23,4 @@ data class Bank(
 
     override val key: Long
         get() = id
-
-    fun mapToBank() =
-        DbBank(
-            id = id,
-            name = name,
-            logo = logo?.toByteArray()
-        )
 }
-
-fun DbBank.mapToBank() =
-    Bank(
-        name,
-        logo?.toImageBitmap()
-    ).also { it.id = id }

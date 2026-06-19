@@ -9,7 +9,7 @@ import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.model.mapToAccount
+import com.ucasoft.modernMoney.model.toAccount
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
 import com.ucasoft.modernMoney.viewModels.DetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +39,7 @@ class AccountViewModel(
                 .collect { (accounts, banks) ->
                     allAccounts.clear()
                     allAccounts.addAll(accounts.filterNot { it.account.id == id }
-                        .map { it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards) })
+                        .map { it.toAccount() })
                     if (id == null) {
                         val newAccount = Account(order = allAccounts.size)
                         state.update { AccountUiState(newAccount, isModified = true, errors = validate(newAccount)) }
@@ -55,11 +55,7 @@ class AccountViewModel(
                     .collect { (account, banks) ->
                         state.update {
                             it.copy(
-                                entity = account.account.mapToAccount(
-                                    account.currencies,
-                                    banks[account.account.bankId],
-                                    account.cards
-                                ), isLoading = false
+                                entity = account.toAccount(), isLoading = false
                             )
                         }
                     }

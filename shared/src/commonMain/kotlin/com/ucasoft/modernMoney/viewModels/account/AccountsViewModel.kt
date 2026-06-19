@@ -5,7 +5,7 @@ import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
-import com.ucasoft.modernMoney.model.mapToAccount
+import com.ucasoft.modernMoney.model.toAccount
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ReorderingViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,8 @@ class AccountsViewModel(private val accountDao: AccountDao, bankRepository: Bank
     override val listState = accountDao.allAccounts()
         .combine(bankRepository.banks) { accounts, banks ->
             AccountsUiState(accounts.map {
-                it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards)
+                //it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards)
+                it.toAccount()
             })
         }.stateIn(
             scope = viewModelScope,

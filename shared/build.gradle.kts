@@ -42,6 +42,8 @@ kotlin {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
 
+                implementation(libs.komm.annotions)
+
                 api(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
@@ -63,6 +65,7 @@ kotlin {
 
                 api(libs.compose.ui.test)
             }
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
         }
 
         val commonTest by getting {
@@ -95,6 +98,12 @@ kotlin {
 dependencies {
     add("kspJvm", libs.androidx.room.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
+    add("kspCommonMainMetadata", libs.komm.processor)
+    add("kspCommonMainMetadata", libs.komm.plugins.interable)
+    /*add("kspJvm", libs.komm.processor)
+    add("kspJvm", libs.komm.plugins.interable)
+    add("kspAndroid", libs.komm.processor)
+    add("kspAndroid", libs.komm.plugins.interable)*/
 }
 
 room {
@@ -103,4 +112,10 @@ room {
 
 kotlin {
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+}
+
+tasks.configureEach {
+    if (name == "kspKotlinJvm" || name == "kspAndroidMain") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
 }

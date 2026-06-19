@@ -4,12 +4,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.components.treeview.TreeViewNode
+import com.ucasoft.komm.annotations.KOMMMap
+import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapFunction
 import com.ucasoft.modernMoney.ui.toByteArray
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
+@KOMMMap(from = [DbCategory::class], to = [], config = MapConfiguration(
+        allowNotNullAssertion = false,
+        tryAutoCast = true,
+        mapDefaultAsFallback = false,
+        convertFunctionName = ""
+    )
+)
 data class Category(
     override val name: String,
+    @MapFunction("com.ucasoft.modernMoney.ui", "")
     override val logo: ImageBitmap? = null,
 ) : TreeViewNode<Long>, KeyEntity<Long>, LogoEntity {
 
@@ -59,11 +70,3 @@ data class Category(
             logo?.toByteArray()
         )
 }
-
-fun DbCategory.mapToCategory() =
-    Category(
-        name,
-        logo?.toImageBitmap()
-    ).also {
-        it.id = id
-    }
