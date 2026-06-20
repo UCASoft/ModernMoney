@@ -8,6 +8,7 @@ import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.model.AccountMapContext
 import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.toAccount
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
@@ -39,7 +40,7 @@ class AccountViewModel(
                 .collect { (accounts, banks) ->
                     allAccounts.clear()
                     allAccounts.addAll(accounts.filterNot { it.account.id == id }
-                        .map { it.toAccount() })
+                        .map { it.toAccount(AccountMapContext(banks)) })
                     if (id == null) {
                         val newAccount = Account(order = allAccounts.size)
                         state.update { AccountUiState(newAccount, isModified = true, errors = validate(newAccount)) }
@@ -55,13 +56,14 @@ class AccountViewModel(
                     .collect { (account, banks) ->
                         state.update {
                             it.copy(
-                                entity = account.toAccount(), isLoading = false
+                                entity = account.toAccount(AccountMapContext(banks)), isLoading = false
                             )
                         }
                     }
             }
         }
     }
+
 
     fun addAccount(account: Account) {
         viewModelScope.launch {

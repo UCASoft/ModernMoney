@@ -4,7 +4,7 @@ import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.modernMoney.db.model.AccountCard as DbAccountCard
 
-@KOMMMap(from = [DbAccountCard::class], to = [], config = MapConfiguration(allowNotNullAssertion = false, tryAutoCast = true, mapDefaultAsFallback = false, convertFunctionName = ""))
+@KOMMMap(from = [DbAccountCard::class], to = [], context = Unit::class, config = MapConfiguration(allowNotNullAssertion = false, tryAutoCast = true, mapDefaultAsFallback = false, convertFunctionName = ""))
 data class AccountCard(
     val type: String,
     val number: String

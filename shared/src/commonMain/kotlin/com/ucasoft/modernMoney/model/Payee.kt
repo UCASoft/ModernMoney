@@ -8,7 +8,7 @@ import com.ucasoft.modernMoney.ui.toByteArray
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Payee as DbPayee
 
-@KOMMMap(from = [DbPayee::class], to = [DbPayee::class], config = MapConfiguration(
+@KOMMMap(from = [DbPayee::class], to = [DbPayee::class], context = Unit::class, config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,

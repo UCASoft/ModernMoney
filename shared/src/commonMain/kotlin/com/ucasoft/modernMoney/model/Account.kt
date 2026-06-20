@@ -1,17 +1,23 @@
 package com.ucasoft.modernMoney.model
 
-import com.ucasoft.komm.abstractions.KOMMConverter
+import com.ucasoft.komm.abstractions.KOMMContextConverter
 import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapConvert
 import com.ucasoft.komm.annotations.MapEmbedded
 import com.ucasoft.modernMoney.db.model.FullAccount
-import com.ucasoft.modernMoney.db.repositories.BankRepository
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.ucasoft.modernMoney.db.model.Account as DbAccount
 
-@KOMMMap(from = [FullAccount::class], to = [], config = MapConfiguration(allowNotNullAssertion = false, tryAutoCast = true, mapDefaultAsFallback = false, convertFunctionName = ""))
+@KOMMMap(
+    from = [FullAccount::class],
+    to = [],
+    context = AccountMapContext::class,
+    config = MapConfiguration(
+        allowNotNullAssertion = false,
+        tryAutoCast = true,
+        mapDefaultAsFallback = false,
+        convertFunctionName = "")
+)
 @MapEmbedded("account")
 data class Account(
     val name: String = "",
@@ -39,11 +45,10 @@ data class Account(
         )
 }
 
-class BankResolver(account: FullAccount) : KOMMConverter<FullAccount, Long?, Account, Bank?>(account), KoinComponent {
-
-    private val bankRepository by inject<BankRepository>()
-
-    override fun convert(sourceMember: Long?): Bank? {
-        return bankRepository.banks.value[sourceMember]
-    }
+class BankResolver(account: FullAccount, context: AccountMapContext) : KOMMContextConverter<FullAccount, Long?, AccountMapContext, Account, Bank?>(account, context) {
+    override fun convert(sourceMember: Long?) = context.banks[sourceMember]
 }
+
+data class AccountMapContext(
+    val banks: Map<Long, Bank>
+)

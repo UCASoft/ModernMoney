@@ -6,7 +6,7 @@ import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapFunction
 import com.ucasoft.modernMoney.db.model.Bank as DbBank
 
-@KOMMMap(from = [DbBank::class], to = [DbBank::class], config = MapConfiguration(
+@KOMMMap(from = [DbBank::class], to = [DbBank::class], context = Unit::class, config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,

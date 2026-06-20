@@ -7,7 +7,7 @@ import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.modernMoney.db.model.Currency as DbCurrency
 import com.ucasoft.modernMoney.network.model.Currency as NetworkCurrency
 
-@KOMMMap(from = [DbCurrency::class, NetworkCurrency::class], to = [DbCurrency::class], config = MapConfiguration(
+@KOMMMap(from = [DbCurrency::class, NetworkCurrency::class], to = [DbCurrency::class], context = Unit::class, config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,
@@ -27,6 +27,5 @@ data class Currency(
 }
 
 class VisibleResolver(currency: Currency?) : KOMMResolver<Currency, Boolean> (currency) {
-
     override fun resolve() = true
 }
