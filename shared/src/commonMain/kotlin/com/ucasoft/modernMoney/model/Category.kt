@@ -11,10 +11,15 @@ import com.ucasoft.modernMoney.ui.toByteArray
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
-@KOMMMap(from = [DbCategory::class], to = [], context = Unit::class, config = MapConfiguration(
+@KOMMMap(
+    from = [DbCategory::class],
+    to = [],
+    context = Unit::class,
+    config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,
+        nullableContext = false,
         convertFunctionName = ""
     )
 )

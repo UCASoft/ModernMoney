@@ -10,15 +10,17 @@ import com.ucasoft.modernMoney.db.model.Account as DbAccount
 
 @KOMMMap(
     from = [FullAccount::class],
-    to = [],
+    to = [DbAccount::class],
     context = AccountMapContext::class,
     config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,
+        nullableContext = true,
         convertFunctionName = "")
 )
-@MapEmbedded("account")
+@MapEmbedded("account", `for` = [FullAccount::class])
+@MapEmbedded("bank", `for` = [DbAccount::class])
 data class Account(
     val name: String = "",
     val currencies: List<AccountCurrency> = emptyList(),
@@ -35,14 +37,6 @@ data class Account(
 
     val isBankAccount: Boolean
         get() = bank != null
-
-    fun mapToDbAccount() =
-        DbAccount(
-            id,
-            name,
-            bankId = bank?.id,
-            order
-        )
 }
 
 class BankResolver(account: FullAccount, context: AccountMapContext) : KOMMContextConverter<FullAccount, Long?, AccountMapContext, Account, Bank?>(account, context) {

@@ -29,7 +29,7 @@ class AccountsViewModel(private val accountDao: AccountDao, bankRepository: Bank
 
     fun deleteAccount(account: Account) {
         viewModelScope.launch {
-            accountDao.delete(account.mapToDbAccount())
+            accountDao.delete(account.toAccount())
             transactionDao.clearTransaction()
         }
     }

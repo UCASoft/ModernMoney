@@ -7,7 +7,8 @@ import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.model.Transaction
-import com.ucasoft.modernMoney.model.mapToTransaction
+import com.ucasoft.modernMoney.model.TransactionMapContext
+import com.ucasoft.modernMoney.model.toTransaction
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,32 +59,12 @@ class TransactionsViewModel(
 
     private fun combineTransactions(
         transactionFlow: Flow<List<DbTransaction>>
-    ): Flow<TransactionsUiState> = transactionFlow
-        .combine(accountCurrencyRepository.accountCurrencies) { transactions, accountCurrencies ->
-            transactions.map {
-                it to BuildTransaction(
-                    it.expenseCurrencyId?.let { accountCurrencies[it] },
-                    it.incomeCurrencyId?.let { accountCurrencies[it] }
-                )
-            }
-        }
-        .combine(categoryRepository.categories) { transactionsWithBuild, categories ->
-            transactionsWithBuild.map { (transaction, build) ->
-                transaction to build.copy(
-                    category = transaction.categoryId?.let { categories[it] }
-                )
-            }
-        }
-        .combine(accountRepository.accounts) { transactionsWithBuild, accounts ->
+    ): Flow<TransactionsUiState> =
+        combine(transactionFlow, accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories) {
+            transactions, accounts, accountCurrencies, categories ->
             TransactionsUiState(
-                transactionsWithBuild.map { (transaction, build) ->
-                    transaction.mapToTransaction(
-                        expenseAccount = build.expenseAccountCurrency?.let { accounts[it.accountId] },
-                        expenseAccountCurrency = build.expenseAccountCurrency,
-                        incomeAccount = build.incomeAccountCurrency?.let { accounts[it.accountId] },
-                        incomeAccountCurrency = build.incomeAccountCurrency,
-                        build.category
-                    )
+                transactions.map {
+                    it.toTransaction(TransactionMapContext(accounts, accountCurrencies, categories))
                 }
             )
         }

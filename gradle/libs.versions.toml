@@ -23,7 +23,7 @@ haze = "2.0.0-alpha03"
 mock = "1.14.11"
 ui-test = "1.11.3"
 test = "1.5.0"
-komm = "0.70.5"
+komm = "0.71.0"
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

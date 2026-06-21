@@ -67,7 +67,7 @@ class AccountViewModel(
 
     fun addAccount(account: Account) {
         viewModelScope.launch {
-            val accountId = accountDao.insert(account.mapToDbAccount())
+            val accountId = accountDao.insert(account.toAccount())
             account.currencies.forEach {
                 accountCurrencyDao.insert(it.mapToDbAccountCurrency(accountId))
             }
@@ -79,7 +79,7 @@ class AccountViewModel(
 
     fun updateAccount(account: Account) {
         viewModelScope.launch {
-            accountDao.update(account.mapToDbAccount())
+            accountDao.update(account.toAccount())
             account.currencies.filter { it.id == 0L }.forEach {
                 accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
             }
