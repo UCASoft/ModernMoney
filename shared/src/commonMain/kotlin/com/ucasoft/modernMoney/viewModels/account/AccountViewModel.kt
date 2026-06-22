@@ -7,9 +7,13 @@ import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
+import com.ucasoft.modernMoney.model.AccountIdContext
 import com.ucasoft.modernMoney.model.AccountCurrency
+import com.ucasoft.modernMoney.model.AccountMapContext
 import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.model.mapToAccount
+import com.ucasoft.modernMoney.model.toAccount
+import com.ucasoft.modernMoney.model.toAccountCard
+import com.ucasoft.modernMoney.model.toAccountCurrency
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
 import com.ucasoft.modernMoney.viewModels.DetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +43,7 @@ class AccountViewModel(
                 .collect { (accounts, banks) ->
                     allAccounts.clear()
                     allAccounts.addAll(accounts.filterNot { it.account.id == id }
-                        .map { it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards) })
+                        .map { it.toAccount(AccountMapContext(banks)) })
                     if (id == null) {
                         val newAccount = Account(order = allAccounts.size)
                         state.update { AccountUiState(newAccount, isModified = true, errors = validate(newAccount)) }
@@ -55,11 +59,7 @@ class AccountViewModel(
                     .collect { (account, banks) ->
                         state.update {
                             it.copy(
-                                entity = account.account.mapToAccount(
-                                    account.currencies,
-                                    banks[account.account.bankId],
-                                    account.cards
-                                ), isLoading = false
+                                entity = account.toAccount(AccountMapContext(banks)), isLoading = false
                             )
                         }
                     }
@@ -67,25 +67,26 @@ class AccountViewModel(
         }
     }
 
+
     fun addAccount(account: Account) {
         viewModelScope.launch {
-            val accountId = accountDao.insert(account.mapToDbAccount())
+            val accountId = accountDao.insert(account.toAccount())
             account.currencies.forEach {
-                accountCurrencyDao.insert(it.mapToDbAccountCurrency(accountId))
+                accountCurrencyDao.insert(it.toAccountCurrency(AccountIdContext(accountId)))
             }
             account.cards.forEach {
-                accountCardDao.insert(it.mapToDbAccountCard(accountId))
+                accountCardDao.insert(it.toAccountCard(AccountIdContext(accountId)))
             }
         }
     }
 
     fun updateAccount(account: Account) {
         viewModelScope.launch {
-            accountDao.update(account.mapToDbAccount())
+            accountDao.update(account.toAccount())
             account.currencies.filter { it.id == 0L }.forEach {
-                accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
+                accountCurrencyDao.insert(it.toAccountCurrency(AccountIdContext(account.id)))
             }
-            accountCardDao.refreshCards(account.id, account.cards.map { it.mapToDbAccountCard(account.id) })
+            accountCardDao.refreshCards(account.id, account.cards.map { it.toAccountCard(AccountIdContext(account.id)) })
         }
     }
 

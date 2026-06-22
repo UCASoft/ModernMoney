@@ -1,12 +1,30 @@
 package com.ucasoft.modernMoney.model
 
-import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
+import com.ucasoft.komm.abstractions.KOMMContextConverter
+import com.ucasoft.komm.annotations.KOMMMap
+import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapConvert
+import com.ucasoft.komm.annotations.MapEmbedded
+import com.ucasoft.modernMoney.db.model.FullAccount
 import com.ucasoft.modernMoney.db.model.Account as DbAccount
-import com.ucasoft.modernMoney.db.model.AccountCard as DbAccountCard
 
+@KOMMMap(
+    from = [FullAccount::class],
+    to = [DbAccount::class],
+    context = AccountMapContext::class,
+    config = MapConfiguration(
+        allowNotNullAssertion = false,
+        tryAutoCast = true,
+        mapDefaultAsFallback = false,
+        nullableContext = true,
+        convertFunctionName = "")
+)
+@MapEmbedded("account", `for` = [FullAccount::class])
+@MapEmbedded("bank", `for` = [DbAccount::class])
 data class Account(
     val name: String = "",
     val currencies: List<AccountCurrency> = emptyList(),
+    @MapConvert<FullAccount, Account, BankResolver>(BankResolver::class, "bankId")
     val bank: Bank? = null,
     val order: Int = 0,
     val cards: List<AccountCard> = emptyList()
@@ -19,22 +37,12 @@ data class Account(
 
     val isBankAccount: Boolean
         get() = bank != null
-
-    fun mapToDbAccount() =
-        DbAccount(
-            id,
-            name,
-            bankId = bank?.id,
-            order
-        )
 }
 
-fun DbAccount.mapToAccount(currencies: List<AccountCurrencyWithCurrency>, bank: Bank?, cards: List<DbAccountCard>) =
-    Account(
-        name,
-        currencies.map { it.mapToAccountCurrency() },
-        bank,
-        order,
-        cards.map { it.mapToAccountCard() }
-    ).also { it.id = id }
+class BankResolver(account: FullAccount, context: AccountMapContext) : KOMMContextConverter<FullAccount, Long?, AccountMapContext, Account, Bank?>(account, context) {
+    override fun convert(sourceMember: Long?) = context.banks[sourceMember]
+}
 
+data class AccountMapContext(
+    val banks: Map<Long, Bank>
+)

@@ -1,7 +1,8 @@
 package com.ucasoft.modernMoney.db.repositories
 
 import com.ucasoft.modernMoney.db.dto.AccountDao
-import com.ucasoft.modernMoney.model.mapToAccount
+import com.ucasoft.modernMoney.model.AccountMapContext
+import com.ucasoft.modernMoney.model.toAccount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -11,7 +12,7 @@ class AccountRepository(accountDao: AccountDao, bankRepository: BankRepository, 
 
     val accounts = accountDao.allAccounts()
         .combine(bankRepository.banks) { accounts, banks ->
-            accounts.associate { it.account.id to it.account.mapToAccount(it.currencies, banks[it.account.bankId], it.cards) }
+            accounts.associate { it.account.id to it.toAccount(AccountMapContext(banks)) }
         }.stateIn(
             scope,
             started = SharingStarted.Eagerly,

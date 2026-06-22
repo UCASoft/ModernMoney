@@ -3,7 +3,7 @@ package com.ucasoft.modernMoney.viewModels.bank
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.model.mapToBank
+import com.ucasoft.modernMoney.model.toBank
 import com.ucasoft.modernMoney.viewModels.ListState
 import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class BanksViewModel(private val bankDao: BankDao): ListViewModel<Bank, BanksUiState>() {
 
     override val listState = bankDao.allBanks().map {
-        BanksUiState(it.map { it.mapToBank() })
+        BanksUiState(it.map { it.toBank() })
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -23,7 +23,7 @@ class BanksViewModel(private val bankDao: BankDao): ListViewModel<Bank, BanksUiS
 
     fun deleteBank(bank: Bank) {
         viewModelScope.launch {
-            bankDao.delete(bank.mapToBank())
+            bankDao.delete(bank.toBank())
         }
     }
 }

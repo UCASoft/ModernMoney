@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.BankDao
 import com.ucasoft.modernMoney.model.Bank
-import com.ucasoft.modernMoney.model.mapToBank
+import com.ucasoft.modernMoney.model.toBank
 import com.ucasoft.modernMoney.viewModels.LogoDetailsState
 import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +21,12 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): LogoEntityViewMode
 
     init {
         viewModelScope.launch {
-            bankDao.allBanks().collect { allBanks.addAll(it.filterNot { it.id == id }.map { it.mapToBank() }) }
+            bankDao.allBanks().collect { allBanks.addAll(it.filterNot { it.id == id }.map { it.toBank() }) }
         }
         if (id != null) {
             viewModelScope.launch {
                 bankDao.bankById(id).collect { bank ->
-                    stateFlow.update { it.copy(entity = bank.mapToBank(), isLoading = false) }
+                    stateFlow.update { it.copy(entity = bank.toBank(), isLoading = false) }
                 }
             }
         } else {
@@ -37,13 +37,13 @@ class BankViewModel(private val bankDao: BankDao, id: Long?): LogoEntityViewMode
 
     fun addBank(bank: Bank) {
         viewModelScope.launch {
-            bankDao.insert(bank.mapToBank())
+            bankDao.insert(bank.toBank())
         }
     }
 
     fun updateBank(bank: Bank) {
         viewModelScope.launch {
-            bankDao.update(bank.mapToBank())
+            bankDao.update(bank.toBank())
         }
         stateFlow.update { it.copy(
             isModified = false

@@ -8,7 +8,8 @@ import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.model.Transaction
-import com.ucasoft.modernMoney.model.mapToTransaction
+import com.ucasoft.modernMoney.model.TransactionMapContext
+import com.ucasoft.modernMoney.model.toTransaction
 import com.ucasoft.modernMoney.viewModels.DetailViewModel
 import com.ucasoft.modernMoney.viewModels.DetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,38 +34,17 @@ class TransactionViewModel(
     init {
         if (id != null) {
             viewModelScope.launch {
-                transactionDao.transactionById(id)
-                    .combine(accountCurrencyRepository.accountCurrencies) { transaction, accountCurrencies ->
-                        transaction to BuildTransaction(
-                            transaction.expenseCurrencyId?.let { accountCurrencies[it] },
-                            transaction.incomeCurrencyId?.let { accountCurrencies[it] }
+                combine(transactionDao.transactionById(id), accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories) {
+                        transaction, accounts, accountCurrencies, categories ->
+                        transaction to TransactionMapContext(accounts, accountCurrencies, categories)
+                }.collect { (transaction, context) ->
+                    state.update {
+                        it.copy(
+                            entity = transaction.toTransaction(context),
+                            isLoading = false
                         )
                     }
-                    .combine(accountRepository.accounts) { transactionWithBuild, accounts ->
-                        transactionWithBuild.first to transactionWithBuild.second.copy(
-                            expenseAccount = transactionWithBuild.second.expenseAccountCurrency?.let { accounts[it.accountId] },
-                            incomeAccount = transactionWithBuild.second.incomeAccountCurrency?.let { accounts[it.accountId] }
-                        )
-                    }
-                    .combine(categoryRepository.categories) { transactionWithBuild, categories ->
-                        transactionWithBuild.first to transactionWithBuild.second.copy(
-                            category = transactionWithBuild.first.categoryId?.let { categories[it] }
-                        )
-                    }
-                    .collect { transactionWithBuild ->
-                        state.update {
-                            it.copy(
-                                entity = transactionWithBuild.first.mapToTransaction(
-                                    expenseAccount = transactionWithBuild.second.expenseAccount,
-                                    expenseAccountCurrency = transactionWithBuild.second.expenseAccountCurrency,
-                                    incomeAccount = transactionWithBuild.second.incomeAccount,
-                                    incomeAccountCurrency = transactionWithBuild.second.incomeAccountCurrency,
-                                    category = transactionWithBuild.second.category
-                                ),
-                                isLoading = false
-                            )
-                        }
-                    }
+                }
             }
         } else {
             val newTransaction = Transaction(Clock.System.now())

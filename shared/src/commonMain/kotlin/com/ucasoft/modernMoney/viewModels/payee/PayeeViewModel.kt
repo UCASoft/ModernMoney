@@ -1,18 +1,14 @@
 package com.ucasoft.modernMoney.viewModels.payee
 
-import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.PayeeDao
-import com.ucasoft.modernMoney.model.Bank
 import com.ucasoft.modernMoney.model.Payee
-import com.ucasoft.modernMoney.model.mapToBank
-import com.ucasoft.modernMoney.model.mapToPayee
+import com.ucasoft.modernMoney.model.toPayee
 import com.ucasoft.modernMoney.viewModels.LogoDetailsState
 import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -35,7 +31,7 @@ class PayeeViewModel(private val payeeDao: PayeeDao, id: Long?) : LogoEntityView
         if (id != null) {
             viewModelScope.launch {
                 payeeDao.payeeById(id).collect { payee ->
-                    stateFlow.update { it.copy(entity = payee.mapToPayee(), isLoading = false) }
+                    stateFlow.update { it.copy(entity = payee.toPayee(), isLoading = false) }
                 }
             }
         } else {
@@ -46,13 +42,13 @@ class PayeeViewModel(private val payeeDao: PayeeDao, id: Long?) : LogoEntityView
 
     fun addPayee(payee: Payee) {
         viewModelScope.launch {
-            payeeDao.insert(payee.mapToPayee())
+            payeeDao.insert(payee.toPayee())
         }
     }
 
     fun updatePayee(payee: Payee) {
         viewModelScope.launch {
-            payeeDao.update(payee.mapToPayee())
+            payeeDao.update(payee.toPayee())
         }
         stateFlow.update {
             it.copy(

@@ -5,20 +5,41 @@ import androidx.compose.material.icons.filled.NorthEast
 import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.SouthWest
 import androidx.compose.ui.graphics.Color
+import com.ucasoft.komm.abstractions.KOMMContextConverter
+import com.ucasoft.komm.annotations.KOMMMap
+import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapConvert
+import com.ucasoft.komm.annotations.MapName
 import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 import kotlin.time.Instant
 
+@KOMMMap(
+    from = [DbTransaction::class],
+    to = [],
+    context = TransactionMapContext::class,
+    config = MapConfiguration(
+        allowNotNullAssertion = false,
+        tryAutoCast = true,
+        mapDefaultAsFallback = false,
+        nullableContext = false,
+        convertFunctionName = "")
+)
 data class Transaction(
     val dateTime: Instant,
+    @MapConvert<DbTransaction, Transaction, AccountConverter>(AccountConverter::class, "expenseCurrencyId")
     val expenseAccount: Account? = null,
+    @MapConvert<DbTransaction, Transaction, AccountCurrencyConverter>(AccountCurrencyConverter::class, "expenseCurrencyId")
     val expenseAccountCurrency: AccountCurrency? = null,
     val expenseAmount: Double? = null,
+    @MapConvert<DbTransaction, Transaction, AccountConverter>(AccountConverter::class, "incomeCurrencyId")
     val incomeAccount: Account? = null,
+    @MapConvert<DbTransaction, Transaction, AccountCurrencyConverter>(AccountCurrencyConverter::class, "incomeCurrencyId")
     val incomeAccountCurrency: AccountCurrency? = null,
     val incomeAmount: Double? = null,
     val payeeId: Long? = null,
     val payeeCurrencyCode: String? = null,
     val payeeAmount: Double? = null,
+    @MapConvert<DbTransaction, Transaction, CategoryConverter>(CategoryConverter::class, "categoryId")
     val category: Category? = null,
     val locationId: Long? = null,
     val comment: String? = null
@@ -88,24 +109,29 @@ enum class TransactionType {
     TRANSFER
 }
 
-fun DbTransaction.mapToTransaction(
-    expenseAccount: Account?,
-    expenseAccountCurrency: AccountCurrency?,
-    incomeAccount: Account?,
-    incomeAccountCurrency: AccountCurrency?,
-    category: Category?
-) = Transaction(
-        dataTime,
-        expenseAccount,
-        expenseAccountCurrency,
-        expenseAmount,
-        incomeAccount,
-        incomeAccountCurrency,
-        incomeAmount,
-        payeeId,
-        payeeCurrencyCode,
-        payeeAmount,
-        category,
-        locationId,
-        comment
-    ).also { it.id = id }
+data class TransactionMapContext(
+    val accounts: Map<Long, Account>,
+    val accountCurrencies: Map<Long, AccountCurrency>,
+    val categories: Map<Long, Category>
+)
+
+class AccountConverter(
+    transaction: DbTransaction,
+    context: TransactionMapContext
+) : KOMMContextConverter<DbTransaction, Long?, TransactionMapContext, Transaction, Account?>(transaction, context) {
+    override fun convert(sourceMember: Long?) = context.accounts[context.accountCurrencies[sourceMember]?.accountId]
+}
+
+class AccountCurrencyConverter(
+    transaction: DbTransaction,
+    context: TransactionMapContext
+) : KOMMContextConverter<DbTransaction, Long?, TransactionMapContext, Transaction, AccountCurrency?>(transaction, context) {
+    override fun convert(sourceMember: Long?) = context.accountCurrencies[sourceMember]
+}
+
+class CategoryConverter(
+    transaction: DbTransaction,
+    context: TransactionMapContext
+) : KOMMContextConverter<DbTransaction, Long?, TransactionMapContext, Transaction, Category?>(transaction, context){
+    override fun convert(sourceMember: Long?) = context.categories[sourceMember]
+}
