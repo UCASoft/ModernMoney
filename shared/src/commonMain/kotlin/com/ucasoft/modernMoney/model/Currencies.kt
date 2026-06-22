@@ -4,6 +4,8 @@ import com.ucasoft.komm.abstractions.KOMMResolver
 import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapDefault
+import com.ucasoft.komm.annotations.MapName
+import com.ucasoft.modernMoney.db.model.AccountCurrency
 import com.ucasoft.modernMoney.db.model.Currency as DbCurrency
 import com.ucasoft.modernMoney.network.model.Currency as NetworkCurrency
 
@@ -21,6 +23,7 @@ import com.ucasoft.modernMoney.network.model.Currency as NetworkCurrency
 )
 data class Currency(
     val name: String,
+    @MapName("currencyCode", [AccountCurrency::class])
     val code: String,
     val symbol: String,
     @MapDefault<VisibleResolver>(VisibleResolver::class, `for` = [NetworkCurrency::class])

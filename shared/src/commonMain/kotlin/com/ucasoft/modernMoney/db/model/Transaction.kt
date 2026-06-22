@@ -45,7 +45,7 @@ import kotlin.time.Instant
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val dataTime: Instant,
+    val dateTime: Instant,
     val expenseCurrencyId: Long? = null,
     val expenseAmount: Double? = null,
     val incomeCurrencyId: Long? = null,

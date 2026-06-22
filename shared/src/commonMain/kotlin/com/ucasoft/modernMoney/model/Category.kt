@@ -4,24 +4,31 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.components.treeview.TreeViewNode
+import com.ucasoft.komm.abstractions.KOMMContextResolver
 import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.komm.annotations.MapFunction
+import com.ucasoft.komm.annotations.MapTargetDefault
 import com.ucasoft.modernMoney.ui.toByteArray
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
 @KOMMMap(
     from = [DbCategory::class],
-    to = [],
-    context = Unit::class,
+    to = [DbCategory::class],
+    context = CategoryMapContext::class,
     config = MapConfiguration(
         allowNotNullAssertion = false,
         tryAutoCast = true,
         mapDefaultAsFallback = false,
-        nullableContext = false,
+        nullableContext = true,
         convertFunctionName = ""
     )
+)
+@MapTargetDefault(
+    "parentId",
+    MapDefault(CategoryParentIdResolver::class),
 )
 data class Category(
     override val name: String,
@@ -65,13 +72,12 @@ data class Category(
         result = 31 * result + children.hashCode()
         return result
     }
-
-
-    fun mapToDbCategory(parentId: Long?) =
-        DbCategory(
-            id,
-            name,
-            parentId,
-            logo?.toByteArray()
-        )
 }
+
+class CategoryParentIdResolver(category: DbCategory?, context: CategoryMapContext) : KOMMContextResolver<CategoryMapContext, DbCategory?, Long?>(category, context) {
+    override fun resolve() = context.parentId
+}
+
+data class CategoryMapContext(
+    val parentId: Long?
+)

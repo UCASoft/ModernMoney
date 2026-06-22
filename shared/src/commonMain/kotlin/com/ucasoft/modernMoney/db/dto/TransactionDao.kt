@@ -11,18 +11,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    @Query("SELECT * FROM transactions ORDER BY dataTime DESC")
+    @Query("SELECT * FROM transactions ORDER BY dateTime DESC")
     fun allTransaction(): Flow<List<Transaction>>
 
-    @Query("""
+    @Query(
+        """
         WITH user_currencies AS (
             SELECT id FROM account_currencies WHERE accountId = :accountId
         )
         SELECT * FROM transactions 
         WHERE expenseCurrencyId IN user_currencies
         OR incomeCurrencyId IN user_currencies
-        ORDER BY dataTime DESC;
-        """)
+        ORDER BY dateTime DESC;
+        """
+    )
     fun transactionsByAccountId(accountId: Long): Flow<List<Transaction>>
 
     @Query("SELECT * FROM transactions WHERE id = :id")

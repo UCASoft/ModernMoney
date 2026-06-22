@@ -25,7 +25,6 @@ import kotlin.time.Instant
         convertFunctionName = "")
 )
 data class Transaction(
-    @MapName("dataTime") //TODO Fix DB model!
     val dateTime: Instant,
     @MapConvert<DbTransaction, Transaction, AccountConverter>(AccountConverter::class, "expenseCurrencyId")
     val expenseAccount: Account? = null,

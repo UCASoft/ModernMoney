@@ -3,6 +3,7 @@ package com.ucasoft.modernMoney.viewModels.category
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.CategoryDao
 import com.ucasoft.modernMoney.model.Category
+import com.ucasoft.modernMoney.model.CategoryMapContext
 import com.ucasoft.modernMoney.model.toCategory
 import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +24,7 @@ class CategoriesViewModel(private val categoryDao: CategoryDao) : ListViewModel<
 
     fun deleteCategory(category: Category, parentId: Long? = null) {
         viewModelScope.launch {
-            categoryDao.delete(category.mapToDbCategory(parentId))
+            categoryDao.delete(category.toCategory(CategoryMapContext(parentId)))
         }
     }
 
