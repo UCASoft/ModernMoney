@@ -28,8 +28,19 @@ import com.ucasoft.modernMoney.imports.money.model.Category
 import com.ucasoft.modernMoney.model.Category as MMCategory
 import com.ucasoft.modernMoney.imports.money.model.Currency
 import com.ucasoft.modernMoney.imports.money.model.Transaction
+import com.ucasoft.modernMoney.imports.money.model.TransactionMapContext
 import com.ucasoft.modernMoney.imports.money.model.flatten
+import com.ucasoft.modernMoney.imports.money.model.toBank
 import com.ucasoft.modernMoney.imports.money.model.toModernMoney
+import com.ucasoft.modernMoney.imports.money.model.toTransaction
+import com.ucasoft.modernMoney.model.AccountIdContext
+import com.ucasoft.modernMoney.model.CategoryMapContext
+import com.ucasoft.modernMoney.model.toAccount
+import com.ucasoft.modernMoney.model.toAccountCard
+import com.ucasoft.modernMoney.model.toAccountCurrency
+import com.ucasoft.modernMoney.model.toBank
+import com.ucasoft.modernMoney.model.toCategory
+import com.ucasoft.modernMoney.model.toCurrency
 import com.ucasoft.modernMoney.ui.rememberJsonPicker
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
@@ -137,19 +148,25 @@ fun ImportPreference() {
                 it.decodeToString()
             )
 
-            val banks = backup.getTableRecords<Bank>().map { it.toModernMoney() }
+            val banks = backup.getTableRecords<Bank>().map { it.toBank() }
             val currencies = backup.getTableRecords<Currency>().map { it.toModernMoney(currenciesState.remote) }.toSet()
             val accounts = backup.getTableRecords<Account>().map {
-                it.toModernMoney(backup.getTableRecords<Currency>(), currencies, banks, backup.getTableRecords<AccountBank>(), backup.getTableRecords<Card>())
+                it.toModernMoney(
+                    backup.getTableRecords<Currency>(),
+                    currencies,
+                    banks,
+                    backup.getTableRecords<AccountBank>(),
+                    backup.getTableRecords<Card>()
+                )
             }
             val categories = backup.getTableRecords<Category>().toModernMoney()
 
             runBlocking {
                 database.useWriterConnection {
                     it.immediateTransaction {
-                        execSQL("DELETE FROM accounts")
-                        execSQL("DELETE FROM account_cards")
                         execSQL("DELETE FROM account_currencies")
+                        execSQL("DELETE FROM account_cards")
+                        execSQL("DELETE FROM accounts")
                         execSQL("DELETE FROM banks")
                         execSQL("DELETE FROM categories")
                         execSQL("DELETE FROM currencies")
@@ -161,20 +178,28 @@ fun ImportPreference() {
                     }
                 }
 
-                banks.forEach { database.bankDao.insert(it.mapToBank()) }
-                currencies.forEach { database.currencyDao.insert(it.mapToCurrency()) }
+                banks.forEach { database.bankDao.insert(it.toBank()) }
+                currencies.forEach { database.currencyDao.insert(it.toCurrency()) }
                 accounts.forEach { account ->
-                    database.accountDao.insert(account.mapToDbAccount())
+                    database.accountDao.insert(account.toAccount())
                     account.currencies.forEach {
-                        database.accountCurrencyDao.insert(it.mapToDbAccountCurrency(account.id))
+                        database.accountCurrencyDao.insert(it.toAccountCurrency(AccountIdContext(account.id)))
                     }
                     account.cards.forEach {
-                        database.accountCardDao.insert(it.mapToDbAccountCard(account.id))
+                        database.accountCardDao.insert(it.toAccountCard(AccountIdContext(account.id)))
                     }
                 }
                 val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
                 importCategories(database, categories)
-                val transactions = backup.getTableRecords<Transaction>().map { it.toModernMoney(backup.getTableRecords<Currency>(), accountCurrencies, categories.flatten()) }
+                val transactions = backup.getTableRecords<Transaction>().map {
+                    it.toTransaction(
+                        TransactionMapContext(
+                            backup.getTableRecords<Currency>(),
+                            accountCurrencies,
+                            categories.flatten()
+                        )
+                    )
+                }
                 transactions.forEach {
                     database.transactionDao.insert(it.mapToTransaction())
                 }
@@ -190,7 +215,7 @@ fun ImportPreference() {
 
 suspend fun importCategories(database: ModernMoneyDatabase, categories: List<MMCategory>, parentId: Long? = null) {
     categories.forEach {
-        database.categoryDao.insert(it.mapToDbCategory(parentId))
+        database.categoryDao.insert(it.toCategory(CategoryMapContext(parentId)))
         if (it.children.isNotEmpty()) {
             importCategories(database, it.children, it.id)
         }
