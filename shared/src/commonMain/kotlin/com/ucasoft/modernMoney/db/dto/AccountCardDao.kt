@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.db.dto
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.ucasoft.modernMoney.db.model.AccountCard
 
@@ -14,7 +15,7 @@ interface AccountCardDao {
     @Insert
     suspend fun insert(card: AccountCard)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(card: List<AccountCard>)
 
     suspend fun refreshCards(accountId: Long, cards: List<AccountCard>) {
