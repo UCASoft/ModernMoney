@@ -34,7 +34,7 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
 
     NavigationSuiteScaffold(
         navigationItems = {
-            screens.map {
+            screens.forEach {
                 NavigationSuiteItem(
                     icon = {
                         Icon(
@@ -110,9 +110,9 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                 NavHost(
                     navController = navController,
                     startDestination = screens.first().title,
-                    modifier = Modifier.padding(top = it.calculateTopPadding())
+                    modifier = Modifier.padding(it)
                 ) {
-                    screens.map { screen ->
+                    screens.forEach { screen ->
                         composable(screen.title) {
                             screen.content()
                         }

@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.*
@@ -229,7 +231,11 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
 ) {
 
     val navigatorEventState = rememberNavigationEventState(NavigationEventInfo.None)
-    val navigator = rememberListDetailPaneScaffoldNavigator<Pair<K?, DetailsMode>>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<Pair<K?, DetailsMode>>(
+        scaffoldDirective = calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth(
+            currentWindowAdaptiveInfo()
+        )
+    )
     val scope = rememberCoroutineScope()
 
     NavigationBackHandler(
@@ -256,7 +262,6 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
     val state by viewModel.listState.collectAsStateWithLifecycle()
 
     ListDetailPaneScaffold(
-        modifier = Modifier.displayCutoutPadding(),
         scaffoldState = navigator.scaffoldState,
         directive = navigator.scaffoldDirective,
         listPane = {
