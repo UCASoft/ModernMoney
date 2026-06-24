@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.viewModels.account
 
 import androidx.lifecycle.viewModelScope
+import com.ucasoft.modernMoney.db.dto.AccountCurrencyDao
 import com.ucasoft.modernMoney.db.dto.AccountDao
 import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.BankRepository
@@ -14,12 +15,23 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AccountsViewModel(private val accountDao: AccountDao, bankRepository: BankRepository, private val transactionDao: TransactionDao) : ReorderingViewModel<Account, AccountsUiState>() {
+class AccountsViewModel(
+    private val accountDao: AccountDao,
+    bankRepository: BankRepository,
+    private val transactionDao: TransactionDao,
+    accountCurrencyDao: AccountCurrencyDao
+) : ReorderingViewModel<Account, AccountsUiState>() {
 
     override val listState = accountDao.allAccounts()
-        .combine(bankRepository.banks) { accounts, banks ->
+        .combine(bankRepository.banks) { accounts, banks -> accounts to banks }
+        .combine(accountCurrencyDao.currencyBalances()) { (accounts, banks), balances ->
+            val balanceByCurrencyId = balances.associate { it.currencyId to it.balance }
             AccountsUiState(accounts.map {
-                it.toAccount(AccountMapContext(banks))
+                it.toAccount(AccountMapContext(banks)).also { account ->
+                    account.currencies.forEach {
+                        it.balance = balanceByCurrencyId[it.id] ?: 0.0
+                    }
+                }
             })
         }.stateIn(
             scope = viewModelScope,

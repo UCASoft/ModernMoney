@@ -158,12 +158,12 @@ private fun CurrenciesColumn(accountCurrencies: List<AccountCurrency>) {
     ) {
         accountCurrencies.sortedBy {
             if (it.currency.code == "CZK") 0 else 1
-        }.map { it.currency }.forEachIndexed { index, currency ->
+        }.forEachIndexed { index, accountCurrency ->
 
             val mainCurrencyIndex = 0
 
             Text(
-                text = "${currency.symbol} 5369.0",
+                text = "${accountCurrency.currency.symbol} ${accountCurrency.balance}",
                 fontWeight = if (index == mainCurrencyIndex) FontWeight.Bold else FontWeight.Normal,
                 fontSize = if (index == mainCurrencyIndex) 12.sp else 11.sp
             )

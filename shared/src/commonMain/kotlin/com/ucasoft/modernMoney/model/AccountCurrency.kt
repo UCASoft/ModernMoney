@@ -34,6 +34,9 @@ data class AccountCurrency (
 ) {
     var id: Long = 0L
         internal set
+
+    var balance: Double = 0.0
+        internal set
 }
 
 class AccountCurrencyResolver(accountCurrency: AccountCurrency?, context: AccountIdContext) : AccountIdResolver<AccountCurrency, AccountIdContext>(accountCurrency, context)
