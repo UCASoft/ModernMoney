@@ -10,12 +10,12 @@ kotlin {
     /*linuxX64()
     mingwX64()*/
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(libs.compose.components.resources)
             }
         }
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.desktop.currentOs)

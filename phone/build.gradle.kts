@@ -33,7 +33,7 @@ android {
     buildToolsVersion = "36.1.0"
 }
 
-val syncKmpStrings by tasks.registering(Copy::class) {
+val syncKmpStrings = tasks.register<Copy>("syncKmpStrings") {
     description = "Copy shared composeResources strings into Android res"
 
     from(

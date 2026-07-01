@@ -20,7 +20,7 @@ kotlin {
         buildToolsVersion = "36.1.0"
     }
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(libs.compose.runtime)
                 api(libs.compose.foundation)
@@ -68,26 +68,26 @@ kotlin {
             kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.mock)
             }
         }
 
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
                 runtimeOnly(libs.kotlinx.coroutines.swing)
             }
         }
 
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
                 implementation(compose.desktop.currentOs)
             }
         }
 
-        val androidMain by getting {
+        androidMain {
             dependencies {
                 implementation(libs.androidx.ui.test.android)
             }
