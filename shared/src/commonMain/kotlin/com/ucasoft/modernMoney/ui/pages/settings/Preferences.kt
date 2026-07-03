@@ -1,7 +1,9 @@
 package com.ucasoft.modernMoney.ui.pages.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -9,51 +11,28 @@ import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.execSQL
-import androidx.room.immediateTransaction
-import androidx.room.useWriterConnection
-import com.ucasoft.modernMoney.db.ModernMoneyDatabase
-import com.ucasoft.modernMoney.imports.money.model.Account
-import com.ucasoft.modernMoney.imports.money.model.AccountBank
-import com.ucasoft.modernMoney.imports.money.model.Backup
-import com.ucasoft.modernMoney.imports.money.model.Bank
-import com.ucasoft.modernMoney.imports.money.model.Card
-import com.ucasoft.modernMoney.imports.money.model.Category
-import com.ucasoft.modernMoney.model.Category as MMCategory
-import com.ucasoft.modernMoney.imports.money.model.Currency
-import com.ucasoft.modernMoney.imports.money.model.Transaction
-import com.ucasoft.modernMoney.imports.money.model.TransactionMapContext
-import com.ucasoft.modernMoney.imports.money.model.flatten
-import com.ucasoft.modernMoney.imports.money.model.toBank
-import com.ucasoft.modernMoney.imports.money.model.toModernMoney
-import com.ucasoft.modernMoney.imports.money.model.toTransaction
-import com.ucasoft.modernMoney.model.AccountIdContext
-import com.ucasoft.modernMoney.model.CategoryMapContext
-import com.ucasoft.modernMoney.model.toAccount
-import com.ucasoft.modernMoney.model.toAccountCard
-import com.ucasoft.modernMoney.model.toAccountCurrency
-import com.ucasoft.modernMoney.model.toBank
-import com.ucasoft.modernMoney.model.toCategory
-import com.ucasoft.modernMoney.model.toCurrency
+import com.ucasoft.modernMoney.imports.ImportProvider
+import com.ucasoft.modernMoney.imports.ImportStatus
+import com.ucasoft.modernMoney.imports.ProgressStatus
+import com.ucasoft.modernMoney.imports.money.MoneyJsonProvider
 import com.ucasoft.modernMoney.ui.rememberJsonPicker
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.*
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun Preferences() {
-
     val viewModel = koinViewModel<SettingsViewModel>()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,6 +74,117 @@ fun Preferences() {
 }
 
 @Composable
+fun ImportPreference() {
+    val scope = rememberCoroutineScope()
+    var importStatus by remember { mutableStateOf<ImportStatus<ProgressStatus<*>>>(ImportStatus.Idle()) }
+    var importProviderName by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val providers = remember {
+        listOf(
+            MoneyJsonProvider("Money", "Import from Money JSON Backup")
+        )
+    }
+
+    val jsonPicker = rememberJsonPicker( {
+        val provider = providers.firstOrNull { it.name == importProviderName } ?: return@rememberJsonPicker
+        scope.launch {
+            provider.runImport(it).collect {
+                importStatus = it
+            }
+        }
+    })
+
+
+    StatusListPreference(
+        title = "Import Data",
+        items = providers,
+        itemLabel = { it.name },
+        itemDescription = { it.description },
+        status = importStatus,
+        onItemSelected = {
+            importProviderName = it.name
+            jsonPicker()
+        }
+    )
+}
+
+@Composable
+fun <T: ImportProvider<*>> StatusListPreference(
+    title: String,
+    items: List<T>,
+    itemLabel: (T) -> String,
+    itemDescription: (T) -> String,
+    onItemSelected: (T) -> Unit,
+    status: ImportStatus<ProgressStatus<*>>,
+    modifier: Modifier = Modifier
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val loadingStatus = status as? ImportStatus.Loading<*, *>
+    val importProgress by remember(loadingStatus?.progressStatus) {
+        loadingStatus?.progressStatus ?: emptyFlow()
+    }.collectAsState(initial = null)
+    val progressMessage = (importProgress as? Pair<*, *>)?.first as? String
+    val progressPercent = ((importProgress as? Pair<*, *>)?.second as? Int)?.coerceIn(0, 100)
+
+    Preference(
+        title = { Text(title) },
+        summary = {
+            when (status) {
+                is ImportStatus.Idle -> Text("Select a source to import your data")
+                is ImportStatus.Loading<*, *> -> Text("Importing... ${progressMessage ?: "please wait"}")
+                is ImportStatus.Success -> Text("Import completed successfully")
+                is ImportStatus.Error -> Text("Error: ${status.message}")
+            }
+        },
+        enabled = status !is ImportStatus.Loading<*, *>,
+        widgetContainer = {
+            if (status is ImportStatus.Loading<*, *>) {
+                if (progressPercent != null) {
+                    CircularProgressIndicator(
+                        progress = { progressPercent / 100f },
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+            }
+        },
+        onClick = { showDialog = true },
+        modifier = modifier
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(title) },
+            text = {
+                Column {
+                    items.forEach { item ->
+                        ListItem(
+                            headlineContent = { Text(itemLabel(item)) },
+                            supportingContent = { Text(itemDescription(item)) },
+                            modifier = Modifier.clickable {
+                                showDialog = false
+                                onItemSelected(item)
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
 fun CurrenciesPreference() {
 
     val currenciesViewModel = koinViewModel<CurrenciesViewModel>()
@@ -130,95 +220,6 @@ fun CurrenciesPreference() {
                 )
             }
         )
-    }
-}
-
-@Composable
-fun ImportPreference() {
-
-    val currenciesViewModel = koinViewModel<CurrenciesViewModel>()
-    val currenciesState by currenciesViewModel.fullState.collectAsStateWithLifecycle()
-    val database = koinInject<ModernMoneyDatabase>()
-
-    val jsonPicker = rememberJsonPicker {
-        if (it != null) {
-            val json = Json { ignoreUnknownKeys = true }
-            val backup = json.decodeFromString(
-                Backup.serializer(),
-                it.decodeToString()
-            )
-
-            val banks = backup.getTableRecords<Bank>().map { it.toBank() }
-            val currencies = backup.getTableRecords<Currency>().map { it.toModernMoney(currenciesState.remote) }.toSet()
-            val accounts = backup.getTableRecords<Account>().map {
-                it.toModernMoney(
-                    backup.getTableRecords<Currency>(),
-                    currencies,
-                    banks,
-                    backup.getTableRecords<AccountBank>(),
-                    backup.getTableRecords<Card>()
-                )
-            }
-            val categories = backup.getTableRecords<Category>().toModernMoney()
-
-            runBlocking {
-                database.useWriterConnection {
-                    it.immediateTransaction {
-                        execSQL("DELETE FROM account_currencies")
-                        execSQL("DELETE FROM account_cards")
-                        execSQL("DELETE FROM accounts")
-                        execSQL("DELETE FROM banks")
-                        execSQL("DELETE FROM categories")
-                        execSQL("DELETE FROM currencies")
-                        execSQL("DELETE FROM locations")
-                        execSQL("DELETE FROM payees")
-                        execSQL("DELETE FROM payee_location")
-                        execSQL("DELETE FROM transactions")
-                        execSQL("DELETE FROM sqlite_sequence WHERE name in ('accounts', 'account_cards', 'account_currencies', 'banks', 'categories', 'currencies', 'locations', 'payees', 'payee_location', 'transactions')")
-                    }
-                }
-
-                banks.forEach { database.bankDao.insert(it.toBank()) }
-                currencies.forEach { database.currencyDao.insert(it.toCurrency()) }
-                accounts.forEach { account ->
-                    database.accountDao.insert(account.toAccount())
-                    account.currencies.forEach {
-                        database.accountCurrencyDao.insert(it.toAccountCurrency(AccountIdContext(account.id)))
-                    }
-                    account.cards.forEach {
-                        database.accountCardDao.insert(it.toAccountCard(AccountIdContext(account.id)))
-                    }
-                }
-                val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
-                importCategories(database, categories)
-                val transactions = backup.getTableRecords<Transaction>().map {
-                    it.toTransaction(
-                        TransactionMapContext(
-                            backup.getTableRecords<Currency>(),
-                            accountCurrencies,
-                            categories.flatten()
-                        )
-                    )
-                }
-                transactions.forEach {
-                    database.transactionDao.insert(it.mapToTransaction())
-                }
-            }
-        }
-    }
-
-    Preference(
-        title = { Text("Import") },
-        onClick = { jsonPicker() }
-    )
-}
-
-suspend fun importCategories(database: ModernMoneyDatabase, categories: List<MMCategory>, parentId: Long? = null) {
-    categories.forEach {
-        database.categoryDao.insert(it.toCategory(CategoryMapContext(parentId)))
-        if (it.children.isNotEmpty()) {
-            importCategories(database, it.children, it.id)
-        }
     }
 }
 
