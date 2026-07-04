@@ -8,6 +8,9 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.ucasoft.modern_money.shared.generated.resources.Res
+import com.ucasoft.modern_money.shared.generated.resources.title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen() {
@@ -18,7 +21,7 @@ fun SettingsScreen() {
             modifier = Modifier.fillMaxSize()
         ) {
             ListItem(
-                headlineContent = { Text("Settings") }
+                headlineContent = { Text(stringResource(Res.string.title)) },
             )
             Box(
                 modifier = Modifier.fillMaxSize()

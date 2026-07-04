@@ -26,9 +26,17 @@ import com.ucasoft.modernMoney.imports.money.MoneyJsonProvider
 import com.ucasoft.modernMoney.ui.rememberJsonPicker
 import com.ucasoft.modernMoney.viewModels.CurrenciesViewModel
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
+import com.ucasoft.modern_money.shared.generated.resources.Res
+import com.ucasoft.modern_money.shared.generated.resources.currencies
+import com.ucasoft.modern_money.shared.generated.resources.import_summary
+import com.ucasoft.modern_money.shared.generated.resources.import_title
+import com.ucasoft.modern_money.shared.generated.resources.language
+import com.ucasoft.modern_money.shared.generated.resources.pin_code
+import com.ucasoft.modern_money.shared.generated.resources.protect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -43,16 +51,16 @@ fun Preferences() {
         Column {
             ListPreference(
                 value = state.language,
-                values = listOf("EN", "FR"),
+                values = listOf("EN", "FR", "RU"),
                 onValueChange = viewModel::setLanguage,
-                title = { Text("Language") },
+                title = { Text(stringResource(Res.string.language)) },
                 summary = { Text(state.language) },
                 type = ListPreferenceType.DROPDOWN_MENU
             )
             TwoTargetSwitchPreference(
                 value = protected,
                 onValueChange = { protected = it },
-                title = { Text("Protected") },
+                title = { Text(stringResource(Res.string.protect)) },
                 enabled = protected,
                 switchEnabled = true,
                 onClick = { }
@@ -60,7 +68,7 @@ fun Preferences() {
             TextFieldPreference(
                 value = "1234",
                 onValueChange = { },
-                title = { Text("Pin Code") },
+                title = { Text(stringResource(Res.string.pin_code)) },
                 textToValue = { it },
                 summary = { Text("Defined") },
                 textField = PasswordFieldPreferenceDefaults.PasswordField
@@ -94,7 +102,7 @@ fun ImportPreference() {
 
 
     StatusListPreference(
-        title = "Import Data",
+        title = stringResource(Res.string.import_title),
         items = providers,
         itemLabel = { it.name },
         itemDescription = { it.description },
@@ -128,7 +136,7 @@ fun <T: ImportProvider<*>> StatusListPreference(
         title = { Text(title) },
         summary = {
             when (status) {
-                is ImportStatus.Idle -> Text("Select a source to import your data")
+                is ImportStatus.Idle -> Text(stringResource(Res.string.import_summary))
                 is ImportStatus.Loading<*, *> -> Text("Importing... ${progressMessage ?: "please wait"}")
                 is ImportStatus.Success -> Text("Import completed successfully")
                 is ImportStatus.Error -> Text("Error: ${status.message}")
@@ -191,7 +199,7 @@ fun CurrenciesPreference() {
 
     if (currenciesState.isLoading) {
         Preference(
-            title = { Text("Currencies") },
+            title = { Text(stringResource(Res.string.currencies)) },
             enabled = false,
             widgetContainer = { CircularProgressIndicator() }
         )
@@ -202,7 +210,7 @@ fun CurrenciesPreference() {
                 currenciesViewModel.updateCurrencies(it.toList())
             },
             values = currenciesState.remote,
-            title = { Text("Currencies") },
+            title = { Text(stringResource(Res.string.currencies)) },
             item = { v, vs, t ->
                 ListItem(
                     modifier = Modifier.toggleable(v in vs, true, Role.Checkbox, null, t),

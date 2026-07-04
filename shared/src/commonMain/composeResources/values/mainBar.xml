@@ -2,5 +2,8 @@
 <resources>
     <string name="accounts">Accounts</string>
     <string name="transactions">Transaction</string>
+    <string name="banks">Banks</string>
+    <string name="categories">Categories</string>
     <string name="reports">Reports</string>
+    <string name="payees">Payees</string>
 </resources>

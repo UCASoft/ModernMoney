@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accounts">Акаунты</string>
+    <string name="transactions">Транзакции</string>
+    <string name="banks">Банки</string>
+    <string name="categories">Категории</string>
+    <string name="reports">Отчеты</string>
+    <string name="payees">Бенифициары</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">Paramètres</string>
+    <string name="language">Langue</string>
+    <string name="protect">Protéger</string>
+    <string name="pin_code">Сode PIN</string>
+    <string name="currencies">Devises</string>
+    <string name="import_title">Données d'importation</string>
+    <string name="import_summary">Sélectionnez une source pour importer vos données</string>
+</resources>

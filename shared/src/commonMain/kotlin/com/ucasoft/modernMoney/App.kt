@@ -36,6 +36,7 @@ import com.ucasoft.modernMoney.ui.pages.transaction.TransactionListDetails
 import com.ucasoft.modernMoney.viewModels.SettingsViewModel
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.module.Module
 import org.koin.dsl.koinConfiguration
 
 sealed class Screen(val title: String, val icon: ImageVector, val content: @Composable () -> Unit) {
@@ -49,25 +50,23 @@ sealed class Screen(val title: String, val icon: ImageVector, val content: @Comp
 }
 
 @Composable
-fun App() {
+fun App(vararg platformModules: Module) {
     KoinApplication(
         configuration = koinConfiguration {
-            modules(platformDbModule, daoModule, repositoryModule, serviceModule, viewModelModule, networkModule)
+            modules(*platformModules, platformDbModule, daoModule, repositoryModule, serviceModule, viewModelModule, networkModule)
         }
     ) {
         val settingsViewModel = koinViewModel<SettingsViewModel>()
         val settings by settingsViewModel.state.collectAsStateWithLifecycle()
         val language = settings.language
         CompositionLocalProvider(LocalAppLocale provideLocale language) {
-            key(language) {
-                ModernMoneyTheme {
-                    MainLayout(
-                        listOf(
-                            Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
-                            Screen.Payees
-                        ), Screen.Settings
-                    )
-                }
+            ModernMoneyTheme {
+                MainLayout(
+                    listOf(
+                        Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
+                        Screen.Payees
+                    ), Screen.Settings
+                )
             }
         }
     }
