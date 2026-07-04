@@ -14,6 +14,7 @@ kotlin {
     androidLibrary {
         namespace = "com.ucasoft.modernMoney.shared"
         compileSdk = 36
+        minSdk = 29
         androidResources {
             enable = true
         }

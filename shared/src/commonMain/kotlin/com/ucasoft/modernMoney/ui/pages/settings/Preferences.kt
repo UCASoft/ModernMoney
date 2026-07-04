@@ -43,10 +43,8 @@ fun Preferences() {
         Column {
             ListPreference(
                 value = state.language,
-                onValueChange = {
-                    viewModel.setLanguage(it)
-                },
                 values = listOf("EN", "FR"),
+                onValueChange = viewModel::setLanguage,
                 title = { Text("Language") },
                 summary = { Text(state.language) },
                 type = ListPreferenceType.DROPDOWN_MENU

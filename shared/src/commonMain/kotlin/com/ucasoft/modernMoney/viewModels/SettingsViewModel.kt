@@ -3,17 +3,19 @@ package com.ucasoft.modernMoney.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.getStringFlow
 import com.russhwolf.settings.observable.makeObservable
+import com.ucasoft.modernMoney.db.dto.PayeeDao
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalSettingsApi::class)
-class SettingsViewModel : ViewModel() {
-
-    private val settings = Settings().makeObservable()
+class SettingsViewModel(
+    private val settings: ObservableSettings
+) : ViewModel() {
 
     private val language = settings.getStringFlow(SettingsKey.LANGUAGE, "EN")
 

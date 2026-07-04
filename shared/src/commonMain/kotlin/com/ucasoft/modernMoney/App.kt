@@ -11,9 +11,14 @@ import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucasoft.modernMoney.di.daoModule
 import com.ucasoft.modernMoney.di.networkModule
 import com.ucasoft.modernMoney.di.platformDbModule
@@ -28,8 +33,9 @@ import com.ucasoft.modernMoney.ui.pages.categories.CategoryListDetails
 import com.ucasoft.modernMoney.ui.pages.payee.PayeeListDetails
 import com.ucasoft.modernMoney.ui.pages.settings.SettingsScreen
 import com.ucasoft.modernMoney.ui.pages.transaction.TransactionListDetails
+import com.ucasoft.modernMoney.viewModels.SettingsViewModel
 import org.koin.compose.KoinApplication
-import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.koinConfiguration
 
 sealed class Screen(val title: String, val icon: ImageVector, val content: @Composable () -> Unit) {
@@ -49,15 +55,27 @@ fun App() {
             modules(platformDbModule, daoModule, repositoryModule, serviceModule, viewModelModule, networkModule)
         }
     ) {
-        ModernMoneyTheme {
-            MainLayout(
-                listOf(
-                    Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
-                    Screen.Payees
-                ), Screen.Settings
-            )
+        val settingsViewModel = koinViewModel<SettingsViewModel>()
+        val settings by settingsViewModel.state.collectAsStateWithLifecycle()
+        val language = settings.language
+        CompositionLocalProvider(LocalAppLocale provideLocale language) {
+            key(language) {
+                ModernMoneyTheme {
+                    MainLayout(
+                        listOf(
+                            Screen.Accounts, Screen.Transactions, Screen.Banks, Screen.Categories, Screen.Reports,
+                            Screen.Payees
+                        ), Screen.Settings
+                    )
+                }
+            }
         }
     }
+}
+
+expect object LocalAppLocale {
+    @Composable
+    infix fun provideLocale(language: String?): ProvidedValue<*>
 }
 
 @Composable
