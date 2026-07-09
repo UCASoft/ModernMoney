@@ -59,7 +59,7 @@ fun App(vararg platformModules: Module) {
         val settingsViewModel = koinViewModel<SettingsViewModel>()
         val settings by settingsViewModel.state.collectAsStateWithLifecycle()
         val language = settings.language
-        CompositionLocalProvider(LocalAppLocale provideLocale language) {
+        AppLocaleProvider(language) {
             ModernMoneyTheme {
                 MainLayout(
                     listOf(
@@ -72,10 +72,6 @@ fun App(vararg platformModules: Module) {
     }
 }
 
-expect object LocalAppLocale {
-    @Composable
-    infix fun provideLocale(language: String?): ProvidedValue<*>
-}
 
 @Composable
 fun UnknownScreen(content: String = "Unknown page") {
