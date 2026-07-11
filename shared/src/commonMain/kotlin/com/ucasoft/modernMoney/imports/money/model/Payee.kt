@@ -5,13 +5,14 @@ import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.komm.annotations.MapTargetDefault
-import com.ucasoft.modernMoney.model.Bank as MMBank
+import com.ucasoft.komm.plugins.iterable.annotations.KOMMIterableString
+import com.ucasoft.modernMoney.model.Payee as MMPayee
 import kotlinx.serialization.Serializable
 
 @Serializable
 @KOMMMap(
     from = [],
-    to = [MMBank::class],
+    to = [MMPayee::class],
     context = Unit::class,
     config = MapConfiguration(
         allowNotNullAssertion = false,
@@ -23,11 +24,13 @@ import kotlinx.serialization.Serializable
 )
 @MapTargetDefault(
     "logo",
-    MapDefault(BankNullableResolver::class)
+    MapDefault(PayeeNullableResolver::class)
 )
-data class Bank(
+data class Payee(
     val id: Long,
-    val name: String
+    val name: String,
+    @KOMMIterableString(";")
+    val aliases: String
 )
 
-class BankNullableResolver(destination: Bank?) : NullableResolver<Bank, ImageBitmap?>(destination)
+class PayeeNullableResolver(destination: Payee?) : NullableResolver<Payee, ImageBitmap?>(destination)

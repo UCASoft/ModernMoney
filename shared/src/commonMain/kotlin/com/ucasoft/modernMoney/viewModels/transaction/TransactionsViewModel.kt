@@ -6,6 +6,7 @@ import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
+import com.ucasoft.modernMoney.db.repositories.PayeeRepository
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionMapContext
 import com.ucasoft.modernMoney.model.toTransaction
@@ -24,7 +25,8 @@ class TransactionsViewModel(
     private val transactionDao: TransactionDao,
     private val accountCurrencyRepository: AccountCurrencyRepository,
     private val accountRepository: AccountRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val payeeRepository: PayeeRepository
 ): ListViewModel<Transaction, TransactionsUiState>() {
 
     private val transactionFilter = MutableStateFlow<Long?>(null)
@@ -60,11 +62,11 @@ class TransactionsViewModel(
     private fun combineTransactions(
         transactionFlow: Flow<List<DbTransaction>>
     ): Flow<TransactionsUiState> =
-        combine(transactionFlow, accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories) {
-            transactions, accounts, accountCurrencies, categories ->
+        combine(transactionFlow, accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories, payeeRepository.payees) {
+            transactions, accounts, accountCurrencies, categories, payees ->
             TransactionsUiState(
                 transactions.map {
-                    it.toTransaction(TransactionMapContext(accounts, accountCurrencies, categories))
+                    it.toTransaction(TransactionMapContext(accounts, accountCurrencies, categories, payees))
                 }
             )
         }

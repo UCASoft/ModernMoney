@@ -5,6 +5,7 @@ import com.ucasoft.modernMoney.db.dto.TransactionDao
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
+import com.ucasoft.modernMoney.db.repositories.PayeeRepository
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Category
 import com.ucasoft.modernMoney.model.Transaction
@@ -25,6 +26,7 @@ class TransactionViewModel(
     accountCurrencyRepository: AccountCurrencyRepository,
     accountRepository: AccountRepository,
     categoryRepository: CategoryRepository,
+    payeeRepository: PayeeRepository,
     id: Long?
 ) : DetailViewModel<Transaction, TransactionUiState>() {
 
@@ -34,9 +36,9 @@ class TransactionViewModel(
     init {
         if (id != null) {
             viewModelScope.launch {
-                combine(transactionDao.transactionById(id), accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories) {
-                        transaction, accounts, accountCurrencies, categories ->
-                        transaction to TransactionMapContext(accounts, accountCurrencies, categories)
+                combine(transactionDao.transactionById(id), accountRepository.accounts, accountCurrencyRepository.accountCurrencies, categoryRepository.categories, payeeRepository.payees) {
+                        transaction, accounts, accountCurrencies, categories, payees ->
+                        transaction to TransactionMapContext(accounts, accountCurrencies, categories, payees)
                 }.collect { (transaction, context) ->
                     state.update {
                         it.copy(

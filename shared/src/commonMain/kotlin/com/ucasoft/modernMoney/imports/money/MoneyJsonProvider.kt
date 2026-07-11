@@ -12,6 +12,7 @@ import com.ucasoft.modernMoney.imports.money.model.Account
 import com.ucasoft.modernMoney.imports.money.model.Bank
 import com.ucasoft.modernMoney.imports.money.model.Category
 import com.ucasoft.modernMoney.imports.money.model.Currency
+import com.ucasoft.modernMoney.imports.money.model.Payee
 import com.ucasoft.modernMoney.imports.money.model.Transaction
 import com.ucasoft.modernMoney.imports.money.model.TransactionMapContext
 import com.ucasoft.modernMoney.model.*
@@ -72,6 +73,7 @@ data class MoneyJsonProvider(
         val backupCards = backup.getTableRecords<Card>()
         val backupCategories = backup.getTableRecords<Category>()
         val backupTransactions = backup.getTableRecords<Transaction>()
+        val backupPayees = backup.getTableRecords<Payee>()
 
         val banks = backupBanks.map { it.toBank() }
         val currencies = backupCurrencies.map { it.toModernMoney(remoteCurrencies) }.toSet()
@@ -86,6 +88,7 @@ data class MoneyJsonProvider(
         }
         val categories = backupCategories.toModernMoney()
         val flatCategories = categories.flatten()
+        val payees = backupPayees.map { it.toPayee() }
 
         progressFlow.setupAdvance(15, 95, DELETE_STATEMENTS.size +
                 banks.size +
@@ -93,6 +96,7 @@ data class MoneyJsonProvider(
                 accounts.size +
                 accounts.sumOf { it.currencies.size + it.cards.size } +
                 flatCategories.size +
+                payees.size +
                 backupTransactions.size)
 
         database.useWriterConnection { connection ->
@@ -114,6 +118,10 @@ data class MoneyJsonProvider(
                     database.currencyDao.insert(it.toCurrency())
                     progressFlow.advance("Saving currencies...")
                 }
+                payees.forEach {
+                    database.payeeDao.insert(it.toPayee())
+                    progressFlow.advance("Saving payees...")
+                }
                 accounts.forEach { account ->
                     database.accountDao.insert(account.toAccount())
                     progressFlow.advance("Saving accounts...")
@@ -129,15 +137,16 @@ data class MoneyJsonProvider(
             }
         }
 
-        val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
         importCategories(database, categories, progress = progressFlow)
+        val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
 
         val transactions = backupTransactions.map {
             it.toTransaction(
                 TransactionMapContext(
                     backupCurrencies,
                     accountCurrencies,
-                    flatCategories
+                    flatCategories,
+                    payees
                 )
             )
         }

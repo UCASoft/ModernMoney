@@ -9,7 +9,6 @@ import com.ucasoft.komm.abstractions.KOMMContextConverter
 import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapConvert
-import com.ucasoft.komm.annotations.MapName
 import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 import kotlin.time.Instant
 
@@ -36,7 +35,8 @@ data class Transaction(
     @MapConvert<DbTransaction, Transaction, AccountCurrencyConverter>(AccountCurrencyConverter::class, "incomeCurrencyId")
     val incomeAccountCurrency: AccountCurrency? = null,
     val incomeAmount: Double? = null,
-    val payeeId: Long? = null,
+    @MapConvert<DbTransaction, Transaction, PayeeConverter>(PayeeConverter::class, "payeeId")
+    val payee: Payee? = null,
     val payeeCurrencyCode: String? = null,
     val payeeAmount: Double? = null,
     @MapConvert<DbTransaction, Transaction, CategoryConverter>(CategoryConverter::class, "categoryId")
@@ -67,7 +67,7 @@ data class Transaction(
             expenseAmount,
             incomeAccountCurrency?.id,
             incomeAmount,
-            payeeId,
+            payee?.id,
             payeeCurrencyCode,
             payeeAmount,
             category?.id,
@@ -112,7 +112,8 @@ enum class TransactionType {
 data class TransactionMapContext(
     val accounts: Map<Long, Account>,
     val accountCurrencies: Map<Long, AccountCurrency>,
-    val categories: Map<Long, Category>
+    val categories: Map<Long, Category>,
+    val payees: Map<Long, Payee>
 )
 
 class AccountConverter(
@@ -134,4 +135,11 @@ class CategoryConverter(
     context: TransactionMapContext
 ) : KOMMContextConverter<DbTransaction, Long?, TransactionMapContext, Transaction, Category?>(transaction, context){
     override fun convert(sourceMember: Long?) = context.categories[sourceMember]
+}
+
+class PayeeConverter(
+    transaction: DbTransaction,
+    context: TransactionMapContext
+) : KOMMContextConverter<DbTransaction, Long?, TransactionMapContext, Transaction, Payee?>(transaction, context){
+    override fun convert(sourceMember: Long?) = context.payees[sourceMember]
 }

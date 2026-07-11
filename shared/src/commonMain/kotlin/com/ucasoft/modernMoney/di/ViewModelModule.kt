@@ -32,6 +32,6 @@ val viewModelModule = module {
     viewModel { PayeeViewModel(get(), it.getOrNull()) }
     viewModelOf(::PayeesViewModel)
     viewModelOf(::TransactionsViewModel)
-    viewModel { TransactionViewModel(get(), get(), get(), get(), it.getOrNull()) }
+    viewModel { TransactionViewModel(get(), get(), get(), get(), get(), it.getOrNull()) }
     viewModelOf(::SettingsViewModel)
 }

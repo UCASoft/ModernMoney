@@ -10,6 +10,7 @@ import com.ucasoft.komm.annotations.MapTargetDefault
 import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Category
+import com.ucasoft.modernMoney.model.Payee
 import com.ucasoft.modernMoney.model.Transaction as MMTransaction
 import com.ucasoft.modernMoney.model.toAccountCurrency
 import kotlinx.serialization.Serializable
@@ -38,10 +39,6 @@ import kotlin.time.Instant
     MapDefault(TransactionNullableResolver::class)
 )
 @MapTargetDefault(
-    "payeeId",
-    MapDefault(TransactionNullableResolver::class)
-)
-@MapTargetDefault(
     "locationId",
     MapDefault(TransactionNullableResolver::class)
 )
@@ -56,6 +53,8 @@ data class Transaction(
     val incomeCurrencyId: Long? = null,
     @MapConvert<Transaction, MMTransaction, AmountRoundConverter>(AmountRoundConverter::class, "")
     val incomeAmount: Double? = null,
+    @MapConvert<Transaction, MMTransaction, PayeeConverter>(PayeeConverter::class, "payee")
+    val payeeId: Long? = null,
     val payeeCurrencyCode: String? = null,
     val payeeAmount: Double? = null,
     @MapConvert<Transaction, MMTransaction, CategoryConverter>(CategoryConverter::class, "category")
@@ -70,7 +69,8 @@ class DateTimeConverter(source: Transaction) : KOMMConverter<Transaction, Long, 
 data class TransactionMapContext(
     val currencies: List<Currency>,
     val accountCurrencies: List<AccountCurrencyWithCurrency>,
-    val categories: List<Category>
+    val categories: List<Category>,
+    val payees: List<Payee>
 )
 
 class CurrencyIDConverter(source: Transaction, context: TransactionMapContext) : KOMMContextConverter<Transaction, Long?, TransactionMapContext, MMTransaction, AccountCurrency?>(source, context) {
@@ -87,6 +87,12 @@ class AmountRoundConverter(source: Transaction) : KOMMConverter<Transaction, Dou
 class CategoryConverter(source: Transaction, context: TransactionMapContext) : KOMMContextConverter<Transaction, Long?, TransactionMapContext, MMTransaction, Category?>(source, context) {
     override fun convert(sourceMember: Long?) = sourceMember?.let { id ->
         context.categories.firstOrNull { it.id == id }
+    }
+}
+
+class PayeeConverter(source: Transaction, context: TransactionMapContext) : KOMMContextConverter<Transaction, Long?, TransactionMapContext, MMTransaction, Payee?>(source, context) {
+    override fun convert(sourceMember: Long?) = sourceMember?.let { id ->
+        context.payees.firstOrNull { it.id == id }
     }
 }
 

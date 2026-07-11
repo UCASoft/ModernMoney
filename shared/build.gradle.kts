@@ -44,6 +44,7 @@ kotlin {
                 implementation(libs.androidx.sqlite.bundled)
 
                 implementation(libs.komm.annotions)
+                implementation(libs.komm.plugins.interable)
 
                 api(libs.koin.core)
                 implementation(libs.koin.compose)

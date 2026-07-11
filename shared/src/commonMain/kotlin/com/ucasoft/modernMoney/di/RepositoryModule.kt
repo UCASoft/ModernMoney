@@ -6,9 +6,9 @@ import com.ucasoft.modernMoney.db.repositories.BankRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.db.repositories.CurrencyExchangeRepository
 import com.ucasoft.modernMoney.db.repositories.CurrencyRepository
+import com.ucasoft.modernMoney.db.repositories.PayeeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -24,4 +24,5 @@ val repositoryModule = module {
     singleOf(::CategoryRepository)
     singleOf(::CurrencyRepository)
     singleOf(::CurrencyExchangeRepository)
+    singleOf(::PayeeRepository)
 }
