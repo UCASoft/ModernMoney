@@ -21,6 +21,7 @@ import com.ucasoft.modernMoney.ui.pages.account.AccountCurrencyDropDown
 import com.ucasoft.modernMoney.ui.pages.account.AccountDropDown
 import com.ucasoft.modernMoney.ui.pages.account.CurrencyDropDown
 import com.ucasoft.modernMoney.ui.pages.categories.CategoryDropDown
+import com.ucasoft.modernMoney.ui.pages.payee.PayeeDropDown
 import com.ucasoft.modernMoney.viewModels.CurrenciesExchangeViewModel
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionUiState
 import com.ucasoft.modernMoney.viewModels.transaction.TransactionViewModel
@@ -52,7 +53,7 @@ fun TransactionDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
 @Composable
 fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel: TransactionViewModel, detailsMode: DetailsMode) {
 
-    var selectedType by remember { mutableStateOf(transactionState.entity!!.type ?: TransactionType.EXPENSE) }
+    var selectedType by remember(transactionState.entity) { mutableStateOf(transactionState.entity!!.type ?: TransactionType.EXPENSE) }
 
     NavigationBar(
         modifier = Modifier.fillMaxWidth(),
@@ -107,6 +108,9 @@ fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel:
         viewModel.updateTransactionIncome(null, null)
     }
     if (selectedType != TransactionType.TRANSFER) {
+        PayeeDropDown(transactionState.entity.payee) {
+            viewModel.updateTransactionPayee(it)
+        }
         CurrencyAmount(
             "Payee Currency",
             transactionState.entity.payeeCurrencyCode,
@@ -114,10 +118,10 @@ fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel:
             if (selectedType == TransactionType.EXPENSE) transactionState.entity.expenseAccountCurrency?.currency?.code else transactionState.entity.incomeAccountCurrency?.currency?.code,
             if (selectedType == TransactionType.EXPENSE) transactionState.entity.expenseAmount else transactionState.entity.incomeAmount
         ) { currency, amount ->
-            viewModel.updateTransactionPayee(currency, amount)
+            viewModel.updateTransactionPayeeAmount(currency, amount)
         }
     } else {
-        viewModel.updateTransactionPayee(null, null)
+        viewModel.updateTransactionPayeeAmount(null, null)
     }
     CategoryDropDown(
         transactionState.entity.category,

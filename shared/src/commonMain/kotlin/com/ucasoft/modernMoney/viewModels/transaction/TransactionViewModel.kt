@@ -8,6 +8,7 @@ import com.ucasoft.modernMoney.db.repositories.CategoryRepository
 import com.ucasoft.modernMoney.db.repositories.PayeeRepository
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.model.Category
+import com.ucasoft.modernMoney.model.Payee
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionMapContext
 import com.ucasoft.modernMoney.model.toTransaction
@@ -87,7 +88,18 @@ class TransactionViewModel(
         }
     }
 
-    fun updateTransactionPayee(currencyCode: String?, amount: Double?) {
+    fun updateTransactionPayee(payee: Payee?) {
+        state.update {
+            it.copy(
+                entity = it.entity?.copy(
+                    payee = payee
+                )?.also { self -> self.id = it.entity.id },
+                isModified = true
+            )
+        }
+    }
+
+    fun updateTransactionPayeeAmount(currencyCode: String?, amount: Double?) {
         state.update {
             it.copy(
                 entity = it.entity?.copy(
