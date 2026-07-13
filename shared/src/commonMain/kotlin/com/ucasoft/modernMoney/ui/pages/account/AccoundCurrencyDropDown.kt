@@ -19,7 +19,7 @@ import com.ucasoft.modernMoney.model.AccountCurrency
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountCurrencyDropDown(account: Account?, current: AccountCurrency?, label: String = "Currency", onCurrencySelected: (AccountCurrency) -> Unit) {
+fun AccountCurrencyDropDown(account: Account?, current: AccountCurrency?, label: String = "Currency", isEmptyAllowed: Boolean = true, onCurrencySelected: (AccountCurrency?) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -39,6 +39,15 @@ fun AccountCurrencyDropDown(account: Account?, current: AccountCurrency?, label:
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
+            if (isEmptyAllowed) {
+                DropdownMenuItem(
+                    text = { Text("") },
+                    onClick = {
+                        onCurrencySelected(null)
+                        expanded = false
+                    }
+                )
+            }
             account?.currencies?.forEach {
                 DropdownMenuItem(
                     text = { Text(it.currency.name) },

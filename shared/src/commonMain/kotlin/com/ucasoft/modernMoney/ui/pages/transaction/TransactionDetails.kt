@@ -53,7 +53,7 @@ fun TransactionDetails(id: Long?, mode: DetailsMode = DetailsMode.VIEW) {
 @Composable
 fun ColumnScope.EditTransaction(transactionState: TransactionUiState, viewModel: TransactionViewModel, detailsMode: DetailsMode) {
 
-    var selectedType by remember(transactionState.entity) { mutableStateOf(transactionState.entity!!.type ?: TransactionType.EXPENSE) }
+    var selectedType by remember(transactionState.entity?.id) { mutableStateOf(transactionState.entity!!.type ?: TransactionType.EXPENSE) }
 
     NavigationBar(
         modifier = Modifier.fillMaxWidth(),
@@ -146,7 +146,7 @@ fun AccountCurrencyAmount(
     amount: Double?,
     otherAccountCurrencyCode: String?,
     otherAmount: Double?,
-    onCurrencyAmountChanged: (AccountCurrency, Double?) -> Unit
+    onCurrencyAmountChanged: (AccountCurrency?, Double?) -> Unit
 ) {
 
     var selectedAccount by remember(account) { mutableStateOf(account) }
@@ -163,10 +163,10 @@ fun AccountCurrencyAmount(
             modifier = Modifier.fillMaxWidth().padding(8.dp)
         ) {
             Text(title)
-            AccountDropDown(selectedAccount) {
+            AccountDropDown(selectedAccount, isEmptyAllowed = false) {
                 selectedAccount = it
             }
-            AccountCurrencyDropDown(selectedAccount, selectedCurrency) {
+            AccountCurrencyDropDown(selectedAccount, selectedCurrency, isEmptyAllowed = false) {
                 selectedCurrency = it
                 onCurrencyAmountChanged(it, inputAmount.toDoubleOrNull())
             }
@@ -174,7 +174,7 @@ fun AccountCurrencyAmount(
                 value = inputAmount,
                 onValueChange = {
                     inputAmount = it
-                    onCurrencyAmountChanged(selectedCurrency!!, inputAmount.toDoubleOrNull())
+                    onCurrencyAmountChanged(selectedCurrency, inputAmount.toDoubleOrNull())
                 },
                 label = { Text("Amount") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
