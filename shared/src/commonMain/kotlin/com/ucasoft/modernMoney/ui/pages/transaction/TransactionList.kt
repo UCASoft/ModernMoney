@@ -144,7 +144,7 @@ private fun TransactionLogo(transaction: Transaction) {
     ) {
         if (transaction.category?.logo != null) {
             Image(
-                transaction.category.logo,
+                transaction.category.logo!!,
                 "",
                 Modifier.size(32.dp),
                 contentScale = ContentScale.Fit

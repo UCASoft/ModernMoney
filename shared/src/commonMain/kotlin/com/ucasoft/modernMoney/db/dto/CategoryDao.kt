@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
 
     @Query("""
-        WITH RECURSIVE category(id, name, logo, parentId) as (
-            SELECT id, name, logo, parentId FROM categories WHERE parentId IS NULL
+        WITH RECURSIVE category(id, name, buildInLogoCode, uploadLogo, parentId) as (
+            SELECT id, name, buildInLogoCode, uploadLogo, parentId FROM categories WHERE parentId IS NULL
             UNION ALL
-            SELECT c.id, c.name, c.logo, c.parentId FROM categories c
+            SELECT c.id, c.name, c.buildInLogoCode, c.uploadLogo, c.parentId FROM categories c
             JOIN category ON category.id = c.parentId
         )
         SELECT * FROM category

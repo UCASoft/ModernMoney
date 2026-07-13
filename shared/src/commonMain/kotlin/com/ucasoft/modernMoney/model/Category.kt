@@ -5,13 +5,13 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.komm.abstractions.KOMMContextResolver
-import com.ucasoft.komm.annotations.KOMMMap
-import com.ucasoft.komm.annotations.MapConfiguration
-import com.ucasoft.komm.annotations.MapDefault
-import com.ucasoft.komm.annotations.MapFunction
-import com.ucasoft.komm.annotations.MapTargetDefault
-import com.ucasoft.modernMoney.ui.toByteArray
+import com.ucasoft.komm.annotations.*
 import com.ucasoft.modernMoney.ui.toImageBitmap
+import com.ucasoft.modern_money.shared.generated.resources.Res
+import com.ucasoft.modern_money.shared.generated.resources.allDrawableResources
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import com.ucasoft.modernMoney.db.model.Category as DbCategory
 
 @KOMMMap(
@@ -32,12 +32,20 @@ import com.ucasoft.modernMoney.db.model.Category as DbCategory
 )
 data class Category(
     override val name: String,
+    val buildInLogoCode: String? = null,
     @MapFunction("com.ucasoft.modernMoney.ui", "")
-    override val logo: ImageBitmap? = null,
+    val uploadLogo: ImageBitmap? = null,
 ) : TreeViewNode<Long>, KeyEntity<Long>, LogoEntity {
 
     var id: Long = 0L
         internal set
+
+    override val logo: ImageBitmap?
+        get() = uploadLogo ?: Res.allDrawableResources[buildInLogoCode]?.let {
+            runBlocking {
+                getDrawableResourceBytes(getSystemResourceEnvironment(), it)
+            }.toImageBitmap()
+        }
 
     val icon: ImageBitmap
         get() = logo ?: Icons.Default.Category.toImageBitmap()

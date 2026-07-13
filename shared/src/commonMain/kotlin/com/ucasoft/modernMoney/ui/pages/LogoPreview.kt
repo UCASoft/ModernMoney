@@ -59,7 +59,7 @@ fun LogoPreview(entity: LogoEntity?, imagePicker: () -> Unit, onLogoDelete: () -
             modifier = Modifier.weight(1f).padding(end = 8.dp),
             onClick = { imagePicker() }
         ) {
-            Text("Select Logo")
+            Text("Upload Logo")
         }
     }
 }

@@ -20,7 +20,8 @@ data class Category(
     val id: Long = 0L,
     val name: String,
     val parentId: Long? = null,
-    val logo: ByteArray? = null
+    val buildInLogoCode: String? = null,
+    val uploadLogo: ByteArray? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -30,7 +31,8 @@ data class Category(
         if (id != other.id) return false
         if (parentId != other.parentId) return false
         if (name != other.name) return false
-        if (!logo.contentEquals(other.logo)) return false
+        if (buildInLogoCode != other.buildInLogoCode) return false
+        if (!uploadLogo.contentEquals(other.uploadLogo)) return false
 
         return true
     }
@@ -39,7 +41,8 @@ data class Category(
         var result = id.hashCode()
         result = 31 * result + (parentId?.hashCode() ?: 0)
         result = 31 * result + name.hashCode()
-        result = 31 * result + (logo?.contentHashCode() ?: 0)
+        result = 31 * result + (buildInLogoCode?.hashCode() ?: 0)
+        result = 31 * result + (uploadLogo?.contentHashCode() ?: 0)
         return result
     }
 }

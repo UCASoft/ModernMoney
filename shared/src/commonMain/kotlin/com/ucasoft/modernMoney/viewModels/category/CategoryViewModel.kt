@@ -67,6 +67,17 @@ class CategoryViewModel(private val categoryDao: CategoryDao, id: Long?) : LogoE
         }
     }
 
+    fun updateLogo(buildInLogoCode: String?) {
+        viewModelScope.launch {
+            stateFlow.update {
+                it.copy(
+                    entity = it.entity?.copy(buildInLogoCode = buildInLogoCode, uploadLogo = null).also { self -> self!!.id = it.entity!!.id },
+                    isModified = true
+                )
+            }
+        }
+    }
+
     private suspend fun validate(category: Category, parentCategory: Category?): Map<String, String> {
         val errors = mutableMapOf<String, String>()
         when {
@@ -94,7 +105,7 @@ data class CategoryUiState(
 
     override fun updateLogo(logo: ImageBitmap?): CategoryUiState {
         return copy(
-            entity = entity?.copy(logo = logo).also { self -> self!!.id = entity!!.id },
+            entity = entity?.copy(buildInLogoCode = null, uploadLogo = logo).also { self -> self!!.id = entity!!.id },
             isModified = true
         )
     }
