@@ -40,12 +40,16 @@ data class Category(
     var id: Long = 0L
         internal set
 
-    override val logo: ImageBitmap?
-        get() = uploadLogo ?: Res.allDrawableResources[buildInLogoCode]?.let {
+    private val buildInLogo by lazy {
+        Res.allDrawableResources[buildInLogoCode]?.let {
             runBlocking {
                 getDrawableResourceBytes(getSystemResourceEnvironment(), it)
             }.toImageBitmap()
         }
+    }
+
+    override val logo: ImageBitmap?
+        get() = uploadLogo ?: buildInLogo
 
     val icon: ImageBitmap
         get() = logo ?: Icons.Default.Category.toImageBitmap()
