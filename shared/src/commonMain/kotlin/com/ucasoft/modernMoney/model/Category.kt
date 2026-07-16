@@ -82,6 +82,12 @@ data class Category(
     }
 }
 
+fun Category.flatten(): List<Category> =
+    listOf(this) + children.flatMap { it.flatten() }
+
+fun Iterable<Category>.flatten(): List<Category> =
+    flatMap { it.flatten() }
+
 class CategoryParentIdResolver(category: DbCategory?, context: CategoryMapContext) : KOMMContextResolver<CategoryMapContext, DbCategory?, Long?>(category, context) {
     override fun resolve() = context.parentId
 }

@@ -15,14 +15,6 @@ data class Category(
 
 fun List<Category>.toModernMoney() = buildCategoryTree(this)
 
-fun MMCategory.flatten(): List<MMCategory> {
-    return listOf(this) + this.children.flatMap { it.flatten() }
-}
-
-fun List<MMCategory>.flatten(): List<MMCategory> {
-    return this.flatMap { it.flatten() }
-}
-
 private fun buildCategoryTree(categories: List<Category>, parentCategoryId: Long? = null): List<MMCategory> {
     val result = categories.filter { it.parentCategoryId == parentCategoryId }.map { category ->
         MMCategory(

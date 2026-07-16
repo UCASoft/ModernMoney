@@ -1,6 +1,7 @@
 package com.ucasoft.modernMoney.db.repositories
 
 import com.ucasoft.modernMoney.db.dto.CategoryDao
+import com.ucasoft.modernMoney.model.flatten
 import com.ucasoft.modernMoney.model.toCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,6 +12,18 @@ class CategoryRepository(categoryDao: CategoryDao, scope: CoroutineScope) {
 
     val categories = categoryDao.allCategories()
         .map { it.associate { it.id to it.toCategory() } }
+        .stateIn(
+            scope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyMap()
+        )
+
+    val flatCategories = categories
+        .map { categories ->
+            categories.values
+                .flatten()
+                .associateBy { it.id }
+        }
         .stateIn(
             scope,
             started = SharingStarted.Eagerly,
