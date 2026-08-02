@@ -17,7 +17,7 @@ kotlin {
 
 android {
     namespace = "com.ucasoft.modernMoney"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.ucasoft.modernMoney"
@@ -30,7 +30,7 @@ android {
     buildFeatures {
         compose = true
     }
-    buildToolsVersion = "36.1.0"
+    buildToolsVersion = "37.0.0"
 }
 
 val syncKmpStrings = tasks.register<Copy>("syncKmpStrings") {

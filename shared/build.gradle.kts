@@ -13,12 +13,12 @@ kotlin {
     jvm()
     androidLibrary {
         namespace = "com.ucasoft.modernMoney.shared"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 29
         androidResources {
             enable = true
         }
-        buildToolsVersion = "36.1.0"
+        buildToolsVersion = "37.0.0"
     }
     sourceSets {
         commonMain {
