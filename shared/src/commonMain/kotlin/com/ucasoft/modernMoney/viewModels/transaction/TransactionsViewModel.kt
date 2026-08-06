@@ -2,7 +2,7 @@ package com.ucasoft.modernMoney.viewModels.transaction
 
 import androidx.lifecycle.viewModelScope
 import com.ucasoft.modernMoney.db.dto.TransactionDao
-import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
+import com.ucasoft.modernMoney.db.filters.TransactionFilter
 import com.ucasoft.modernMoney.db.repositories.AccountCurrencyRepository
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
@@ -10,16 +10,12 @@ import com.ucasoft.modernMoney.db.repositories.PayeeRepository
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionMapContext
 import com.ucasoft.modernMoney.model.toTransaction
+import com.ucasoft.modernMoney.viewModels.FilteredListViewModel
 import com.ucasoft.modernMoney.viewModels.ListState
-import com.ucasoft.modernMoney.viewModels.ListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import com.ucasoft.modernMoney.db.model.Transaction as DbTransaction
 
 class TransactionsViewModel(
     private val transactionDao: TransactionDao,
@@ -27,31 +23,20 @@ class TransactionsViewModel(
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
     private val payeeRepository: PayeeRepository
-): ListViewModel<Transaction, TransactionsUiState>() {
-
-    private val transactionFilter = MutableStateFlow<Long?>(null)
-
+): FilteredListViewModel<Transaction, TransactionsUiState, TransactionFilter>(
+    ::TransactionFilter
+) {
     @OptIn(ExperimentalCoroutinesApi::class)
     override val listState =
-        transactionFilter
-            .flatMapLatest { accountId ->
-                val flow = if (accountId == null) {
-                    transactionDao.allTransaction()
-                } else {
-                    transactionDao.transactionsByAccountId(accountId)
-                }
-                combineTransactions(flow)
+        filter
+            .flatMapLatest {
+                combineTransactions(transactionDao.transactionsByFilter(it))
             }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = TransactionsUiState(isLoading = true)
             )
-
-
-    fun setFilter(accountId: Long?) {
-        transactionFilter.value = accountId
-    }
 
     fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {

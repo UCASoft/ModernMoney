@@ -11,7 +11,7 @@ plugins {
 kotlin {
     jvmToolchain(21)
     jvm()
-    androidLibrary {
+    android {
         namespace = "com.ucasoft.modernMoney.shared"
         compileSdk = 37
         minSdk = 29
@@ -64,6 +64,8 @@ kotlin {
                 implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.json)
+
+                implementation(libs.koncierge.compose)
 
                 api(libs.compose.ui.test)
             }
