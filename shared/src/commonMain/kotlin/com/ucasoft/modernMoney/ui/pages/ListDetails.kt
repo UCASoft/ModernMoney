@@ -1,10 +1,16 @@
 package com.ucasoft.modernMoney.ui.pages
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -14,8 +20,8 @@ import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -57,7 +63,7 @@ inline fun <reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity
         listContent = { items, viewModel, navigator, scope ->
             val listState = rememberLazyListState()
             var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
-            var draggedOffset by remember { mutableStateOf(0f) }
+            var draggedOffset by remember { mutableFloatStateOf(0f) }
             LazyColumn(
                 state = listState,
                 modifier = Modifier
@@ -124,6 +130,7 @@ inline fun <reified VM: ReorderingViewModel<T, S>, S: ListState<T>, T: KeyEntity
                 }
             }
         },
+        null,
         detailContent
     )
 }
@@ -168,6 +175,7 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
                 }
             }
         },
+        null,
         detailContent
     )
 }
@@ -218,15 +226,17 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T, K> TreeViewDeta
                 }
             }
         },
+        null,
         detailContent
     )
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K> BaseListDetails(
     crossinline onAddClickEvent: suspend (ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>) -> Unit,
     crossinline listContent: @Composable (List<T>, VM, ThreePaneScaffoldNavigator<Pair<K?, DetailsMode>>, CoroutineScope) -> Unit,
+    noinline filterDialogContent: (@Composable (VM, setOnApply: (() -> Unit) -> Unit) -> Unit)? = null,
     crossinline detailContent: @Composable (K?, DetailsMode) -> Unit
 ) {
 
@@ -249,12 +259,22 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
     )
 
     val events = LocalPrimaryActionEvents.current
+    val addEvent = events.onAddEvent
+    val filterEvent = events.onFilterEvent
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
-    LaunchedEffect(events, lifecycleOwner) {
-        events.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
+    LaunchedEffect(addEvent, lifecycleOwner) {
+        addEvent.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
             onAddClickEvent.invoke(navigator)
+        }
+    }
+
+    var showFilterDialog by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(filterEvent, lifecycleOwner) {
+        filterEvent.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
+            showFilterDialog = true
         }
     }
 
@@ -275,6 +295,39 @@ inline fun <reified VM: ListViewModel<T, S>, S: ListState<T>, T: KeyEntity<K>, K
                     }
                 } else {
                     listContent(state.items, viewModel, navigator, scope)
+
+                    if (showFilterDialog && filterDialogContent != null) {
+
+                        var applyFilter by remember { mutableStateOf({}) }
+
+                        AlertDialog(
+                            onDismissRequest = { showFilterDialog = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    applyFilter()
+                                    showFilterDialog = false
+                                }) {
+                                    Text("Ok")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = {
+                                    showFilterDialog = false
+                                }) {
+                                    Text("Cancel")
+                                }
+                            },
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            title = {
+                                Text("Filter")
+                            },
+                            text = {
+                                filterDialogContent(viewModel) {
+                                    applyFilter = it
+                                }
+                            }
+                        )
+                    }
                 }
             }
         },

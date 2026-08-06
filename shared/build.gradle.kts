@@ -11,7 +11,7 @@ plugins {
 kotlin {
     jvmToolchain(21)
     jvm()
-    androidLibrary {
+    android {
         namespace = "com.ucasoft.modernMoney.shared"
         compileSdk = 37
         minSdk = 29

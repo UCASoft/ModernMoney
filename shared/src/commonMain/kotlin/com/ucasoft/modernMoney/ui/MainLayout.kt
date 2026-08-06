@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -29,7 +30,15 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
 
     val currentDestination by navController.currentBackStackEntryFlow.collectAsState(null)
 
-    val primaryActionEvents = remember { MutableSharedFlow<Unit>() }
+    val addEvent = remember { MutableSharedFlow<Unit>() }
+    val filterEvent = remember { MutableSharedFlow<Unit>() }
+    val primaryActionEvents = remember {
+        PrimaryActionEvents(
+            onAddEvent = addEvent,
+            onFilterEvent = filterEvent
+        )
+    }
+
     val scope = rememberCoroutineScope()
 
     NavigationSuiteScaffold(
@@ -60,7 +69,7 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                 modifier = Modifier.padding(start = 20.dp),
                 onClick = {
                     scope.launch {
-                        primaryActionEvents.emit(Unit)
+                        addEvent.emit(Unit)
                     }
                 }
             ) {
@@ -78,7 +87,21 @@ fun MainLayout(screens: List<Screen>, settingsScreen: Screen) {
                     title = {
                         OutlinedTextField(
                             onValueChange = {},
-                            value = ""
+                            value = "",
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            filterEvent.emit(Unit)
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.FilterList,
+                                        ""
+                                    )
+                                }
+                            }
                         )
                     },
                     navigationIcon = {
