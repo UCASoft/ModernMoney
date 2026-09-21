@@ -2,6 +2,7 @@ package com.ucasoft.modernMoney.di
 
 import com.ucasoft.modernMoney.network.CurrencyClient
 import com.ucasoft.modernMoney.network.CurrencyExchangeClient
+import com.ucasoft.modernMoney.network.FrankfurterExchangeClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -27,9 +28,15 @@ val networkModule = module {
                     },
                     contentType = ContentType.Text.Html
                 )
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                    },
+                    contentType = ContentType.Application.Json
+                )
             }
         }
     }
     singleOf(::CurrencyClient)
-    singleOf(::CurrencyExchangeClient)
+    singleOf<CurrencyExchangeClient>(::FrankfurterExchangeClient)
 }
