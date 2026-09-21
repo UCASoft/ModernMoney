@@ -3,12 +3,7 @@ package com.ucasoft.modernMoney.ui.pages.transaction
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -26,16 +21,12 @@ import com.ucasoft.components.scrollable.ScrollableLazyColumn
 import com.ucasoft.modernMoney.model.Transaction
 import com.ucasoft.modernMoney.model.TransactionType
 import com.ucasoft.modernMoney.ui.EntityCard
-import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.HazeInput
+import dev.chrisbanes.haze.blur.hazeBlur
 import dev.chrisbanes.haze.blur.materials.HazeMaterials
-import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import kotlin.time.Clock
 
 @Composable
@@ -56,11 +47,10 @@ fun TransactionList(
         transactions.groupBy { it.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).date }.forEach { group ->
             stickyHeader {
                 Box(
-                    modifier = Modifier.fillMaxWidth().hazeEffect(hazeState) {
-                        blurEffect {
-                            style = blurStyle
-                        }
-                    }
+                    modifier = Modifier.fillMaxWidth().hazeBlur(
+                        HazeInput.Sources(hazeState),
+                        blurStyle
+                    )
                 ) {
                     Text(
                         text = group.key.format(LocalDate.Formats.ISO),
