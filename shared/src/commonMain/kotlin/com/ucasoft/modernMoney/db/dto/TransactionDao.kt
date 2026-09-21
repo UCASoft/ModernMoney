@@ -8,6 +8,7 @@ import androidx.room.Update
 import com.ucasoft.modernMoney.db.filters.TransactionFilter
 import com.ucasoft.modernMoney.db.model.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 @Dao
 interface TransactionDao {
@@ -21,8 +22,13 @@ interface TransactionDao {
             filter.onlyAccountCurrencies,
             filter.currencyCode,
             filter.categoryId,
-            filter.includeChildren
+            filter.includeChildren,
+            filter.from,
+            filter.to
         )
+
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun transactionById(id: Long): Flow<Transaction>
 
     @Query(
         """
@@ -53,14 +59,6 @@ interface TransactionDao {
             OR (incomeCurrency.currencyCode = :currencyCode AND (:onlyAccountCurrencies = 0 OR incomeCurrency.accountId = :accountId))
             OR (t.payeeCurrencyCode = :currencyCode AND (:onlyAccountCurrencies = 0 OR t.payeeId = :accountId))
         )
-        /*AND (
-            :fromDateTime IS NULL
-            OR t.dateTime >= :fromDateTime
-        )
-        AND (
-            :toDateTime IS NULL
-            OR t.dateTime <= :toDateTime
-        )*/
         AND (
             :categoryId IS NULL
             OR t.categoryId = :categoryId
@@ -68,6 +66,14 @@ interface TransactionDao {
                 :includeChildren = 1
                 AND t.categoryId IN (SELECT id FROM selected_categories)
             )
+        )
+        AND (
+            :from IS NULL
+            OR t.dateTime >= :from
+        )
+        AND (
+            :to IS NULL
+            OR t.dateTime <= :to
         )
         /*AND (
             :payeeId IS NULL
@@ -85,11 +91,10 @@ interface TransactionDao {
         onlyAccountCurrencies: Boolean,
         currencyCode: String?,
         categoryId: Long?,
-        includeChildren: Boolean
+        includeChildren: Boolean,
+        from: Instant?,
+        to: Instant?
     ): Flow<List<Transaction>>
-
-    @Query("SELECT * FROM transactions WHERE id = :id")
-    fun transactionById(id: Long): Flow<Transaction>
 
     @Insert
     suspend fun insert(transaction: Transaction): Long

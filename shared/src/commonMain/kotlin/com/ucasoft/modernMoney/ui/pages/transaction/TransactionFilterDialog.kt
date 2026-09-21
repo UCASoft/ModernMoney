@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucasoft.components.datatime.DateInput
 import com.ucasoft.modernMoney.db.filters.TransactionFilter
 import com.ucasoft.modernMoney.db.repositories.AccountRepository
 import com.ucasoft.modernMoney.db.repositories.CategoryRepository
@@ -106,6 +108,24 @@ fun TransactionFilterDialog(
                 null
             )
             Text("Include children categories")
+        }
+
+        Row {
+            DateInput(
+                value = currentFilter.from,
+            ) {
+                updateFilter {
+                    copy(from = it)
+                }
+            }
+            DateInput(
+                value = currentFilter.to,
+                wholeDay = true
+            ) {
+                updateFilter {
+                    copy(to = it)
+                }
+            }
         }
     }
 }
