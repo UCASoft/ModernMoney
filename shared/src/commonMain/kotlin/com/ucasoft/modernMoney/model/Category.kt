@@ -65,22 +65,24 @@ data class Category(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
+        if (javaClass != other?.javaClass) return false
 
         other as Category
 
-        if (name != other.name) return false
-        if (icon != other.icon) return false
         if (id != other.id) return false
+        if (name != other.name) return false
+        if (buildInLogoCode != other.buildInLogoCode) return false
+        if (uploadLogo != other.uploadLogo) return false
         if (children != other.children) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + icon.hashCode()
-        result = 31 * result + id.hashCode()
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + (buildInLogoCode?.hashCode() ?: 0)
+        result = 31 * result + (uploadLogo?.hashCode() ?: 0)
         result = 31 * result + children.hashCode()
         return result
     }
