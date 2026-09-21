@@ -4,6 +4,7 @@
     <string name="language">Язык</string>
     <string name="protect">Защита</string>
     <string name="pin_code">PIN-код</string>
+    <string name="biometry">Биометрия</string>
     <string name="currencies">Валюты</string>
     <string name="import_title">Импорт</string>
     <string name="import_summary">Выберите источник импорта данных</string>

@@ -19,10 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucasoft.modernMoney.model.Account
 import com.ucasoft.modernMoney.model.AccountCard
 import com.ucasoft.modernMoney.model.AccountCurrency
 import com.ucasoft.modernMoney.ui.EntityCard
+import com.ucasoft.modernMoney.viewModels.SettingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,19 +119,20 @@ fun LazyItemScope.AccountListItem(account: Account, draggedOffset: Float?, onCli
 
 @Composable
 private fun CurrenciesColumn(accountCurrencies: List<AccountCurrency>) {
+    val settings = koinViewModel<SettingsViewModel>()
+    val state by settings.state.collectAsStateWithLifecycle()
     Column(
         horizontalAlignment = Alignment.End,
     ) {
+        val mainCurrencyCode = state.currency.homeCurrency?.code
+
         accountCurrencies.sortedBy {
-            if (it.currency.code == "CZK") 0 else 1
-        }.forEachIndexed { index, accountCurrency ->
-
-            val mainCurrencyIndex = 0
-
+            if (it.currency.code == mainCurrencyCode) 0 else 1
+        }.forEach {
             Text(
-                text = "${accountCurrency.currency.symbol} ${accountCurrency.balance}",
-                fontWeight = if (index == mainCurrencyIndex) FontWeight.Bold else FontWeight.Normal,
-                fontSize = if (index == mainCurrencyIndex) 12.sp else 11.sp
+                text = "${it.currency.symbol} ${it.balance}",
+                fontWeight = if (it.currency.code == mainCurrencyCode) FontWeight.Bold else FontWeight.Normal,
+                fontSize = if (it.currency.code == mainCurrencyCode) 12.sp else 11.sp
             )
         }
     }

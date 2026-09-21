@@ -4,6 +4,7 @@
     <string name="language">Language</string>
     <string name="protect">Protect</string>
     <string name="pin_code">Pin Code</string>
+    <string name="biometry">Biometry</string>
     <string name="currencies">Currencies</string>
     <string name="import_title">Import Data</string>
     <string name="import_summary">Select a source to import your data</string>
