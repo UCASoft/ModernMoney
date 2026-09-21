@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,38 +26,15 @@ import kotlin.time.Instant
 @Composable
 fun DateTimeRow(value: Instant, onValueChange: (Instant) -> Unit) {
 
-    var showDataPicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState(value.toEpochMilliseconds())
-
     var showTimePicker by remember { mutableStateOf(false) }
     val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
     val timePickerState = rememberTimePickerState(localDateTime.hour, localDateTime.minute, true)
 
-
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box(
-            modifier = Modifier.weight(1f).padding(8.dp, 4.dp)
-        ) {
-            OutlinedTextField(
-                value = value.format(DateTimeComponents.Format {
-                    year(); char('-'); monthNumber(); char('-'); day()
-                }),
-                onValueChange = {},
-                label = { Text("Date") },
-                readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = {
-                        showDataPicker = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Select date"
-                        )
-                    }
-                }
-            )
+        DateInput(value, Modifier.weight(1f).padding(8.dp, 4.dp)) {
+            onValueChange(value.withDate(it.toEpochMilliseconds()))
         }
         Box(
             modifier = Modifier.weight(1f).padding(8.dp, 4.dp)
@@ -80,31 +56,6 @@ fun DateTimeRow(value: Instant, onValueChange: (Instant) -> Unit) {
                         )
                     }
                 }
-            )
-        }
-    }
-    if (showDataPicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDataPicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    val selectedDate = datePickerState.selectedDateMillis
-                    if (selectedDate != null) {
-                        onValueChange(value.withDate(selectedDate))
-                    }
-                    showDataPicker = false
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDataPicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            DatePicker(
-                state = datePickerState
             )
         }
     }
