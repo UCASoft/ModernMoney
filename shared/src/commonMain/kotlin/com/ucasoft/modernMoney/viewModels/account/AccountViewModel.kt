@@ -52,14 +52,18 @@ class AccountViewModel(
         }
         if (id != null) {
             viewModelScope.launch {
-                accountDao.accountById(id)
-                    .combine(bankRepository.banks) { account, banks ->
-                        account to banks
+                    combine(accountDao.accountById(id), bankRepository.banks, accountCurrencyDao.currencyBalances()) { account, banks, balances ->
+                        account to AccountMapContext(banks, balances.associate { it.currencyId to it.balance })
                     }
-                    .collect { (account, banks) ->
+                    .collect { (account, context) ->
                         state.update {
                             it.copy(
-                                entity = account.toAccount(AccountMapContext(banks)), isLoading = false
+                                entity = account.toAccount(context).also {
+                                    it.currencies.forEach {
+                                        it.balance = context.balances[it.id] ?: 0.0
+                                    }
+                                },
+                                isLoading = false
                             )
                         }
                     }

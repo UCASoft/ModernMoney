@@ -4,7 +4,6 @@ import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.komm.annotations.MapEmbedded
-import com.ucasoft.komm.annotations.MapName
 import com.ucasoft.komm.annotations.MapTargetDefault
 import com.ucasoft.modernMoney.db.model.AccountCurrency as DbAccountCurrency
 import com.ucasoft.modernMoney.db.model.AccountCurrencyWithCurrency

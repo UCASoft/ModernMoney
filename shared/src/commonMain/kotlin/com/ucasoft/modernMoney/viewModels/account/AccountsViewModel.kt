@@ -22,9 +22,12 @@ class AccountsViewModel(
     accountCurrencyDao: AccountCurrencyDao
 ) : ReorderingViewModel<Account, AccountsUiState>() {
 
-    override val listState = accountDao.allAccounts()
-        .combine(bankRepository.banks) { accounts, banks -> accounts to banks }
-        .combine(accountCurrencyDao.currencyBalances()) { (accounts, banks), balances ->
+    override val listState =
+        combine(
+            accountDao.allAccounts(),
+            bankRepository.banks,
+            accountCurrencyDao.currencyBalances()
+        ) { accounts, banks, balances ->
             val balanceByCurrencyId = balances.associate { it.currencyId to it.balance }
             AccountsUiState(accounts.map {
                 it.toAccount(AccountMapContext(banks)).also { account ->

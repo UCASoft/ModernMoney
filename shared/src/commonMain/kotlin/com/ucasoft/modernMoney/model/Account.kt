@@ -44,5 +44,6 @@ class BankResolver(account: FullAccount, context: AccountMapContext) : KOMMConte
 }
 
 data class AccountMapContext(
-    val banks: Map<Long, Bank>
+    val banks: Map<Long, Bank>,
+    val balances: Map<Long, Double> = emptyMap()
 )
