@@ -102,10 +102,6 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspCommonMainMetadata", libs.komm.processor)
     add("kspCommonMainMetadata", libs.komm.plugins.interable)
-    /*add("kspJvm", libs.komm.processor)
-    add("kspJvm", libs.komm.plugins.interable)
-    add("kspAndroid", libs.komm.processor)
-    add("kspAndroid", libs.komm.plugins.interable)*/
 }
 
 room {
