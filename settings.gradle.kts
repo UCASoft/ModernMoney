@@ -13,5 +13,6 @@ plugins {
 rootProject.name = "modern-money"
 
 include(":desktop")
+include(":plugin-interface-aidl")
 include(":phone")
 include(":shared")

@@ -31,6 +31,7 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "android" }
+android-library = { id = "com.android.library", version.ref = "android" }
 android-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
