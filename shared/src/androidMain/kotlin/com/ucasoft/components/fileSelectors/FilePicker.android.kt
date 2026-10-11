@@ -1,4 +1,4 @@
-package com.ucasoft.modernMoney.ui
+package com.ucasoft.components.fileSelectors
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,14 +13,14 @@ import androidx.compose.ui.platform.LocalContext
 fun <I> rememberFilePicker(
     contract: ActivityResultContract<I, Uri?>,
     mime: I,
-    onFileSelected: (ByteArray?) -> Unit
+    onFileSelected: (SelectedFile<*>?) -> Unit
 ): () -> Unit {
     val context = LocalContext.current
     val currentOnFileSelected by rememberUpdatedState(onFileSelected)
     val launcher = rememberLauncherForActivityResult(
         contract = contract
     ) { uri ->
-        currentOnFileSelected(uri?.let { context.contentResolver.openInputStream(it)?.readBytes() })
+        currentOnFileSelected(uri?.let { AndroidSelectedFile(context, it) })
     }
     return remember(launcher, mime) {
         {

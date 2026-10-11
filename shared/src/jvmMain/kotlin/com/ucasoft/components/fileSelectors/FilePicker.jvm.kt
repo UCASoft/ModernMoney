@@ -1,4 +1,4 @@
-package com.ucasoft.modernMoney.ui
+package com.ucasoft.components.fileSelectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -7,7 +7,7 @@ import java.awt.Frame
 import java.io.File
 
 @Composable
-fun rememberFilePicker(title: String, extension: String, onFileSelected: (ByteArray?) -> Unit): () -> Unit {
+fun rememberFilePicker(title: String, extension: String, onFileSelected: (SelectedFile<*>?) -> Unit): () -> Unit {
     return remember {
         {
             val dialog = FileDialog(null as Frame?, title, FileDialog.LOAD)
@@ -16,7 +16,7 @@ fun rememberFilePicker(title: String, extension: String, onFileSelected: (ByteAr
             val file = dialog.file
             val dir = dialog.directory
             if (file != null) {
-                onFileSelected(File(dir, file).readBytes())
+                onFileSelected(JvmSelectedFile(File(dir, file)))
             } else {
                 onFileSelected(null)
             }

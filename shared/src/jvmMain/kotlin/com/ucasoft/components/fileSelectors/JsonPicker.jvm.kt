@@ -1,8 +1,8 @@
-package com.ucasoft.modernMoney.ui
+package com.ucasoft.components.fileSelectors
 
 import androidx.compose.runtime.Composable
 
 @Composable
-actual fun rememberJsonPicker(onJsonSelected: (ByteArray?) -> Unit): () -> Unit {
+actual fun rememberJsonPicker(onJsonSelected: (SelectedFile<*>?) -> Unit): () -> Unit {
     return rememberFilePicker("Select Money Backup", "*.json", onJsonSelected)
 }
