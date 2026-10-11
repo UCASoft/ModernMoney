@@ -6,6 +6,9 @@ import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapConvert
 import com.ucasoft.komm.annotations.MapEmbedded
 import com.ucasoft.modernMoney.db.model.FullAccount
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportAccount
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportAccountCurrency
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportCard
 import com.ucasoft.modernMoney.db.model.Account as DbAccount
 
 @KOMMMap(
@@ -47,3 +50,19 @@ data class AccountMapContext(
     val banks: Map<Long, Bank>,
     val balances: Map<Long, Double> = emptyMap()
 )
+
+fun ImportAccount.toModernMoney(backupCurrencies: List<ImportAccountCurrency>, currencies: Set<Currency>, banks: List<Bank>, cards: List<ImportCard>): Account {
+
+    val bank = banks.firstOrNull { it.id == bankId?.toLong() }
+    return Account(
+        name = name,
+        currencies = backupCurrencies.filter { it.accountId == id }.map { currency ->
+            AccountCurrency(id.toLong(), currencies.first { it.code == currency.currencyCode.trim() })
+        },
+        bank = bank,
+        cards = cards.filter { it.accountId == id }.map { it.toAccountCard() },
+        order = order
+    ).also {
+        it.id = id.toLong()
+    }
+}

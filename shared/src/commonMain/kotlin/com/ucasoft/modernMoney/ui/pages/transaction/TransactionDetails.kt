@@ -211,7 +211,7 @@ fun CurrencyAmount(
     onCurrencyAmountChanged: (String?, Double?) -> Unit
 ) {
 
-    var selectedCurrencyCode by remember { mutableStateOf(currencyCode) }
+    var selectedCurrencyCode by remember(currencyCode) { mutableStateOf(currencyCode) }
     var inputAmount by remember(amount) { mutableStateOf(amount?.toString() ?: "") }
 
     val exchangeState by koinViewModel<CurrenciesExchangeViewModel>().state.collectAsStateWithLifecycle()

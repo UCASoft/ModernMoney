@@ -8,4 +8,6 @@ class JvmSelectedFile(
     override val bytes by lazy {
         descriptor.readBytes()
     }
+
+    override fun toImportSource() = descriptor
 }

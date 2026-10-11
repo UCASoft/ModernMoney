@@ -13,4 +13,6 @@ class AndroidSelectedFile(
             inputStream.readBytes()
         } ?: ByteArray(0)
     }
+
+    override fun toImportSource() = context.contentResolver.openFileDescriptor(descriptor, "r")
 }

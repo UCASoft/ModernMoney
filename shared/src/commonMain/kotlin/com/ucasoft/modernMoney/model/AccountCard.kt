@@ -1,14 +1,17 @@
 package com.ucasoft.modernMoney.model
 
 import com.ucasoft.komm.abstractions.KOMMContextResolver
+import com.ucasoft.komm.abstractions.KOMMConverter
 import com.ucasoft.komm.annotations.KOMMMap
 import com.ucasoft.komm.annotations.MapConfiguration
+import com.ucasoft.komm.annotations.MapConvert
 import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.komm.annotations.MapTargetDefault
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportCard
 import com.ucasoft.modernMoney.db.model.AccountCard as DbAccountCard
 
 @KOMMMap(
-    from = [DbAccountCard::class],
+    from = [DbAccountCard::class, ImportCard::class],
     to = [DbAccountCard::class],
     context = AccountIdContext::class,
     config = MapConfiguration(
@@ -24,6 +27,7 @@ import com.ucasoft.modernMoney.db.model.AccountCard as DbAccountCard
     default = MapDefault(AccountCardResolver::class)
 )
 data class AccountCard(
+    @MapConvert<ImportCard, AccountCard, TypeConverter>(TypeConverter::class, "type")
     val type: String,
     val number: String
 ) {
@@ -44,3 +48,10 @@ open class AccountIdResolver<T, C: AccountIdContext>(
 open class AccountIdContext(
     val accountId: Long
 )
+
+class TypeConverter(source: ImportCard) : KOMMConverter<ImportCard, String, AccountCard, String>(source) {
+    override fun convert(sourceMember: String) = when(sourceMember) {
+        "master" -> "mastercard"
+        else -> sourceMember
+    }
+}

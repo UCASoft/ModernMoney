@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import com.ucasoft.modernMoney.model.KeyEntity
 import com.ucasoft.modernMoney.model.LogoEntity
-import com.ucasoft.modernMoney.ui.rememberImagePicker
+import com.ucasoft.components.fileSelectors.rememberImagePicker
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modernMoney.viewModels.LogoDetailsState
 import com.ucasoft.modernMoney.viewModels.LogoEntityViewModel
@@ -26,7 +26,7 @@ inline fun <K, T, S: LogoDetailsState<T>, reified VM: LogoEntityViewModel<T, S>>
         { state, viewModel, mode ->
             val imagePicker = rememberImagePicker {
                 if (it != null) {
-                    viewModel.updateLogo(it.toImageBitmap())
+                    viewModel.updateLogo(it.bytes.toImageBitmap())
                 }
             }
             editContent(state, viewModel, mode)

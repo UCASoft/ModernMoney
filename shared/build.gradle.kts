@@ -23,6 +23,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                api(project(":plugin-interface"))
                 api(libs.compose.runtime)
                 api(libs.compose.foundation)
                 api(libs.compose.material3)

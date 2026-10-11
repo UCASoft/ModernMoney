@@ -6,6 +6,7 @@ import com.ucasoft.komm.annotations.MapConfiguration
 import com.ucasoft.komm.annotations.MapDefault
 import com.ucasoft.komm.annotations.MapName
 import com.ucasoft.modernMoney.db.model.AccountCurrency
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportAccountCurrency
 import com.ucasoft.modernMoney.db.model.Currency as DbCurrency
 import com.ucasoft.modernMoney.network.model.Currency as NetworkCurrency
 
@@ -37,3 +38,5 @@ data class Currency(
 class VisibleResolver(currency: Currency?) : KOMMResolver<Currency, Boolean> (currency) {
     override fun resolve() = true
 }
+
+fun ImportAccountCurrency.toModernMoney(remote: List<Currency>) = remote.first { it.code == currencyCode.trim() }

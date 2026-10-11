@@ -1,103 +1,109 @@
-package com.ucasoft.modernMoney.imports.money
+package com.ucasoft.modernMoney.imports
 
 import androidx.room.execSQL
 import androidx.room.immediateTransaction
 import androidx.room.useWriterConnection
+import com.ucasoft.components.fileSelectors.SelectedFile
 import com.ucasoft.modernMoney.db.ModernMoneyDatabase
-import com.ucasoft.modernMoney.imports.ImportProvider
-import com.ucasoft.modernMoney.imports.ImportStatus
-import com.ucasoft.modernMoney.imports.PercentageProgress
-import com.ucasoft.modernMoney.imports.money.model.*
-import com.ucasoft.modernMoney.imports.money.model.Account
-import com.ucasoft.modernMoney.imports.money.model.Bank
-import com.ucasoft.modernMoney.imports.money.model.Category
-import com.ucasoft.modernMoney.imports.money.model.Currency
-import com.ucasoft.modernMoney.imports.money.model.Payee
-import com.ucasoft.modernMoney.imports.money.model.Transaction
-import com.ucasoft.modernMoney.imports.money.model.TransactionMapContext
-import com.ucasoft.modernMoney.model.*
+import com.ucasoft.modernMoney.model.AccountIdContext
+import com.ucasoft.modernMoney.model.Category
+import com.ucasoft.modernMoney.model.CategoryMapContext
+import com.ucasoft.modernMoney.model.Currency
+import com.ucasoft.modernMoney.model.ImportTransactionMapContext
+import com.ucasoft.modernMoney.model.flatten
+import com.ucasoft.modernMoney.model.toAccount
+import com.ucasoft.modernMoney.model.toAccountCard
+import com.ucasoft.modernMoney.model.toAccountCurrency
+import com.ucasoft.modernMoney.model.toBank
+import com.ucasoft.modernMoney.model.toCategory
+import com.ucasoft.modernMoney.model.toCurrency
+import com.ucasoft.modernMoney.model.toModernMoney
+import com.ucasoft.modernMoney.model.toPayee
+import com.ucasoft.modernMoney.model.toTransaction
 import com.ucasoft.modernMoney.network.CurrencyClient
+import com.ucasoft.modernMoney.plugin.interfaces.PluginInfo
+import com.ucasoft.modernMoney.plugin.interfaces.PluginManager
+import com.ucasoft.modernMoney.plugin.interfaces.imports.ImportPluginCallback
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportPluginData
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.ucasoft.modernMoney.model.Category as MMCategory
-import com.ucasoft.modernMoney.model.Currency as MMCurrency
 
-data class MoneyJsonProvider(
-    override val name: String,
-    override val description: String,
-) : ImportProvider<PercentageProgress> {
-
+class ImportPluginProcessor: KoinComponent {
+    private val pluginManager by inject<PluginManager>()
     private val dataBase by inject<ModernMoneyDatabase>()
     private val currencyClient by inject<CurrencyClient>()
 
-    override fun runImport(bytes: ByteArray?): Flow<ImportStatus<PercentageProgress>> {
+    fun runImport(pluginInfo: PluginInfo, selectedFile: SelectedFile<*>, scope: CoroutineScope): Flow<ImportStatus<PercentageProgress>> {
         val progress = PercentageProgress()
-        return flow {
-            emit(ImportStatus.Loading(progress.flow))
+        var importPluginData = ImportPluginData()
+        return channelFlow {
+            val result = CompletableDeferred<String?>()
+            send(ImportStatus.Loading(progress.flow))
             progress.emit("Starting import..." to 0)
-            progress.emit("Picking file..." to 2)
-            if (bytes == null || bytes.isEmpty()) {
-                emit(ImportStatus.Error("No file selected"))
-                emit(ImportStatus.Idle())
-                return@flow
-            }
             progress.emit("Loading currencies..." to 5)
             val remoteCurrencies = currencyClient
                 .fetchCurrencies()
                 .map { it.toCurrency() }
-            progress.emit("Importing data..." to 10)
-            performJsonImport(dataBase, remoteCurrencies, bytes, progress)
-            progress.emit("Finalizing import..." to 100)
-            emit(ImportStatus.Success())
+
+            pluginManager.initImportPlugin(pluginInfo, selectedFile.toImportSource(), object : ImportPluginCallback {
+                override fun onProgress(phase: String?, message: String?, percent: Int) {
+                    scope.launch {
+                        progress.emit((message ?: phase ?: "Importing data...") to 5 + percent / 2)
+                    }
+                }
+
+                override fun onDataChunk(chunk: ImportPluginData) {
+                    importPluginData += chunk
+                }
+
+                override fun onCompleted() {
+                    result.complete(null)
+                }
+
+                override fun onError(message: String) {
+                    result.complete(message)
+                }
+            })
+
+            val errorMessage = result.await()
+            if (errorMessage != null) {
+                send(ImportStatus.Error(errorMessage))
+                return@channelFlow
+            }
+
+            processImport(dataBase, remoteCurrencies, importPluginData, progress)
+
+            send(ImportStatus.Success())
         }
     }
 
-    private suspend fun performJsonImport(
+    private suspend fun processImport(
         database: ModernMoneyDatabase,
-        remoteCurrencies: List<MMCurrency>,
-        data: ByteArray,
+        remoteCurrencies: List<Currency>,
+        data: ImportPluginData,
         progressFlow: PercentageProgress
     ) {
-        val json = Json { ignoreUnknownKeys = true }
-        progressFlow.emit("Processing data..." to 12)
-        val backup = json.decodeFromString(Backup.serializer(), data.decodeToString())
-
-        progressFlow.emit("Parsing data..." to 15)
-        val backupBanks = backup.getTableRecords<Bank>()
-        val backupCurrencies = backup.getTableRecords<Currency>()
-        val backupAccounts = backup.getTableRecords<Account>()
-        val backupAccountBanks = backup.getTableRecords<AccountBank>()
-        val backupCards = backup.getTableRecords<Card>()
-        val backupCategories = backup.getTableRecords<Category>()
-        val backupTransactions = backup.getTableRecords<Transaction>()
-        val backupPayees = backup.getTableRecords<Payee>()
-
-        val banks = backupBanks.map { it.toBank() }
-        val currencies = backupCurrencies.map { it.toModernMoney(remoteCurrencies) }.toSet()
-        val accounts = backupAccounts.map {
+        val banks = data.banks.map { it.toBank() }
+        val currencies = data.accountCurrencies.map { it.toModernMoney(remoteCurrencies) }.toSet()
+        val accounts = data.accounts.map {
             it.toModernMoney(
-                backupCurrencies,
+                data.accountCurrencies,
                 currencies,
                 banks,
-                backupAccountBanks,
-                backupCards
+                data.cards
             )
         }
-        val categories = backupCategories.toModernMoney()
+        val categories = data.categories.toModernMoney()
         val flatCategories = categories.flatten()
-        val payees = backupPayees.map { it.toPayee() }
+        val payees = data.payees.map { it.toPayee() }
 
-        progressFlow.setupAdvance(15, 95, DELETE_STATEMENTS.size +
-                banks.size +
-                currencies.size +
-                accounts.size +
-                accounts.sumOf { it.currencies.size + it.cards.size } +
-                flatCategories.size +
-                payees.size +
-                backupTransactions.size)
+        progressFlow.setupAdvance(55, 95, DELETE_STATEMENTS.size + data.size)
 
         database.useWriterConnection { connection ->
             progressFlow.advance("Removing old data...")
@@ -140,10 +146,10 @@ data class MoneyJsonProvider(
         importCategories(database, categories, progress = progressFlow)
         val accountCurrencies = database.accountCurrencyDao.accountCurrencies().first()
 
-        val transactions = backupTransactions.map {
+        val transactions = data.transactions.map {
             it.toTransaction(
-                TransactionMapContext(
-                    backupCurrencies,
+                ImportTransactionMapContext(
+                    data.accountCurrencies,
                     accountCurrencies,
                     flatCategories,
                     payees
@@ -164,7 +170,7 @@ data class MoneyJsonProvider(
 
     private suspend fun importCategories(
         database: ModernMoneyDatabase,
-        categories: List<MMCategory>,
+        categories: List<Category>,
         parentId: Long? = null,
         progress: PercentageProgress
     ) {
@@ -177,7 +183,7 @@ data class MoneyJsonProvider(
         }
     }
 
-    companion object {
+    private companion object {
         private val DELETE_STATEMENTS = listOf(
             "DELETE FROM account_currencies",
             "DELETE FROM account_cards",

@@ -3,10 +3,8 @@ package com.ucasoft.modernMoney.db.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalTime::class)
 @Entity(
     tableName = "transactions",
     foreignKeys = [

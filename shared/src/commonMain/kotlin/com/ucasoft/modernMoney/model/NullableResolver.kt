@@ -1,4 +1,4 @@
-package com.ucasoft.modernMoney.imports.money.model
+package com.ucasoft.modernMoney.model
 
 import com.ucasoft.komm.abstractions.KOMMResolver
 

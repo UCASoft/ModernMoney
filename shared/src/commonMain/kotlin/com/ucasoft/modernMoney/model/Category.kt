@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.ucasoft.components.treeview.TreeViewNode
 import com.ucasoft.komm.abstractions.KOMMContextResolver
 import com.ucasoft.komm.annotations.*
+import com.ucasoft.modernMoney.plugin.interfaces.imports.model.ImportCategory
 import com.ucasoft.modernMoney.ui.toImageBitmap
 import com.ucasoft.modern_money.shared.generated.resources.Res
 import com.ucasoft.modern_money.shared.generated.resources.allDrawableResources
@@ -101,3 +102,34 @@ class CategoryParentIdResolver(category: DbCategory?, context: CategoryMapContex
 data class CategoryMapContext(
     val parentId: Long?
 )
+
+fun List<ImportCategory>.toModernMoney() = buildCategoryTree(this)
+
+private fun buildCategoryTree(categories: List<ImportCategory>, parentCategoryId: String? = null): List<Category> {
+    val result = categories.filter { it.parentId == parentCategoryId }.map { category ->
+        Category(
+            name = category.name,
+            buildInLogoCode = mapLogoResource(category.logo),
+        ).also {
+            it.id = category.id.toLong()
+        }
+    }
+    result.forEach { category ->
+        category.children.addAll(buildCategoryTree(categories, category.id.toString()))
+    }
+    return result
+}
+
+private fun mapLogoResource(logoResource: String?): String? {
+    if (logoResource != null && logoResource.startsWith("ic_categories_custom")) {
+        return null
+    }
+
+    val resourceName = logoResource!!.replace("com.ucasoft.money:drawable/ic_categories", "category").substringBefore("_color")
+
+    if (Res.allDrawableResources.containsKey(resourceName)) {
+        return resourceName
+    }
+
+    return null
+}
